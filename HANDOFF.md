@@ -106,3 +106,10 @@ Open, in the owner's words or mine:
 - History was rewritten to GitHub's no-reply author address before going public; keep using that identity (it is set in this repository's git config).
 - The app updates itself: the deploy writes app/version.json, the app checks it on open, on return to the foreground and every 5 minutes, and reloads when it changed. Check with tools/test-update.mjs.
 
+
+## UPDATE 6, 2026-11-28
+- Undo is permanent (history of 200 moves, saved). Compact step card. Progress lives in localStorage on each device (no sync, no backup yet).
+- Rerouting: objectives left open in passed steps show as 'Left open nearby' (list and map) in any later step within about 330 map px, are always listed behind the 'N open' counter in the header, and steps with open objectives return at the end of the route.
+- Route data: base-game sections never use the Shadow map and DLC sections use it whenever they can (namesake markers had put 13 steps on the wrong map). 239 steps now.
+- KNOWN, NOT FIXED: the order is the wiki walkthrough's section order and has not been checked for sense step by step. Legacy dungeons appear twice (overview sections plus the detailed section list: Stormveil, Leyndell), 17 consecutive steps jump more than 1500 map px (some are wrong pins, e.g. 'East Capital Rampart to Avenue Balcony'), and there is no final step for the last bosses of either game. The owner asked whether the walkthrough is coherent; this needs a real pass.
+

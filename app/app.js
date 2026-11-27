@@ -57,6 +57,7 @@
     setMap(s.map); stepLayer.clearLayers(); markerOf.clear(); spot.clearLayers();
     const show = [...new Set([...s.m, ...s.n])].map(i => M[i]).filter(m => s.m.includes(m.i) ? true : m.kind === 'g' || (m.kind === 'x' && S.extras));
     for (const m of show) { const mk = L.marker(ll(m.x, m.y), { icon: symIcon(m), zIndexOffset: m.kind === 'g' ? 200 : 0, title: m.title, m }).addTo(stepLayer); explain(mk); mk.on('click', () => focusRow(m.i)); markerOf.set(m.i, mk); }
+    for (const m of nearbyLeft(s)) { if (markerOf.has(m.i)) continue; const mk = L.marker(ll(m.x, m.y), { icon: symIcon(m), zIndexOffset: 150, title: m.title, m }).addTo(stepLayer); explain(mk); mk.on('click', () => focusRow(m.i)); markerOf.set(m.i, mk); }
     L.marker(ll(s.x, s.y), { icon: pinIcon, zIndexOffset: 1000, interactive: false }).addTo(stepLayer);
     if (fit) fitStep(s);
     drawAll();
@@ -110,21 +111,43 @@
   // ---------- Route tab ----------
   // Every objective has its own tick. "Next step" moves on: a step with everything ticked is done; a step with open
   // objectives is remembered and comes back at the end of the route with only what is still open.
-  let openInfo = null;   // openInfo: the objective whose wiki note is unfolded
-  function checkHTML(m) {
-    return `<button class="chk${S.got[m.i] ? ' got' : ''}" data-i="${m.i}"><img class="ci" data-pan="${m.i}" src="icons/${m.f}.png" alt=""><span class="cn">${esc(m.title)}</span><span class="cc">${esc(m.label)}</span><span class="box" data-tick="1" aria-hidden="true"></span></button>${openInfo === m.i ? `<div class="info">${esc(m.desc || "The wiki map has no extra note for this one.")}</div>` : ""}`;
+  // Rerouting: what you leave open is not parked until the end. It is offered again in every later step that passes
+  // close to it ("Left open nearby", also drawn on the map), it is always reachable through the "open" counter in the
+  // header, and whatever is still open at the very end comes back as its own steps.
+  let openInfo = null, showOpen = false;   // openInfo: the objective whose wiki note is unfolded
+  const NEAR = 0.04;                        // about 330 px on the 8192 px map: "you are passing by"
+  const leftOpen = () => M.filter(m => m.kind === 'g' && !S.got[m.i] && stepOf.has(m.i) && S.st[ROUTE[stepOf.get(m.i)].id]);
+  function nearbyLeft(s) {
+    const mine = new Set([...s.m, ...s.n]), pts = [[s.x, s.y], ...s.m.map(i => [M[i].x, M[i].y])];
+    return leftOpen().filter(m => m.map === s.map && !mine.has(m.i) && pts.some(p => Math.hypot(p[0] - m.x, p[1] - m.y) < NEAR));
+  }
+  function settle(i) { // a passed step is done exactly when nothing in it is open any more
+    const st = stepOf.has(i) ? ROUTE[stepOf.get(i)] : null; if (!st || !S.st[st.id]) return;
+    S.st[st.id] = grabOf(st).some(m => !S.got[m.i]) ? 'l' : 'd';
+  }
+  function renderOpen() {
+    const all = leftOpen(), by = new Map(); for (const m of all) { const k = stepOf.get(m.i); if (!by.has(k)) by.set(k, []); by.get(k).push(m); }
+    const html = [...by.keys()].sort((a, b) => a - b).map(k => `<div class="over sec qh"><span>${esc(ROUTE[k].title)}</span><span>${by.get(k).length}</span></div>` + by.get(k).map(m => rowHTML(m, m.desc || m.label)).join('')).join('');
+    listPage('Left open', all.length + ' objectives from steps you moved past', '<button class="back">&lsaquo; Back to the route</button>' + (html || '<p class="lead">Nothing is open. Everything in the steps behind you is ticked.</p>'));
+    $('.back').onclick = () => { showOpen = false; renderRoute(); const s = currentStep(); if (s) drawStep(s, true); };
+    refreshCounts = () => { all.forEach(m => settle(m.i)); save(); const y = $('.list').scrollTop; renderOpen(); $('.list').scrollTop = y; };
+  }
+  function checkHTML(m, sub) {
+    return `<button class="chk${S.got[m.i] ? ' got' : ''}" data-i="${m.i}"><img class="ci" data-pan="${m.i}" src="icons/${m.f}.png" alt=""><span class="cn">${esc(m.title)}</span><span class="cc">${esc(typeof sub === 'string' ? sub : m.label)}</span><span class="box" data-tick="1" aria-hidden="true"></span></button>${openInfo === m.i ? `<div class="info">${esc(m.desc || "The wiki map has no extra note for this one.")}</div>` : ""}`;
   }
   const shot = (f, cls) => f ? `<img class="shot ${cls || ''}" loading="lazy" src="walk/${esc(f)}" alt="">` : '';
   function zoomPicture(src) { const sh = $('#sheet'); sh.hidden = false; sh.innerHTML = `<img class="bigshot" src="${src}" alt="">`; sh.onclick = () => { sh.hidden = true; sh.innerHTML = ''; }; }
   function renderRoute() {
+    if (showOpen) return renderOpen();
     const pane = $('#pane'), s = currentStep(), total = ROUTE.length, dn = doneCount();
     if (!s) { pane.innerHTML = `<div class="listhead"><h1>Route complete</h1></div><div class="list"><p class="lead">Every step is done. The Gauntlet tab is next.</p></div>`; return; }
     const keep = $('.body', pane) ? $('.body', pane).scrollTop : 0;
     const pos = ROUTE.indexOf(s) + 1, grab = grabOf(s), extra = extraOf(s), nx = nextAfter(s), open = grab.filter(m => !S.got[m.i]).length;
-    const para = s.text.length ? s.text : ['Explore this place and pick up everything listed above.'];
+    const para = s.text.length ? s.text : ['Explore this place and pick up everything listed below.'];
+    const back = nearbyLeft(s), openAll = leftOpen().length;
     pane.innerHTML = `
       <div class="head">
-        <div class="steprow"><span class="over gold">Step ${pos} of ${total}<span class="reg"> &middot; ${esc(s.region)}</span></span><span style="display:flex;align-items:center"><span class="meta">${Math.round(dn / total * 100)}%</span><button class="gear" aria-label="Settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1 7 17M17 7l2.1-2.1"/></svg></button></span></div>
+        <div class="steprow"><span class="over gold">Step ${pos} of ${total}<span class="reg"> &middot; ${esc(s.region)}</span></span><span style="display:flex;align-items:center">${openAll ? `<button class="chip" id="openb">${openAll} open</button>` : ''}<span class="meta">${Math.round(dn / total * 100)}%</span><button class="gear" aria-label="Settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1 7 17M17 7l2.1-2.1"/></svg></button></span></div>
         <div class="bar"><i style="width:${dn / total * 100}%"></i></div>
         <h1 class="title">${esc(s.title)}</h1>
       </div>
@@ -135,6 +158,7 @@
         ${s.miss ? `<div class="miss"><b>Missable:</b> ${esc(s.miss)}</div>` : ''}
         <div class="sechead" id="todo"><span class="over">To do here &middot; ${grab.length - open} of ${grab.length}</span>${grab.length > 1 ? `<button class="link" id="allb">${open ? 'Tick all' : 'Untick all'}</button>` : ''}</div>
         ${grab.map(checkHTML).join('') || '<div class="none">Nothing to pick up here.</div>'}
+        ${back.length ? `<div class="sechead"><span class="over warn">Left open nearby &middot; ${back.length}</span></div>${back.map(m => checkHTML(m, 'from ' + ROUTE[stepOf.get(m.i)].title)).join('')}` : ''}
         ${extra.length ? `<button class="link wide" id="xt">${S.extras ? 'Hide' : 'Show'} ${extra.length} nearby materials</button>${S.extras ? extra.map(checkHTML).join('') : ''}` : ''}
       </div>
       <div class="foot">
@@ -145,13 +169,14 @@
     pane.querySelectorAll('.chk').forEach(r => r.onclick = e => {
       const m = M[+r.dataset.i];
       if (!e.target.closest('[data-tick]')) { openInfo = openInfo === m.i ? null : m.i; renderRoute(); if (openInfo != null) showSpot(m, true); return; }   // the row explains it and finds it on the map
-      if (S.got[m.i]) delete S.got[m.i]; else S.got[m.i] = 1; save();                                                                                   // the box ticks it
+      if (S.got[m.i]) delete S.got[m.i]; else S.got[m.i] = 1; settle(m.i); save();                                                                      // the box ticks it
       const mk = markerOf.get(m.i); if (mk) mk.setIcon(symIcon(m));
       renderRoute();
     });
-    const allb = $('#allb', pane); if (allb) allb.onclick = () => { grab.forEach(m => { if (open) S.got[m.i] = 1; else delete S.got[m.i]; }); save(); renderRoute(); drawStep(s, false); };
+    const allb = $('#allb', pane); if (allb) allb.onclick = () => { grab.forEach(m => { if (open) S.got[m.i] = 1; else delete S.got[m.i]; }); settle(grab[0].i); save(); renderRoute(); drawStep(s, false); };
     const xt = $('#xt', pane); if (xt) xt.onclick = () => { S.extras = !S.extras; save(); renderRoute(); drawStep(s, false); };
     $('.gear', pane).onclick = openSettings;
+    const ob = $('#openb', pane); if (ob) ob.onclick = () => { showOpen = true; renderRoute(); };
     const jump = $('#jump', pane); if (jump) jump.onclick = () => $('#todo', pane).scrollIntoView({ behavior: 'smooth', block: 'start' });
     pane.querySelectorAll('.shot').forEach(im => im.onclick = () => zoomPicture(im.src));
     $('.done', pane).onclick = () => finish(s, open && grab.length ? 'l' : 'd');
@@ -159,7 +184,7 @@
   }
   function finish(s, how) {
     peek = null;
-    S.st[s.id] = how; S.hist.push(s.id); if (S.hist.length > 200) S.hist.shift();
+    showOpen = false; S.st[s.id] = how; S.hist.push(s.id); if (S.hist.length > 200) S.hist.shift();
     save(); openInfo = null; const b = $('.body'); if (b) b.scrollTop = 0; renderRoute(); const n = currentStep(); if (n) drawStep(n, true);
   }
   function focusRow(i) { if (openInfo !== i && M[i].kind === 'g') { openInfo = i; if (S.tab === 'route') renderRoute(); } const r = $(`.chk[data-i="${i}"], .row[data-i="${i}"]`); if (r) { r.scrollIntoView({ block: 'nearest', behavior: 'smooth' }); r.classList.add('flash'); setTimeout(() => r.classList.remove('flash'), 900); } pulse(markerOf.get(i)); }

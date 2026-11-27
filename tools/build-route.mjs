@@ -49,7 +49,11 @@ for (const [game, file] of [['base', 'walkthrough-base.json'], ['dlc', 'walkthro
     const h = title.match(HEADER); if (h) region = h[1].replace(/^Things you Should do in /i, '').replace(/\s*Walkthrough$/i, '').trim();
     if (NOISE.test(title)) continue;
     // choose one hit per link: the one nearest to the section's anchor (median of unambiguous hits on the dominant map)
-    const hits = (s.markers || []).map(l => l.hits.filter(x => all.has(`${x.map}:${x.id}`))).filter(a => a.length);
+    // names repeat across the two games (a "Site of Grace" in the base game is not the one in the Realm of Shadow):
+    // base-game sections never use the Shadow map, and DLC sections use it whenever they name anything on it
+    let hits = (s.markers || []).map(l => l.hits.filter(x => all.has(`${x.map}:${x.id}`))).filter(a => a.length);
+    const okMap = game === 'base' ? (x => x.map !== 'shadow') : (hits.flat().some(x => x.map === 'shadow') ? (x => x.map === 'shadow') : (() => true));
+    hits = hits.map(a => a.filter(okMap)).filter(a => a.length);
     if (!hits.length) continue;
     const count = {}; hits.flat().forEach(x => count[x.map] = (count[x.map] || 0) + 1);
     const map = Object.entries(count).sort((a, b) => b[1] - a[1])[0][0];

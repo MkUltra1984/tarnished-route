@@ -218,3 +218,10 @@ button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:poin
   .done{height:42px;font-size:16px}.foot{padding:6px 16px 6px}
   .tab{height:55px}
 }
+
+/* leftovers */
+.chip{height:24px;padding:0 8px;margin-right:8px;border-radius:12px;border:1px solid var(--danger);color:var(--danger);font-size:13px;line-height:22px;font-weight:700;white-space:nowrap}
+.over.warn{color:var(--danger)}
+.chk{grid-template-columns:32px minmax(0,1fr) minmax(0,auto) 28px}
+.cc{max-width:34vw;overflow:hidden;text-overflow:ellipsis}
+@media (min-width:840px){.cc{max-width:150px}}
