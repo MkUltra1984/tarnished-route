@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Map proof</title>
+<link rel="stylesheet" href="../node_modules/leaflet/dist/leaflet.css">
+<style>
+html,body{height:100%;margin:0;background:#111;font-family:system-ui,sans-serif}
+#map{position:absolute;inset:0;background:#1b1b1b}
+#hud{position:absolute;left:12px;top:12px;z-index:1000;background:rgba(15,15,15,.85);color:#e8dcc0;padding:8px 12px;border-radius:8px;font-size:14px}
+</style>
+</head>
+<body>
+<div id="map"></div>
+<div id="hud">Map proof: wiki HD map + wiki markers</div>
+<script src="../node_modules/leaflet/dist/leaflet.js"></script>
+<script src="overland.data.js"></script>
+<script>
+var D = window.MAPDATA, W = 256, bounds = [[-W, 0], [0, W]];
+var map = L.map('map', { crs: L.CRS.Simple, minZoom: 0, maxZoom: 7, zoomSnap: 0.25, zoomDelta: 0.5, wheelPxPerZoomLevel: 90, attributionControl: true, preferCanvas: true, maxBounds: [[-W * 1.3, -W * .3], [W * .3, W * 1.3]] });
+map.attributionControl.addAttribution('Map and marker data: Fextralife Elden Ring Wiki');
+// progressive image pyramid: low resolution first, sharper ones stacked on top as you zoom in
+var shown = {};
+function ensure(level) { for (var i = 0; i <= level && i < D.images.length; i++) if (!shown[i]) { shown[i] = L.imageOverlay(D.images[i], bounds, { zIndex: i + 1 }).addTo(map); } }
+function levelFor(z) { var px = W * Math.pow(2, z) * (window.devicePixelRatio || 1), i = 0; while (i < D.images.length - 1 && 256 * Math.pow(2, i) < px) i++; return i; }
+map.on('zoomend', function () { ensure(levelFor(map.getZoom())); });
+var COLORS = { Bosses: '#e0503c', Weapons: '#e8c15a', Armor: '#8fb4d8', 'Sites of Grace': '#f3e6a1', 'Ashes of War': '#c58be0', Talismans: '#6fd0a0', Spells: '#7aa7ff', 'Spirit Ashes': '#b7f0ff' };
+var q = new URLSearchParams(location.search), only = q.get('cat');
+D.markers.forEach(function (m) {
+  if (only ? m.cat !== only : !COLORS[m.cat]) return;
+  L.circleMarker([-m.y * W, m.x * W], { radius: 5, color: '#111', weight: 1, fillColor: COLORS[m.cat] || '#fff', fillOpacity: .95 }).bindTooltip(m.title).addTo(map);
+});
+var z = parseFloat(q.get('z') || '1.6'), cx = parseFloat(q.get('x') || '0.5'), cy = parseFloat(q.get('y') || '0.5');
+map.setView([-cy * W, cx * W], z); ensure(levelFor(z));
+</script>
+</body>
+</html>

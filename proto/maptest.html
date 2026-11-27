@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><title>Map treatments</title>
+<link href="https://fonts.googleapis.com/css2?family=Marcellus&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#141414;color:#efe9db;font-family:Inter,system-ui,sans-serif;padding:28px}
+h1{font-family:Marcellus,serif;font-weight:400;font-size:28px;margin:0 0 4px}
+h2{font-family:Marcellus,serif;font-weight:400;font-size:22px;margin:26px 0 12px;color:#e0c284}
+p{margin:0;color:#a39c8c;font-size:15px}
+.row{display:grid;gap:16px}
+.r5{grid-template-columns:repeat(5,1fr)}.r3{grid-template-columns:repeat(3,1fr)}
+figure{margin:0;background:#1b1a18;border:1px solid #39342b;border-radius:8px;overflow:hidden}
+figure div{aspect-ratio:1;background-size:cover;background-position:center}
+figcaption{padding:10px 12px;font-size:14px;line-height:1.35}
+figcaption b{display:block;font-size:16px;margin-bottom:2px}
+figcaption span{color:#a39c8c}
+</style></head><body>
+<h1>Map treatments on the same Limgrave crop</h1>
+<p>Row 1 changes the look. Row 2 is about sharpness when zoomed in, and about whether a repaint stays aligned with the real map.</p>
+<h2>1 · Look</h2>
+<div class="row r5">
+<figure><div style="background-image:url(../assets/maptest/original.png)"></div><figcaption><b>Original</b><span>The wiki map as it is.</span></figcaption></figure>
+<figure><div style="background-image:url(../assets/maptest/grade-dusk.png)"></div><figcaption><b>Regrade: Dusk</b><span>Darker and calmer, so gold markers stand out. Geometry exact.</span></figcaption></figure>
+<figure><div style="background-image:url(../assets/maptest/grade-gilded.png)"></div><figcaption><b>Regrade: Gilded</b><span>Warm sepia-gold to match the interface. Geometry exact.</span></figcaption></figure>
+<figure><div style="background-image:url(../assets/maptest/grade-vivid.png)"></div><figcaption><b>Regrade: Vivid</b><span>Richer colour, crisper linework. Geometry exact.</span></figcaption></figure>
+<figure><div style="background-image:url(../assets/maptest/repaint.png)"></div><figcaption><b>AI repaint</b><span>Redrawn by the image model. See the alignment check below.</span></figcaption></figure>
+</div>
+<h2>2 · Sharpness and accuracy</h2>
+<div class="row r3">
+<figure><div style="background-image:url(../assets/maptest/zoom-plain.png)"></div><figcaption><b>Zoomed 2x: today</b><span>The original simply stretched. Soft.</span></figcaption></figure>
+<figure><div style="background-image:url(../assets/maptest/zoom-ai.png)"></div><figcaption><b>Zoomed 2x: AI upscaled</b><span>Real-ESRGAN on your RTX 3060. Same geometry, sharper lines.</span></figcaption></figure>
+<figure><div style="background-image:url(../assets/maptest/overlay.png)"></div><figcaption><b>Accuracy check: repaint over original</b><span>50% blend. Doubled or ghosted edges show where the repaint moved things.</span></figcaption></figure>
+</div>
+</body></html>

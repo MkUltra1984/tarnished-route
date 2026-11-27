@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Layout mockup</title>
+<link rel="stylesheet" href="../node_modules/leaflet/dist/leaflet.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Marcellus&family=Source+Sans+3:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#141414;--panel:#1d1c1a;--panel2:#272522;--line:#3a352c;--gold:#e0c284;--gold2:#b89a5a;--text:#ece6d8;--muted:#a39c8c;--red:#d9604a;--green:#7fbf8a;--blue:#7fb6dc}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0;background:var(--bg);color:var(--text);font-family:"Source Sans 3",system-ui,sans-serif;font-size:17px;line-height:1.4;overflow:hidden}
+h1,h2,h3{font-family:Marcellus,Georgia,serif;font-weight:400;margin:0;letter-spacing:.01em}
+button{font:inherit;color:inherit;cursor:pointer}
+#app{position:absolute;inset:0;display:grid}
+#map{background:#1b1b1b;min-height:0}
+.leaflet-container{background:#1b1a18;font-family:inherit}
+.leaflet-control-attribution{background:rgba(20,20,20,.7)!important;color:#8d8676!important;font-size:11px}
+.leaflet-control-attribution a{color:#b89a5a!important}
+
+/* top bar */
+#top{display:flex;align-items:center;gap:12px;padding:8px 14px;background:var(--panel);border-bottom:1px solid var(--line)}
+#top .brand{font-family:Marcellus,serif;color:var(--gold);font-size:19px;white-space:nowrap}
+#top .search{flex:1;display:flex;align-items:center;gap:8px;background:#121211;border:1px solid var(--line);border-radius:10px;padding:0 12px;height:44px;color:var(--muted)}
+#top .prog{display:flex;flex-direction:column;gap:3px;min-width:150px;font-size:13px;color:var(--muted)}
+.bar{height:6px;border-radius:3px;background:#0e0e0d;overflow:hidden}
+.bar i{display:block;height:100%;background:linear-gradient(90deg,var(--gold2),var(--gold))}
+
+/* step panel */
+#panel{background:var(--panel);display:flex;flex-direction:column;min-height:0;border-left:1px solid var(--line)}
+#panel .head{padding:14px 16px 10px;border-bottom:1px solid var(--line)}
+.eyebrow{font-size:12.5px;letter-spacing:.09em;text-transform:uppercase;color:var(--gold2);display:flex;justify-content:space-between}
+#panel h2{font-size:25px;line-height:1.15;margin-top:4px}
+#panel .body{overflow:auto;padding:12px 16px;display:flex;flex-direction:column;gap:10px;min-height:0;flex:1}
+.guide{color:#d6cfbf;font-size:16px;margin:0}
+.obj{display:flex;gap:10px;align-items:center;background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:8px 10px;min-height:56px}
+.obj.cur{border-color:var(--gold);box-shadow:0 0 0 1px var(--gold) inset}
+.obj.done{opacity:.5}
+.obj img{width:30px;height:30px;object-fit:contain;flex:none}
+.obj .n{flex:1;min-width:0}
+.obj .n b{display:block;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.obj .n span{font-size:13px;color:var(--muted)}
+.tick{width:34px;height:34px;border-radius:9px;border:2px solid var(--line);background:#131312;flex:none;display:grid;place-items:center;color:var(--green);font-weight:700}
+.obj.done .tick{border-color:var(--green)}
+.foot{padding:12px 16px;border-top:1px solid var(--line);display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+.foot button{height:48px;border-radius:10px;border:1px solid var(--line);background:var(--panel2)}
+.foot .go{grid-column:1/-1;height:62px;background:var(--gold);border-color:var(--gold);color:#1c1608;font-family:Marcellus,serif;font-size:21px;letter-spacing:.04em}
+.warn{border:1px solid var(--red);background:#2a1814;border-radius:12px;padding:9px 11px;font-size:15px}
+.warn b{color:var(--red)}
+
+/* tabs */
+#tabs{display:flex;background:var(--panel);border-top:1px solid var(--line)}
+#tabs button{flex:1;height:54px;border:0;background:none;color:var(--muted);font-size:14.5px;border-top:3px solid transparent}
+#tabs button.on{color:var(--gold);border-top-color:var(--gold)}
+
+/* map chrome */
+.mapsel{position:absolute;left:12px;top:12px;z-index:500;display:flex;gap:6px}
+.mapsel button{height:40px;padding:0 13px;border-radius:20px;border:1px solid var(--line);background:rgba(24,23,21,.92);font-size:14px}
+.mapsel button.on{border-color:var(--gold);color:var(--gold)}
+.mapctl{position:absolute;right:12px;bottom:26px;z-index:500;display:flex;flex-direction:column;gap:6px}
+.mapctl button{width:48px;height:48px;border-radius:12px;border:1px solid var(--line);background:rgba(24,23,21,.92);font-size:22px}
+.pin{width:30px;height:30px;border-radius:50%;background:var(--gold);color:#1c1608;display:grid;place-items:center;font-weight:700;font-size:15px;border:2px solid #1c1608;box-shadow:0 0 0 3px rgba(224,194,132,.35)}
+.pin.done{background:#4d493f;color:#b9b2a1;box-shadow:none}
+.pin.cur{width:38px;height:38px;font-size:18px;box-shadow:0 0 0 6px rgba(224,194,132,.4)}
+.you{width:22px;height:22px;border-radius:50%;background:var(--blue);border:3px solid #0d1a22;box-shadow:0 0 0 5px rgba(127,182,220,.35)}
+.youlbl{color:#cfeaff;font-weight:700;font-size:14px;text-shadow:0 0 4px #000,0 0 4px #000;white-space:nowrap}
+
+/* layout A: map-first, panel on the right */
+body.a #app{grid-template-columns:minmax(0,1fr) 380px;grid-template-rows:auto minmax(0,1fr) auto}
+body.a #top{grid-column:1/-1}
+body.a #mapwrap{position:relative;min-height:0}
+body.a #tabs{grid-column:1/-1}
+/* layout B: guide-first, readable column on the left */
+body.b #app{grid-template-columns:460px minmax(0,1fr);grid-template-rows:auto minmax(0,1fr) auto}
+body.b #top{grid-column:1/-1}
+body.b #panel{order:1;border-left:0;border-right:1px solid var(--line)}
+body.b #mapwrap{order:2;position:relative;min-height:0}
+body.b #tabs{grid-column:1/-1;order:3}
+body.b .guide{font-size:17px}
+/* layout C: full map, bottom sheet */
+body.c #app{grid-template-columns:1fr;grid-template-rows:auto minmax(0,1fr) auto}
+body.c #mapwrap{position:relative;min-height:0}
+body.c #panel{position:absolute;left:12px;right:12px;bottom:66px;z-index:600;border:1px solid var(--gold2);border-radius:16px;max-height:46%;box-shadow:0 10px 40px rgba(0,0,0,.6)}
+body.c #panel .body{flex-direction:row;overflow-x:auto;overflow-y:hidden}
+body.c .guide{display:none}
+body.c .obj{min-width:240px}
+body.c .foot{grid-template-columns:2fr 1fr 1fr 1fr}
+body.c .foot .go{grid-column:auto;height:52px}
+#mapwrap #map{position:absolute;inset:0}
+/* phone */
+@media (max-width:700px){
+  body.a #app,body.b #app{grid-template-columns:1fr;grid-template-rows:auto 40% minmax(0,1fr) auto}
+  body.a #panel,body.b #panel{border:0;border-top:1px solid var(--line);order:2}
+  body.b #mapwrap{order:1}
+  #top .brand,#top .prog{display:none}
+  #panel h2{font-size:21px}
+  #tabs button{font-size:12.5px}
+}
+</style>
+</head>
+<body>
+<div id="app">
+  <div id="top">
+    <div class="brand">Tarnished Route</div>
+    <div class="search">Search any weapon, armor, ash, spell or boss…</div>
+    <div class="prog"><span id="progtxt"></span><div class="bar"><i style="width:2%"></i></div></div>
+  </div>
+  <div id="mapwrap">
+    <div id="map"></div>
+    <div class="mapsel"><button class="on">Lands Between</button><button>Underground</button><button>Ashen Capital</button><button>Land of Shadow</button></div>
+    <div class="mapctl"><button>+</button><button>−</button><button title="Centre on me">◎</button></div>
+  </div>
+  <div id="panel">
+    <div class="head"><div class="eyebrow"><span id="region"></span><span id="stepno"></span></div><h2 id="title"></h2></div>
+    <div class="body" id="body"></div>
+    <div class="foot"><button class="go" id="go"></button><button>Do later</button><button>Wiki page</button><button>Undo</button></div>
+  </div>
+  <div id="tabs"><button class="on">Route</button><button>Steps</button><button>Bosses</button><button>Collection</button><button>Quests</button><button>Shop</button><button>Gauntlet</button><button>More</button></div>
+</div>
+<script src="../node_modules/leaflet/dist/leaflet.js"></script>
+<script src="overland.data.js"></script>
+<script src="wt.data.js"></script>
+<script>
+var q = new URLSearchParams(location.search), variant = q.get('v') || 'a';
+document.body.className = variant;
+var THEMES = {
+  moon: { '--bg': '#0f141b', '--panel': '#161d27', '--panel2': '#1e2835', '--line': '#2f3d50', '--gold': '#9cc4ef', '--gold2': '#6f93bd', '--text': '#e6edf5', '--muted': '#93a2b4' },
+  ember: { '--bg': '#150f0e', '--panel': '#1f1614', '--panel2': '#2a1d1a', '--line': '#47302a', '--gold': '#e9895c', '--gold2': '#b5633f', '--text': '#f1e6df', '--muted': '#ad968c' },
+  parchment: { '--bg': '#e9dfc8', '--panel': '#f3ead6', '--panel2': '#e6dabd', '--line': '#c2b38c', '--gold': '#7a5a17', '--gold2': '#8c6c2a', '--text': '#2b2416', '--muted': '#6c6149' }
+};
+var th = THEMES[q.get('t')]; if (th) for (var k in th) document.documentElement.style.setProperty(k, th[k]);
+if (q.get('t') === 'parchment') { var st = document.createElement('style'); st.textContent = '.foot .go{color:#f6eedb}.mapsel button,.mapctl button{background:rgba(243,234,214,.94)}#top .search{background:#fbf5e6}.tick{background:#fbf5e6}.pin{background:#7a5a17;color:#fff;border-color:#fff}'; document.head.appendChild(st); }
+var D = window.MAPDATA, WT = window.WT, W = 256, bounds = [[-W, 0], [0, W]];
+var byId = {}; D.markers.forEach(function (m) { byId[m.id] = m; });
+var si = +(q.get('s') || 5), S = WT[si], doneN = +(q.get('d') || 2);
+// objectives: markers on this map mentioned by this walkthrough section, in order of mention
+var objs = []; S.markers.forEach(function (o) { var h = o.hits.filter(function (x) { return x.map === 'overland'; })[0]; if (h && byId[h.id]) objs.push(byId[h.id]); });
+objs = objs.slice(0, 7);
+document.getElementById('region').textContent = 'Limgrave · West';
+document.getElementById('stepno').textContent = 'Step ' + (si + 1) + ' of ' + WT.length;
+document.getElementById('title').textContent = S.title;
+document.getElementById('progtxt').textContent = '38 of 5,111 collected · 1 of 254 bosses';
+var body = document.getElementById('body');
+function el(t, c, txt) { var e = document.createElement(t); if (c) e.className = c; if (txt != null) e.textContent = txt; return e; }
+var g = el('p', 'guide', S.text[0] || ''); body.appendChild(g);
+objs.forEach(function (m, i) {
+  var o = el('div', 'obj' + (i < doneN ? ' done' : i === doneN ? ' cur' : ''));
+  var im = el('img'); im.src = m.icon; im.alt = ''; o.appendChild(im);
+  var n = el('div', 'n'); n.appendChild(el('b', null, (i + 1) + '. ' + m.title)); n.appendChild(el('span', null, m.cat)); o.appendChild(n);
+  o.appendChild(el('div', 'tick', i < doneN ? '✓' : '')); body.appendChild(o);
+});
+if (variant !== 'c') { var w = el('div', 'warn'); w.appendChild(el('b', null, 'Missable. ')); w.appendChild(document.createTextNode('Example of a lock-out warning: shown only on steps where something can be lost.')); body.appendChild(w); }
+document.getElementById('go').textContent = objs[doneN] ? 'GOT IT: ' + objs[doneN].title.toUpperCase() : 'STEP DONE';
+
+var map = L.map('map', { crs: L.CRS.Simple, minZoom: 0, maxZoom: 7, zoomSnap: 0.25, zoomControl: false, maxBounds: [[-W * 1.3, -W * .3], [W * .3, W * 1.3]] });
+map.attributionControl.setPrefix(false).addAttribution('Map and data: <a href="https://eldenring.wiki.fextralife.com/Interactive+Map">Fextralife Elden Ring Wiki</a>');
+var shown = {};
+function ensure(level) { for (var i = 0; i <= level && i < D.images.length; i++) if (!shown[i]) shown[i] = L.imageOverlay(D.images[i], bounds, { zIndex: i + 1 }).addTo(map); }
+function levelFor(z) { var px = W * Math.pow(2, z) * (window.devicePixelRatio || 1), i = 0; while (i < D.images.length - 1 && 256 * Math.pow(2, i) < px) i++; return i; }
+map.on('zoomend', function () { ensure(levelFor(map.getZoom())); });
+function ll(m) { return [-m.y * W, m.x * W]; }
+// other wiki markers nearby, with the wiki's own icons, dimmed
+var skip = { 'Consumables': 1, 'Crafting Materials': 1, 'Upgrade Materials': 1, 'Summoning Pools': 1 };
+var inStep = {}; objs.forEach(function (m) { inStep[m.id] = 1; });
+D.markers.forEach(function (m) { if (skip[m.cat] || inStep[m.id] || !m.icon) return; L.marker(ll(m), { icon: L.icon({ iconUrl: m.icon, iconSize: [24, 24], className: 'bg' }), opacity: .8 }).addTo(map); });
+// route line through this step's objectives
+var pts = objs.map(ll);
+if (pts.length > 1) {
+  L.polyline(pts.slice(0, doneN + 1), { color: '#6b6658', weight: 4 }).addTo(map);
+  L.polyline(pts.slice(Math.max(0, doneN - 1), doneN + 1), { color: '#e0c284', weight: 5 }).addTo(map);
+  L.polyline(pts.slice(doneN), { color: '#e0c284', weight: 3, dashArray: '8 8', opacity: .8 }).addTo(map);
+}
+objs.forEach(function (m, i) { L.marker(ll(m), { icon: L.divIcon({ className: '', html: '<div class="pin' + (i < doneN ? ' done' : i === doneN ? ' cur' : '') + '">' + (i + 1) + '</div>', iconSize: i === doneN ? [38, 38] : [30, 30] }), zIndexOffset: 1000 }).addTo(map); });
+if (doneN > 0 && objs[doneN - 1]) {
+  L.marker(ll(objs[doneN - 1]), { icon: L.divIcon({ className: '', html: '<div class="you"></div>', iconSize: [22, 22] }), zIndexOffset: 2000 }).addTo(map);
+  L.marker(ll(objs[doneN - 1]), { icon: L.divIcon({ className: '', html: '<div class="youlbl">You are here</div>', iconSize: [100, 20], iconAnchor: [50, -16] }), zIndexOffset: 2000 }).addTo(map);
+}
+var b = L.latLngBounds(pts.length ? pts : [[-W, 0], [0, W]]);
+map.fitBounds(b.pad(variant === 'c' ? 1.2 : 0.6), { maxZoom: 6 }); ensure(levelFor(map.getZoom()));
+</script>
+</body>
+</html>

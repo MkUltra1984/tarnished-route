@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><title>Symbol style candidates</title>
+<link href="https://fonts.googleapis.com/css2?family=Marcellus&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#141414;color:#efe9db;font-family:Inter,system-ui,sans-serif;padding:32px}
+h1{font-family:Marcellus,serif;font-weight:400;font-size:30px;margin:0 0 6px}
+p{margin:0 0 24px;color:#a39c8c;font-size:16px}
+.cols{display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
+.col{background:#1b1a18;border:1px solid #39342b;border-radius:8px;padding:20px;display:flex;flex-direction:column;gap:16px}
+h2{font-family:Marcellus,serif;font-weight:400;font-size:24px;margin:0;color:#e0c284}
+.desc{font-size:15px;color:#a39c8c;margin:0;min-height:44px}
+.big{display:grid;grid-template-columns:1fr 1fr;gap:8px;background:#232120;border-radius:8px;padding:12px}
+.q{aspect-ratio:1;background-repeat:no-repeat;background-size:200% 200%}
+.map{position:relative;height:300px;border-radius:8px;overflow:hidden;background:url(../assets/maps/Elden-Ring-Overland-v1-4096.jpg);background-size:4096px 4096px;background-position:-1560px -3020px}
+.m{position:absolute;width:48px;height:48px;background-repeat:no-repeat;background-size:200% 200%}
+.cap{font-size:13px;letter-spacing:.1em;text-transform:uppercase;color:#a39c8c}
+</style></head><body>
+<h1>Map symbol style: pick one</h1>
+<p>The same four symbols (boss, weapon, site of grace, key item) in three looks. Top: large. Bottom: at real size (48 px) on the real map.</p>
+<div class="cols" id="cols"></div>
+<script>
+var S = [['a', 'A · Gilded emblems', 'Gold silhouettes embossed on dark round medallions.'], ['b', 'B · Inked cartography', 'Hand-inked drawings on parchment tokens, matching the map art.'], ['c', 'C · Flat heraldic', 'Flat two-tone badges; each category gets its own badge shape.']];
+var POS = ['0% 0%', '100% 0%', '0% 100%', '100% 100%'], SPOTS = [[70, 60], [210, 40], [150, 150], [300, 190], [40, 210], [260, 110]];
+S.forEach(function (s) {
+  var c = document.createElement('div'); c.className = 'col';
+  c.innerHTML = '<h2>' + s[1] + '</h2><p class="desc">' + s[2] + '</p><div class="cap">Large</div>';
+  var big = document.createElement('div'); big.className = 'big';
+  POS.forEach(function (p) { var q = document.createElement('div'); q.className = 'q'; q.style.backgroundImage = 'url(../assets/anchor/' + s[0] + '.png)'; q.style.backgroundPosition = p; big.appendChild(q); });
+  c.appendChild(big);
+  var cap = document.createElement('div'); cap.className = 'cap'; cap.textContent = 'Real size on the map'; c.appendChild(cap);
+  var map = document.createElement('div'); map.className = 'map';
+  SPOTS.forEach(function (xy, i) { var m = document.createElement('div'); m.className = 'm'; m.style.left = xy[0] + 'px'; m.style.top = xy[1] + 'px'; m.style.backgroundImage = 'url(../assets/anchor/' + s[0] + '.png)'; m.style.backgroundPosition = POS[i % 4]; map.appendChild(m); });
+  c.appendChild(map);
+  document.getElementById('cols').appendChild(c);
+});
+</script></body></html>

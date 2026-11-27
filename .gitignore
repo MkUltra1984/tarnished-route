@@ -1,0 +1,8 @@
+node_modules/
+tools/bin/
+# raw API tiles are large; the stitched maps in assets/maps2 are what the app uses
+assets/repaint/
+assets/maptest/
+# never commit secrets
+.env
+*.key

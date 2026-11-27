@@ -1,0 +1,1172 @@
+(function () {const vns = document.createElement('style');
+vns.innerHTML = '     :root {             --vmap-primary: #ED1C24;             --vmap-border: 1px solid #ED1C24;         } #vm6a67bcf49240c157fd42bdc6 {         width: 100%;         height: 80vh; 		background-color: #222222;     } ';
+document.querySelector('#script-vm6a67bcf49240c157fd42bdc6').before(vns);
+const vnd = document.createElement('div');
+vnd.setAttribute('id', 'vm6a67bcf49240c157fd42bdc6');
+document.querySelector('#script-vm6a67bcf49240c157fd42bdc6').before(vnd);
+
+
+window["vm6a67bcf49240c157fd42bdc6"] = new ValnetMap("vm6a67bcf49240c157fd42bdc6", {
+	header: {
+		title: 'Elden Ring',
+		dropdown: {
+			options: [
+				{
+					label: 'Overland',
+					value: '/Interactive_Map#tabber-Overland_Map'
+				},
+				{
+					label: 'Underground',
+					value: '/Interactive_Map#tabber-Underground_Map'
+				},
+				{
+					label: 'Realm Of Shadow',
+					value: '/Interactive_Map#tabber-Realm_Of_Shadow_Map'
+				}
+			],
+			placeholder: 'Ashen Capital'
+		},
+		subtitle: 'The Lands Between - Ashen Capital',
+		posterImage: {
+			alt: 'Elden Ring',
+			src: 'https://static0.gamerantimages.com/wordpress/wp-content/uploads/2024/12/mixcollage-08-dec-2024-02-50-pm-6945-1.jpg?w=67'
+		}
+	},
+	layers: [
+		{
+			uid: 'l6a725f29480e7c18049bac9b',
+			label: 'Locations',
+			layers: [
+				{
+					uid: 'l6a725f29480e7c18049bac9c',
+					icon: 'https://static0.fextralifeimages.com/wordpress/wp-content/uploads/mapimages/Elden-Ring-grace.png?h=40',
+					label: 'Sites of Grace',
+					visible: true
+				},
+				{
+					uid: 'l6a725f29480e7c18049bac9e',
+					icon: 'https://static0.fextralifeimages.com/wordpress/wp-content/uploads/mapimages/Elden-Ring-herosgrave.png?h=40',
+					label: 'Locations',
+					visible: true
+				},
+				{
+					uid: 'l6a725f29480e7c18049baca0',
+					icon: 'https://static0.fextralifeimages.com/wordpress/wp-content/uploads/mapimages/Elden-Ring-summoning-pool.png?h=40',
+					label: 'Summoning Pools',
+					visible: true
+				}
+			],
+			visible: true
+		},
+		{
+			uid: 'l6a725f29480e7c18049baca2',
+			label: 'Equipment',
+			layers: [
+				{
+					uid: 'l6a725f29480e7c18049baca3',
+					icon: 'https://static0.fextralifeimages.com/wordpress/wp-content/uploads/mapimages/Elden-Ring-hammer.png?h=40',
+					label: 'Weapons',
+					visible: true
+				},
+				{
+					uid: 'l6a725f29480e7c18049baca5',
+					icon: 'https://static0.fextralifeimages.com/wordpress/wp-content/uploads/mapimages/Elden-Ring-armor.png?h=40',
+					label: 'Armor',
+					visible: true
+				},
+				{
+					uid: 'l6a725f29480e7c18049baca7',
+					icon: 'https://static0.fextralifeimages.com/wordpress/wp-content/uploads/mapimages/Elden-Ring-ashofwar.png?h=40',
+					label: 'Ashes of War',
+					visible: true
+				},
+				{
+					uid: 'l6a725f29480e7c18049baca9',
+					icon: 'https://static0.fextralifeimages.com/wordpress/wp-content/uploads/mapimages/Elden-Ring-yellowspell.png?h=40',
+					label: 'Spells',
+					visible: true
+				},
+				{
+					uid: 'l6a725f29480e7c18049bacab',
+					icon: 'https://static0.fextralifeimages.com/wordpress/wp-content/uploads/mapimages/Elden-Ring-talisman.png?h=40',
+					label: 'Talismans',
+					visible: true
+				}
+			],
+			visible: true
+		},
+		{
+			uid: 'l6a725f29480e7c18049bacad',
+			label: 'Items',
+			layers: [
+				{
+					uid: 'l6a725f29480e7c18049bacae',
+					icon: 'https://static0.fextralifeimages.com/wordpress/wp-content/uploads/mapimages/Elden-Ring-glovewort.png?h=40',
+					label: 'Upgrade Materials',
+					visible: true
+				},
+				{
+					uid: 'l6a725f29480e7c18049bacb0',
+					icon: 'https://static0.fextralifeimages.com/wordpress/wp-content/uploads/mapimages/Elden-Ring-crafting.png?h=40',
+					label: 'Consumables',
+					visible: true
+				},
+				{
+					uid: 'l6a725f29480e7c18049bacb2',
+					icon: 'https://static0.fextralifeimages.com/wordpress/wp-content/uploads/mapimages/Elden-Ring-key.png?h=40',
+					label: 'Key Items',
+					visible: true
+				}
+			],
+			visible: true
+		},
+		{
+			uid: 'l6a725f29480e7c18049bacb4',
+			label: 'Characters',
+			layers: [
+				{
+					uid: 'l6a725f29480e7c18049bacb5',
+					icon: 'https://static0.fextralifeimages.com/wordpress/wp-content/uploads/mapimages/Elden-Ring-boss.png?h=40',
+					label: 'Bosses',
+					visible: true
+				},
+				{
+					uid: 'l6a725f29480e7c18049bacb7',
+					icon: 'https://static0.fextralifeimages.com/wordpress/wp-content/uploads/mapimages/Elden-Ring-npc.png?h=40',
+					label: 'NPCs',
+					visible: true
+				}
+			],
+			visible: true
+		}
+	],
+	markers: [
+		{
+			uid: '7668',
+			layers: [
+				'l6a725f29480e7c18049bac9c'
+			],
+			x: 0.41713366,
+			y: 0.344795971,
+			placement: 'center center',
+			src: 'https://static0.fextralifeimages.com/wordpress/wp-content/uploads/mapimages/Elden-Ring-grace.png?h=40',
+			popup: {
+				title: 'Hermit Merchant\'s Shack',
+				description: 'Sites of Grace at the <a target="blank" href=\'https://eldenring.wiki.fextralife.com/Hermit+Merchant\'s+Shack\'>Hermit Merchant\'s Shack</a>.'
+			},
+			tooltip: 'Hermit Merchant\'s Shack',
+			visible: true,
+			type: 'sprite'
+		},
+		{
+			uid: '7667',
+			layers: [
+				'l6a725f29480e7c18049bac9e'
+			],
+			x: 0.41576884,
+			y: 0.345167013,
+			placement: 'center center',
+			src: 'https://static0.fextralifeimages.com/wordpress/wp-content/uploads/mapimages/Elden-Ring-shack.png?h=40',
+			label: true,
+			popup: {
+				title: 'Hermit Merchant\'s Shack',
+				description: 'Found within the outskirts of <a target="blank" href=\'https://eldenring.wiki.fextralife.com/leyndell,+ashen+capital\'>Leyndell, Ashen Capital</a>. It can be found atop a cliff, just inside the capital\'s outermost wall.'
+			},
+			tooltip: 'Hermit Merchant\'s Shack',
+			visible: true,
+			type: 'sprite'
+		},
+		{
+			uid: '7669',
+			layers: [
+				'l6a725f29480e7c18049bac9e'
+			],
+			x: 0.452266668,
+			y: 0.35169117,
+			placement: 'center center',
+			src: 'https://static0.fextralifeimages.com/wordpress/wp-content/uploads/mapimages/Elden-Ring-tree.png?h=40',
+			label: true,
+			popup: {
+				title: 'Minor Erdtree',
+				description: 'Minor Erdtree within the Capital Outskirts.'
+			},
+			tooltip: 'Minor Erdtree',
+			visible: true,
+			type: 'sprite'
+		},
+		{
+			uid: '7670',
+			layers: [
+				'l6a725f29480e7c18049bac9e'
+			],
+			x: 0.47946752,
+			y: 0.367305852,
+			placement: 'center center',
+			src: 'https://static0.fextralifeimages.com/wordpress/wp-content/uploads/mapimages/Elden-Ring-catacomb.png?h=40',
+			label: true,
+			popup: {
+				title: 'Auriza Side Tomb',
+				images: [
+					{
+						src: 'https://eldenring.wiki.fextralife.com/file/Elden-Ring/auriza-side-tomb-location-elden-ring-wiki-guide.jpg'
+					}
+				],
+				description: 'A catacomb at the east-most area of <a target="blank" href=\'https://eldenring.wiki.fextralife.com/leyndell,+ashen+capital\'>Leyndell, Ashen Capital</a> for fallen <em>Auriza</em> warriors'
+			},
+			tooltip: 'Auriza Side Tomb',
+			visible: true,
+			type: 'sprite'
+		},
+		{
+			uid: '7671',
+			layers: [
+				'l6a725f29480e7c18049bac9c'
+			],
+			x: 0.478785235,
+			y: 0.369655785,
+			placement: 'center center',
+			src: 'https://static0.fextralifeimages.com/wordpress/wp-content/uploads/mapimages/Elden-Ring-grace.png?h=40',
+			popup: {
+				title: 'Auriza Side Tomb',
+				description: 'Site of Grace within <a target="blank" href=\'https://eldenring.wiki.fextralife.com/auriza+side+tomb\'>Auriza Side Tomb</a>.'
+			},
+			tooltip: 'Auriza Side Tomb',
+			visible: true,
+			type: 'sprite'
+		},
+		{
+			uid: '7252',
+			layers: [
+				'l6a725f29480e7c18049bac9c'
+			],
+			x: 0.46394935,
+			y: 0.375406936,
+			placement: 'center center',
+			src: 'https://static0.fextralifeimages.com/wordpress/wp-content/uploads/mapimages/Elden-Ring-grace.png?h=40',
+			popup: {
+				title: 'Capital Rampart',
+				description: '<a target="blank" href=\'https://eldenring.wiki.fextralife.com/sites+of+grace\'>Site of grace</a> at the <em>Ashen Capital\'s</em> rampart.'
+			},
+			tooltip: 'Capital Rampart',
+			visible: true,
+			type: 'sprite'
+		},
+		{
+			uid: '7254',
+			layers: [
+				'l6a725f29480e7c18049bac9e'
+			],
+			x: 0.477265924,
+			y: 0.381621891,
+			placement: 'center center',
+			src: 'https://static0.fextralifeimages.com/wordpress/wp-content/uploads/mapimages/Elden-Ring-herosgrave.png?h=40',
+			label: true,
+			popup: {
+				title: 'Auriza Hero\'s Grave',
+				images: [
+					{
+						src: 'https://eldenring.wiki.fextralife.com/file/Elden-Ring/auriza_heros_grave_locations_elden_ring_wiki_guide.jpg'
+					}
+				],
+				description: 'A tomb found within the outskirts of the <em>Ashen Capital</em>. Larger than most catacombs, this was built to honor a fallen champion and is heavily guarded to this day.'
+			},
+			tooltip: 'Auriza Hero\'s Grave',
+			visible: true,
+			type: 'sprite'
+		},
+		{
+			uid: '7253',
+			layers: [
+				'l6a725f29480e7c18049bac9c'
+			],
+			x: 0.474018604,
+			y: 0.381900171,
+			placement: 'center center',
+			src: 'https://static0.fextralifeimages.com/wordpress/wp-content/uploads/mapimages/Elden-Ring-grace.png?h=40',
+			popup: {
+				title: 'Auriza Hero\'s Grave',
+				description: '<a target="blank" href=\'https://eldenring.wiki.fextralife.com/sites+of+grace\'>Site of Grace</a> within <a target="blank" href=\'https://eldenring.wiki.fextralife.com/auriza+hero\'s+grave\'>Auriza Hero\'s Grave</a>.'
+			},
+			tooltip: 'Auriza Hero\'s Grave',
+			visible: true,
+			type: 'sprite'
+		},
+		{
+			uid: '7301',
+			layers: [
+				'l6a725f29480e7c18049bacab'
+			],
+			x: 0.474096604,
+			y: 0.384250103,
+			placement: 'center center',
+			src: 'https://static0.fextralifeimages.com/wordpress/wp-content/uploads/mapimages/Elden-Ring-talisman.png?h=40',
+			popup: {
+				title: 'Crimson Amber Medallion',
+				description: '<strong>Crimson Amber Medallion +2</strong>. Held by a corpse hanging over one of the wooden beams on your way down.'
+			},
+			tooltip: 'Crimson Amber Medallion',
+			visible: true,
+			type: 'sprite'
+		},
+		{
+			uid: '7672',
+			layers: [
+				'l6a725f29480e7c18049bac9c'
+			],
+			x: 0.484618639,
+			y: 0.384435624,
+			placement: 'center center',
+			src: 'https://static0.fextralifeimages.com/wordpress/wp-content/uploads/mapimages/Elden-Ring-grace.png?h=40',
+			popup: {
+				title: 'Frenzied Flame Proscription',
+				description: 'Site of Grace underneath the <a target="blank" href=\'https://eldenring.wiki.fextralife.com/sites+of+grace\'>Cathedral of the Forsaken Site of Grace</a>. Behind the altar at the <a target="blank" href=\'https://eldenring.wiki.fextralife.com/cathedral+of+the+forsaken\'>Cathedral of the Forsaken</a> is an illusory wall. Upon descending to the bottom of the accessed pit the ground collapses, leaving you next to the <strong>Frenzied Flame Proscription Site of Grace</strong>.'
+			},
+			tooltip: 'Frenzied Flame Proscription',
+			visible: true,
+			type: 'sprite'
+		},
+		{
+			uid: '7203',
+			layers: [
+				'l6a725f29480e7c18049bac9e'
+			],
+			x: 0.436169965,
+			y: 0.387744084,
+			placement: 'center center',
+			src: 'https://static0.fextralifeimages.com/wordpress/wp-content/uploads/mapimages/Elden-Ring-leyndell.png?h=40',
+			label: true,
+			popup: {
+				title: 'Leyndell, Ashen Capital',
+				images: [
+					{
+						src: 'https://eldenring.wiki.fextralife.com/file/Elden-Ring/leyndell,_ashen_capital_locations_elden_ring_wiki_600px.jpg'
+					}
+				],
+				description: 'An instance of <a target="blank" href=\'https://eldenring.wiki.fextralife.com/leyndell,+royal+capital\'>Leyndell, Royal Capital</a> after it falls into ruins. This version of the capital is accessible only after making significant story progress and features the same structures and landmarks as its intact counterpart, albeit altered in slight or significant ways.'
+			},
+			tooltip: 'Leyndell, Ashen Capital',
+			visible: true,
+			type: 'sprite'
+		},
+		{
+			uid: '7551',
+			layers: [
+				'l6a725f29480e7c18049bac9c'
+			],
+			x: 0.466306073,
+			y: 0.389104571,
+			placement: 'center center',
+			src: 'https://static0.fextralifeimages.com/wordpress/wp-content/uploads/mapimages/Elden-Ring-grace.png?h=40',
+			popup: {
+				title: 'East Capital Rampart',
+				description: '<a target="blank" href=\'https://eldenring.wiki.fextralife.com/sites+of+grace\'>Site of Grace</a> at the East side of <a target="blank" href=\'https://eldenring.wiki.fextralife.com/leyndell,+royal+capital\'>Leyndell<a>.'
+			},
+			tooltip: 'East Capital Rampart',
+			visible: true,
+			type: 'sprite'
+		},
+		{
+			uid: '7673',
+			layers: [
+				'l6a725f29480e7c18049bac9c'
+			],
+			x: 0.477233381,
+			y: 0.389290092,
+			placement: 'center center',
+			src: 'https://static0.fextralifeimages.com/wordpress/wp-content/uploads/mapimages/Elden-Ring-grace.png?h=40',
+			popup: {
+				title: 'Cathedral of the Forsaken',
+				description: 'Site of Grace at the <a target="blank" href=\'https://eldenring.wiki.fextralife.com/cathedral+of+the+forsaken\'>Cathedral of the Forsaken</a>.'
+			},
+			tooltip: 'Cathedral of the Forsaken',
+			visible: true,
+			type: 'sprite'
+		},
+		{
+			uid: '7251',
+			layers: [
+				'l6a725f29480e7c18049bac9c'
+			],
+			x: 0.456543243,
+			y: 0.393093271,
+			placement: 'center center',
+			src: 'https://static0.fextralifeimages.com/wordpress/wp-content/uploads/mapimages/Elden-Ring-grace.png?h=40',
+			popup: {
+				title: 'Leyndell, Capital of Ash',
+				description: '<a target="blank" href=\'https://eldenring.wiki.fextralife.com/sites+of+grace\'>Site of Grace</a> within the obliterated city.'
+			},
+			tooltip: 'Leyndell, Capital of Ash',
+			visible: true,
+			type: 'sprite'
+		},
+		{
+			uid: '7666',
+			layers: [
+				'l6a725f29480e7c18049bac9c'
+			],
+			x: 0.513284802,
+			y: 0.395164924,
+			placement: 'center center',
+			src: 'https://static0.fextralifeimages.com/wordpress/wp-content/uploads/mapimages/Elden-Ring-grace.png?h=40',
+			popup: {
+				title: 'Forbiden Lands',
+				description: 'Site of Grace at the beginning of the path connecting <a target="blank" href=\'https://eldenring.wiki.fextralife.com/altus+plateau\'>Altus Plateau</a> with the <a target="blank" href=\'https://eldenring.wiki.fextralife.com/mountaintops+of+the+giants\'>Mountaintops of the Giants</a>.'
+			},
+			tooltip: 'Forbiden Lands',
+			visible: true,
+			type: 'sprite'
+		},
+		{
+			uid: '7674',
+			layers: [
+				'l6a725f29480e7c18049bac9e'
+			],
+			x: 0.449769939,
+			y: 0.395164924,
+			placement: 'center center',
+			src: 'https://static0.fextralifeimages.com/wordpress/wp-content/uploads/mapimages/Elden-Ring-subterranean-shunning-grounds.png?h=40',
+			label: true,
+			popup: {
+				title: 'Subterranean Shunning-Grounds',
+				description: 'A massive underground sewer network found beneath the <a target="blank" href=\'https://eldenring.wiki.fextralife.com/Leyndell,+Ashen+Capital\'>Ashen Capital</a>. The entrance can be found in a well northeast of the <em>Avenue Balcony</em>.'
+			},
+			tooltip: 'Subterranean Shunning-Grounds',
+			visible: true,
+			type: 'sprite'
+		},
+		{
+			uid: '7552',
+			layers: [
+				'l6a725f29480e7c18049bac9c'
+			],
+			x: 0.455058948,
+			y: 0.397978657,
+			placement: 'center center',
+			src: 'https://static0.fextralifeimages.com/wordpress/wp-content/uploads/mapimages/Elden-Ring-grace.png?h=40',
+			popup: {
+				title: 'Underground Roadside',
+				description: '<a target="blank" href=\'https://eldenring.wiki.fextralife.com/sites+of+grace\'>Site of Grace</a> found underground within <a target="blank" href=\'https://eldenring.wiki.fextralife.com/subterranean+shunning-grounds\'>Subterranean Shunning-Grounds</a>.'
+			},
+			tooltip: 'Underground Roadside',
+			visible: true,
+			type: 'sprite'
+		},
+		{
+			uid: '5101',
+			layers: [
+				'l6a725f29480e7c18049bac9c'
+			],
+			x: 0.486879712,
+			y: 0.401225276,
+			placement: 'center center',
+			src: 'https://static0.fextralifeimages.com/wordpress/wp-content/uploads/mapimages/Elden-Ring-grace.png?h=40',
+			popup: {
+				title: 'Great Waterfall Crest',
+				description: 'Site of grace, directly after leaving the resting coffin.'
+			},
+			tooltip: 'Great Waterfall Crest',
+			visible: true,
+			type: 'sprite'
+		},
+		{
+			uid: '14155',
+			layers: [
+				'l6a725f29480e7c18049bacb5'
+			],
+			x: 0.47176196,
+			y: 0.402091041,
+			placement: 'center center',
+			src: 'https://static0.fextralifeimages.com/wordpress/wp-content/uploads/mapimages/Elden-Ring-miniboss.png?h=40',
+			popup: {
+				title: 'Ulcerated Tree Spirit',
+				description: '3 Ulcerated Tree Spirits can be found romaing around this deserted sand area, it\'s convinient to try to encouter them one at a time.'
+			},
+			tooltip: 'Ulcerated Tree Spirit',
+			visible: true,
+			type: 'sprite'
+		},
+		{
+			uid: '7555',
+			layers: [
+				'l6a725f29480e7c18049bacab'
+			],
+			x: 0.455822893,
+			y: 0.402771285,
+			placement: 'center center',
+			src: 'https://static0.fextralifeimages.com/wordpress/wp-content/uploads/mapimages/Elden-Ring-talisman.png?h=40',
+			popup: {
+				title: 'Crucible Scale Talisman',
+				description: 'Within the chapel accessed by using one of the flame throwing sculptures as a lift. Located next to the statue guarded by an <a target="blank" href=\'https://eldenring.wiki.fextralife.com/omen\'>Omen</a>.'
+			},
+			tooltip: 'Crucible Scale Talisman',
+			visible: true,
+			type: 'sprite'
+		},
+		{
+			uid: '7553',
+			layers: [
+				'l6a725f29480e7c18049bac9c'
+			],
+			x: 0.457408462,
+			y: 0.403204167,
+			placement: 'center center',
+			src: 'https://static0.fextralifeimages.com/wordpress/wp-content/uploads/mapimages/Elden-Ring-grace.png?h=40',
+			popup: {
+				title: 'Leyndell Catacombs',
+				description: '<a target="blank" href=\'https://eldenring.wiki.fextralife.com/sites+of+grace\'>Site of Grace</a> within <a target="blank" href=\'https://eldenring.wiki.fextralife.com/leyndell+catacombs\'>Leyndell Catacombs</a>.'
+			},
+			tooltip: 'Leyndell Catacombs',
+			visible: true,
+			type: 'sprite'
+		},
+		{
+			uid: '7655',
+			layers: [
+				'l6a725f29480e7c18049bacb0'
+			],
+			x: 0.459949752,
+			y: 0.403729808,
+			placement: 'center center',
+			src: 'https://static0.fextralifeimages.com/wordpress/wp-content/uploads/mapimages/Elden-Ring-consumable.png?h=40',
+			popup: {
+				title: 'Rune Arc - Eastern Rampart',
+				description: 'Held by a burnt corpse sitting against one of the ruined structures.'
+			},
+			tooltip: 'Rune Arc - Eastern Rampart',
+			visible: true,
+			type: 'sprite'
+		},
+		{
+			uid: '7707',
+			layers: [
+				'l6a725f29480e7c18049bacab'
+			],
+			x: 0.470478364,
+			y: 0.404119404,
+			placement: 'center center',
+			src: 'https://static0.fextralifeimages.com/wordpress/wp-content/uploads/mapimages/Elden-Ring-talisman.png?h=40',
+			popup: {
+				title: 'Erdtree\'s Favor +2',
+				description: '<a target="_blank" href=\'https://eldenring.wiki.fextralife.com/Talismans\'>Upgraded Talisman</a>. This Talisman may only be accessed near endgame/post-game. Found on top of a branch jutting out of the ground in a large courtyard, guarded by three <a target="_blank" href=\'https://eldenring.wiki.fextralife.com/Lesser+Ulcerated+Tree+Spirit\'>Ulcerated Tree Spirits</a>.'
+			},
+			tooltip: 'Erdtree\'s Favor +2',
+			visible: true,
+			type: 'sprite'
+		},
+		{
+			uid: '7556',
+			layers: [
+				'l6a725f29480e7c18049bacae'
+			],
+			x: 0.456038764,
+			y: 0.404471892,
+			placement: 'center center',
+			src: 'https://static0.fextralifeimages.com/wordpress/wp-content/uploads/mapimages/Elden-Ring-glovewort.png?h=40',
+			popup: {
+				title: 'Grave Glovewort [9] - Leyndell Catacombs',
+				description: 'Located within <a target="blank" href=\'https://eldenring.wiki.fextralife.com/leyndell+catacombs\'>Leyndell Catacombs</a>, in one of the main halls with a large statue. Guarded by an <a target="blank" href=\'https://eldenring.wiki.fextralife.com/omen\'>Omen</a>.'
+			},
+			tooltip: 'Grave Glovewort [9] - Leyndell Catacombs',
+			visible: true,
+			type: 'sprite'
+		},
+		{
+			uid: '7554',
+			layers: [
+				'l6a725f29480e7c18049bacae'
+			],
+			x: 0.457559298,
+			y: 0.404904774,
+			placement: 'center center',
+			src: 'https://static0.fextralifeimages.com/wordpress/wp-content/uploads/mapimages/Elden-Ring-glovewort.png?h=40',
+			popup: {
+				title: 'Ghost Glovewort [6] - Leyndell Catacombs',
+				description: 'Beyond the stairs southeast of the door leading to the <a target="blank" href=\'https://eldenring.wiki.fextralife.com/bosses\'>Bossfight</a>, in front of a statue guarded by <a target="blank" href=\'https://eldenring.wiki.fextralife.com/skeleton\'>Skeletons</a>.'
+			},
+			tooltip: 'Ghost Glovewort [6] - Leyndell Catacombs',
+			visible: true,
+			type: 'sprite'
+		},
+		{
+			uid: '7557',
+			layers: [
+				'l6a725f29480e7c18049bacae'
+			],
+			x: 0.456659392,
+			y: 0.405894219,
+			placement: 'center center',
+			src: 'https://static0.fextralifeimages.com/wordpress/wp-content/uploads/mapimages/Elden-Ring-glovewort.png?h=40',
+			popup: {
+				title: 'Grave Glovewort [8] - 2x Leyndell Catacombs',
+				description: 'The first <strong>Grave Glovewort [8]</strong> is found over the central grave in one of the main halls. The second one is in front of a large statue following the stairs southeast from the first <strong>Grave Glovewort</strong>.'
+			},
+			tooltip: 'Grave Glovewort [8] - 2x Leyndell Catacombs',
+			visible: true,
+			type: 'sprite'
+		},
+		{
+			uid: '7717',
+			layers: [
+				'l6a725f29480e7c18049bacb0'
+			],
+			x: 0.449876405,
+			y: 0.406636303,
+			placement: 'center center',
+			src: 'https://static0.fextralifeimages.com/wordpress/wp-content/uploads/mapimages/Elden-Ring-crafting.png?h=40',
+			popup: {
+				title: 'Golden Sunflower',
+				description: 'Held by a burnt corpse laying against one of the ruined buildings.'
+			},
+			tooltip: 'Golden Sunflower',
+			visible: true,
+			type: 'sprite'
+		},
+		{
+			uid: '7715',
+			layers: [
+				'l6a725f29480e7c18049bacae'
+			],
+			x: 0.44581769,
+			y: 0.406698144,
+			placement: 'center center',
+			src: 'https://static0.fextralifeimages.com/wordpress/wp-content/uploads/mapimages/Elden-Ring-somber_smithing_stone.png?h=40',
+			popup: {
+				title: 'Somber Ancient Dragon Smithing Stone (Ashen Capital)',
+				description: 'From the main <em>Leyndell, Capital of Ash Site of Grace</em>, go west, along the dragon. Enter the building past it and climb the ladder. Over the railing to the right is an enemy gargoyle, guarding a corpse with the stone.'
+			},
+			tooltip: 'Somber Ancient Dragon Smithing Stone (Ashen Capital)',
+			visible: true,
+			type: 'sprite'
+		},
+		{
+			uid: '7716',
+			layers: [
+				'l6a725f29480e7c18049bacb7'
+			],
+			x: 0.453739618,
+			y: 0.407038268,
+			placement: 'center center',
+			src: 'https://static0.fextralifeimages.com/wordpress/wp-content/uploads/mapimages/Elden-Ring-npc.png?h=40',
+			popup: {
+				title: 'Brother Corhyn',
+				images: [
+					{
+						src: 'https://eldenring.wiki.fextralife.com/file/Elden-Ring/brother_corhyn_ashen_capital_guides_elden_ring_wiki_600px.jpg'
+					}
+				],
+				description: 'At the end of his <a target="blank" href=\'https://eldenring.wiki.fextralife.com/side+quests#corhyn_side_quest\'>Questline</a>, <strong>Brother Corhyn</strong> is found on his knees in sorrow, near the base of the giant spiral spear. After reloading the area, you can find <a target="blank" href=\'https://eldenring.wiki.fextralife.com/Corhyn\'s+Bell+Bearing\'>Corhyn\'s Bell Bearing</a> and <a target="blank" href=\'https://eldenring.wiki.fextralife.com/Corhyn\'s+Robe\'>Corhyn\'s Robe</a> where he was sitting.'
+			},
+			tooltip: 'Brother Corhyn',
+			visible: true,
+			type: 'sprite'
+		},
+		{
+			uid: '7659',
+			layers: [
+				'l6a725f29480e7c18049baca9'
+			],
+			x: 0.465015173,
+			y: 0.409017158,
+			placement: 'center center',
+			src: 'https://static0.fextralifeimages.com/wordpress/wp-content/uploads/mapimages/Elden-Ring-yellowspell.png?h=40',
+			popup: {
+				title: 'Erdtree Heal',
+				description: 'Found on the large covered furniture within <em>Queen\'s Bedchamber</em>, next to the <a target="blank" href=\'https://eldenring.wiki.fextralife.com/sites+of+grace\'>Site of Grace</a>.'
+			},
+			tooltip: 'Erdtree Heal',
+			visible: true,
+			type: 'sprite'
+		},
+		{
+			uid: '14203',
+			layers: [
+				'l6a725f29480e7c18049bacb5'
+			],
+			x: 0.44580026,
+			y: 0.409017158,
+			placement: 'center center',
+			src: 'https://static0.fextralifeimages.com/wordpress/wp-content/uploads/mapimages/Elden-Ring-boss.png?h=40',
+			popup: {
+				title: 'Valiant Gargoyle',
+				images: [
+					{
+						src: 'https://eldenring.wiki.fextralife.com/file/Elden-Ring/valiant_gargoyle.png'
+					}
+				],
+				description: '<p> Endgame <a class="wiki_link" title="" href=\'https://eldenring.wiki.fextralife.com/Bosses\' target="blank">Boss</a>. <a class="wiki_link" title="" href=\'https://eldenring.wiki.fextralife.com/Leyndell,+Royal+Capital\' target="blank">Leyndell, Royal Capital</a>.</p>'
+			},
+			tooltip: 'Valiant Gargoyle',
+			visible: true,
+			type: 'sprite'
+		},
+		{
+			uid: '7658',
+			layers: [
+				'l6a725f29480e7c18049bac9c'
+			],
+			x: 0.464860082,
+			y: 0.410625007,
+			placement: 'center center',
+			src: 'https://static0.fextralifeimages.com/wordpress/wp-content/uploads/mapimages/Elden-Ring-grace.png?h=40',
+			popup: {
+				title: 'Queen\'s Bedchamber',
+				description: '<a target="blank" href=\'https://eldenring.wiki.fextralife.com/sites+of+grace\'>Site of Grace</a> at the <em>Queen\'s Bedchamber</em>.'
+			},
+			tooltip: 'Queen\'s Bedchamber',
+			visible: true,
+			type: 'sprite'
+		},
+		{
+			uid: '7656',
+			layers: [
+				'l6a725f29480e7c18049bacb5'
+			],
+			x: 0.456826309,
+			y: 0.416314317,
+			placement: 'center center',
+			src: 'https://static0.fextralifeimages.com/wordpress/wp-content/uploads/mapimages/Elden-Ring-boss.png?h=40',
+			popup: {
+				title: 'Sir Gideon Ofnir, The All-Knowing',
+				images: [
+					{
+						src: 'https://eldenring.wiki.fextralife.com/file/Elden-Ring/sir_gideon_ofnir_the_all_knowing_bosses_elden_ring_wiki_guide.jpg'
+					}
+				],
+				description: '<h5>Great Enemy Boss</h5><strong>Sir Gideon Ofnir, The All-Knowing <a target="blank" href=\'https://eldenring.wiki.fextralife.com/bosses\'>Bossfight</a></strong> takes place at the <em>Erdtree Sanctuary building</em>. Once leader of <a target="blank" href=\'https://eldenring.wiki.fextralife.com/roundtable+hold\'>Roundtable Hold</a>, <strong>Sir Gideon Ofnir</strong> masters a wide range of powerful sorceries and incantations.'
+			},
+			tooltip: 'Sir Gideon Ofnir, The All-Knowing',
+			visible: true,
+			type: 'sprite'
+		},
+		{
+			uid: '8276',
+			layers: [
+				'l6a725f29480e7c18049baca0'
+			],
+			x: 0.469157851,
+			y: 0.416315307,
+			placement: 'center center',
+			src: 'https://static0.fextralifeimages.com/wordpress/wp-content/uploads/mapimages/Elden-Ring-summoning-pool.png?h=40',
+			popup: {
+				title: 'Effigy of the Martyr: Elden Throne',
+				description: 'Summoning Pool Effigy found on the bridge just before Godfrey\'s Boss Arena in Leyndell, Capital of Ash. Activate this effigy to send your summon sign to this summoning pool.'
+			},
+			tooltip: 'Effigy of the Martyr: Elden Throne',
+			visible: true,
+			type: 'sprite'
+		},
+		{
+			uid: '7718',
+			layers: [
+				'l6a725f29480e7c18049baca5'
+			],
+			x: 0.455428744,
+			y: 0.417427443,
+			placement: 'center center',
+			src: 'https://static0.fextralifeimages.com/wordpress/wp-content/uploads/mapimages/Elden-Ring-armor.png?h=40',
+			popup: {
+				title: 'All-Knowing Set',
+				description: 'Dropped together with <a target="blank" href=\'https://eldenring.wiki.fextralife.com/Scepter+of+the+All-Knowing\'>Scepter of the All-Knowing</a> upon defeating <a target="blank" href=\'https://eldenring.wiki.fextralife.com/Sir+Gideon+Ofnir,+the+All-Knowing+(Boss)\'>Sir Gideon Ofnir, the All-Knowing</a> in <a target="blank" href=\'https://eldenring.wiki.fextralife.com/leyndell,+ashen+capital\'>Leyndell, Ashen Capital</a>. <p>Comprised of:</p><ul><li><a target="blank" href=\'https://eldenring.wiki.fextralife.com/All-Knowing+Helm\'>All-Knowing Helm</a></li><li><a target="blank" href=\'https://eldenring.wiki.fextralife.com/All-Knowing+Armor\'>All-Knowing Armor</a></li><li><a target="blank" href=\'https://eldenring.wiki.fextralife.com/All-Knowing+Gauntlets\'>All-Knowing Gauntlets</a></li><li><a target="blank" href=\'https://eldenring.wiki.fextralife.com/All-Knowing+Greaves\'>All-Knowing Greaves</a></li></ul>'
+			},
+			tooltip: 'All-Knowing Set',
+			visible: true,
+			type: 'sprite'
+		},
+		{
+			uid: '7719',
+			layers: [
+				'l6a725f29480e7c18049baca3'
+			],
+			x: 0.458530607,
+			y: 0.417612964,
+			placement: 'center center',
+			src: 'https://static0.fextralifeimages.com/wordpress/wp-content/uploads/mapimages/Elden-Ring-hammer.png?h=40',
+			popup: {
+				title: 'Scepter of the All-Knowing',
+				description: 'Dropped together with the <a target="blank" href=\'https://eldenring.wiki.fextralife.com/all-knowing+set\'>All-Knowing Set</a> upon defeating <a target="blank" href=\'https://eldenring.wiki.fextralife.com/Sir+Gideon+Ofnir,+the+All-Knowing+(Boss)\'>Sir Gideon Ofnir, the All-Knowing</a> in <a target="blank" href=\'https://eldenring.wiki.fextralife.com/leyndell,+ashen+capital\'>Leyndell, Ashen Capital</a>.'
+			},
+			tooltip: 'Scepter of the All-Knowing',
+			visible: true,
+			type: 'sprite'
+		},
+		{
+			uid: '7720',
+			layers: [
+				'l6a725f29480e7c18049bacb2'
+			],
+			x: 0.471156322,
+			y: 0.417829404,
+			placement: 'center center',
+			src: 'https://static0.fextralifeimages.com/wordpress/wp-content/uploads/mapimages/Elden-Ring-key.png?h=40',
+			popup: {
+				title: 'Remembrance of Hoarah Loux',
+				description: 'Dropped by <a target="blank" href=\'https://eldenring.wiki.fextralife.com/Godfrey,+First+Elden+Lord\'>Godfrey, First Elden Lord</a> (<a target="blank" href=\'https://eldenring.wiki.fextralife.com/Hoarah+Loux,+Warrior\'>Hoarah Loux, Warrior</a>) when defeated.'
+			},
+			tooltip: 'Remembrance of Hoarah Loux',
+			visible: true,
+			type: 'sprite'
+		},
+		{
+			uid: '7654',
+			layers: [
+				'l6a725f29480e7c18049bacab'
+			],
+			x: 0.436534013,
+			y: 0.418355048,
+			placement: 'center center',
+			src: 'https://static0.fextralifeimages.com/wordpress/wp-content/uploads/mapimages/Elden-Ring-talisman.png?h=40',
+			popup: {
+				title: 'Ritual Shield Talisman',
+				description: '<strong>Ritual Shield Talisman</strong> held by a corpse, next to the large <em>Colloseum</em> doors.'
+			},
+			tooltip: 'Ritual Shield Talisman',
+			visible: true,
+			type: 'sprite'
+		},
+		{
+			uid: '7657',
+			layers: [
+				'l6a725f29480e7c18049bac9c'
+			],
+			x: 0.456796155,
+			y: 0.418540569,
+			placement: 'center center',
+			src: 'https://static0.fextralifeimages.com/wordpress/wp-content/uploads/mapimages/Elden-Ring-grace.png?h=40',
+			popup: {
+				title: 'Erdtree Sanctuary',
+				description: 'This Site of Grace is unlocked upon <a target="blank" href=\'https://eldenring.wiki.fextralife.com/sir+gideon+ofnir,+the+all-knowing\'>Sir Gideon Ofnir, The All-Knowing\'s</a> defeat.'
+			},
+			tooltip: 'Erdtree Sanctuary',
+			visible: true,
+			type: 'sprite'
+		},
+		{
+			uid: '7660',
+			layers: [
+				'l6a725f29480e7c18049bac9c'
+			],
+			x: 0.469618333,
+			y: 0.418911611,
+			placement: 'center center',
+			src: 'https://static0.fextralifeimages.com/wordpress/wp-content/uploads/mapimages/Elden-Ring-grace.png?h=40',
+			popup: {
+				title: 'Elden Throne Site of Grace',
+				description: 'Site of Grace for the <a target="blank" href=\'https://eldenring.wiki.fextralife.com/elden+throne\'>Elden Throne</a>. Unlocked upon <a target="blank" href=\'https://eldenring.wiki.fextralife.com/godfrey,+first+elden+lord\'>Godfrey, First Elden Lord</a>\'s defeat.'
+			},
+			tooltip: 'Elden Throne Site of Grace',
+			visible: true,
+			type: 'sprite'
+		},
+		{
+			uid: '6059',
+			layers: [
+				'l6a725f29480e7c18049bacb5'
+			],
+			x: 0.471243036,
+			y: 0.419363048,
+			placement: 'center center',
+			src: 'https://static0.fextralifeimages.com/wordpress/wp-content/uploads/mapimages/Elden-Ring-boss.png?h=40',
+			popup: {
+				title: 'Godfrey, First Elden Lord',
+				images: [
+					{
+						src: 'https://eldenring.wiki.fextralife.com/file/Elden-Ring/godfrey_the_first_elden_lord_hoarah_loux_warrior_boss_elden_ring_wiki_300px.jpg'
+					}
+				],
+				description: '<h5>Legend Type Boss</h5> Located in the chamber atop the long set of stairs southeast of the <a target="blank" href=\'https://eldenring.wiki.fextralife.com/sites+of+grace\'>Queen\'s Bedchamber Site of Grace</a> where <a target="blank" href=\'https://eldenring.wiki.fextralife.com/morgott,+the+omen+king\'>Morgott</a> was previously fought. Mid-battle, <strong>Godfrey</strong> assumes the role of <strong>Hoarah Loux, Warrior</strong>.'
+			},
+			tooltip: 'Godfrey, First Elden Lord',
+			visible: true,
+			type: 'sprite'
+		},
+		{
+			uid: '8278',
+			layers: [
+				'l6a725f29480e7c18049baca0'
+			],
+			x: 0.451345901,
+			y: 0.419473616,
+			placement: 'center center',
+			src: 'https://static0.fextralifeimages.com/wordpress/wp-content/uploads/mapimages/Elden-Ring-summoning-pool.png?h=40',
+			popup: {
+				title: 'Effigy of the Martyr: Erdtree Sanctuary',
+				description: 'Summoning Pool Effigy found just before Sir Gideon Ofnir, The All-Knowing\'s boss arena in Leyndell, Capital of Ash. Activate this effigy to send your summon sign to this summoning pool.'
+			},
+			tooltip: 'Effigy of the Martyr: Erdtree Sanctuary',
+			visible: true,
+			type: 'sprite'
+		},
+		{
+			uid: '8402',
+			layers: [
+				'l6a725f29480e7c18049baca5'
+			],
+			x: 0.446475105,
+			y: 0.424689972,
+			placement: 'center center',
+			src: 'https://static0.fextralifeimages.com/wordpress/wp-content/uploads/mapimages/Elden-Ring-bodyarmor.png?h=40',
+			popup: {
+				title: 'Goldmask\'s Set',
+				description: 'After the completion of <a href"/Brother+Corhyn">Brother Corhyn</a>\'s questline. Head south from the Capital of Ash site of grace and go down the small path in the direction of the colosseum. Go past the plant enemies and stick to the left and you will find Goldmask. Look the rune from him, and reset the area and return to find the rest of his set on his body.'
+			},
+			tooltip: 'Goldmask\'s Set',
+			visible: true,
+			type: 'sprite'
+		},
+		{
+			uid: '7665',
+			layers: [
+				'l6a725f29480e7c18049bac9c'
+			],
+			x: 0.527479759,
+			y: 0.425281166,
+			placement: 'center center',
+			src: 'https://static0.fextralifeimages.com/wordpress/wp-content/uploads/mapimages/Elden-Ring-grace.png?h=40',
+			popup: {
+				title: 'Divine Tower of East Altus: Gates',
+				description: 'Site of Grace at the gates of the <a target="blank" href=\'https://eldenring.wiki.fextralife.com/divine+tower+of+east+altus\'>Divine Tower of East Altus</a>.'
+			},
+			tooltip: 'Divine Tower of East Altus: Gates',
+			visible: true,
+			type: 'sprite'
+		},
+		{
+			uid: '8277',
+			layers: [
+				'l6a725f29480e7c18049baca0'
+			],
+			x: 0.483337544,
+			y: 0.430480206,
+			placement: 'center center',
+			src: 'https://static0.fextralifeimages.com/wordpress/wp-content/uploads/mapimages/Elden-Ring-summoning-pool.png?h=40',
+			popup: {
+				title: 'Effigy of the Martyr: Elden Beast',
+				description: 'Summoning Pool Effigy found just before the Elden Beast boss arena in Leyndell, Capital of Ash. Activate this effigy to send your summon sign to this summoning pool.'
+			},
+			tooltip: 'Effigy of the Martyr: Elden Beast',
+			visible: true,
+			type: 'sprite'
+		},
+		{
+			uid: '7663',
+			layers: [
+				'l6a725f29480e7c18049bac9e'
+			],
+			x: 0.532315237,
+			y: 0.432516484,
+			placement: 'center center',
+			src: 'https://static0.fextralifeimages.com/wordpress/wp-content/uploads/mapimages/Elden-Ring-divinetower.png?h=40',
+			label: true,
+			popup: {
+				title: 'Divine Tower of East Altus',
+				description: 'Found at the very east of the <a target="blank" href=\'https://eldenring.wiki.fextralife.com/leyndell,+ashen+capital\'>Leyndell, Ashen Capital region</a>. Seen last before accessing to the <a target="blank" href=\'https://eldenring.wiki.fextralife.com/forbidden+lands\'>Forbidden Lands</a>.'
+			},
+			tooltip: 'Divine Tower of East Altus',
+			visible: true,
+			type: 'sprite'
+		},
+		{
+			uid: '7664',
+			layers: [
+				'l6a725f29480e7c18049bac9c'
+			],
+			x: 0.52840525,
+			y: 0.432887526,
+			placement: 'center center',
+			src: 'https://static0.fextralifeimages.com/wordpress/wp-content/uploads/mapimages/Elden-Ring-grace.png?h=40',
+			popup: {
+				title: 'Divine Tower of East Altus',
+				description: 'Site of Grace for the <a target="blank" href=\'https://eldenring.wiki.fextralife.com/divine+tower+of+east+altus\'>Divine Tower of East Altus</a>.'
+			},
+			tooltip: 'Divine Tower of East Altus',
+			visible: true,
+			type: 'sprite'
+		},
+		{
+			uid: '5102',
+			layers: [
+				'l6a725f29480e7c18049baca3'
+			],
+			x: 0.494875364,
+			y: 0.434495375,
+			placement: 'center center',
+			src: 'https://static0.fextralifeimages.com/wordpress/wp-content/uploads/mapimages/Elden-Ring-staff.png?h=40',
+			popup: {
+				title: 'Staff of the Avatar',
+				description: 'Staff dropped by a <a href=\'https://eldenring.wiki.fextralife.com/Erdtree+Avatar\' target="_blank">Lesser Erdtree Avatar.</a>'
+			},
+			tooltip: 'Staff of the Avatar',
+			visible: true,
+			type: 'sprite'
+		},
+		{
+			uid: '5104',
+			layers: [
+				'l6a725f29480e7c18049baca7'
+			],
+			x: 0.497337701,
+			y: 0.43692776,
+			placement: 'center center',
+			src: 'https://static0.fextralifeimages.com/wordpress/wp-content/uploads/mapimages/Elden-Ring-ashofwar.png?h=40',
+			popup: {
+				title: 'Ash of War: Golden Land',
+				description: 'Dropped from a <a href=\'https://eldenring.wiki.fextralife.com/Teardrop+Scarab\' target="_blank"> Teardrop Scarab</a>'
+			},
+			tooltip: 'Ash of War: Golden Land',
+			visible: true,
+			type: 'sprite'
+		},
+		{
+			uid: '5103',
+			layers: [
+				'l6a725f29480e7c18049bacae'
+			],
+			x: 0.493682527,
+			y: 0.438581784,
+			placement: 'center center',
+			src: 'https://static0.fextralifeimages.com/wordpress/wp-content/uploads/mapimages/Elden-Ring-glovewort.png?h=40',
+			popup: {
+				title: 'Ghost Glovewort [4]',
+				description: 'Found on the hill, near a yellowish small tree.'
+			},
+			tooltip: 'Ghost Glovewort [4]',
+			visible: true,
+			type: 'sprite'
+		},
+		{
+			uid: '7661',
+			layers: [
+				'l6a725f29480e7c18049bacb5'
+			],
+			x: 0.485497049,
+			y: 0.438700518,
+			placement: 'center center',
+			src: 'https://static0.fextralifeimages.com/wordpress/wp-content/uploads/mapimages/Elden-Ring-boss.png?h=40',
+			popup: {
+				title: 'Radagon of the Golden Order',
+				images: [
+					{
+						src: 'https://eldenring.wiki.fextralife.com/file/Elden-Ring/radagon_elden_beast_dual_boss_elden_ring_wiki_600px.jpg'
+					}
+				],
+				description: '<h5>God Type Boss</h5><strong>Final Boss</strong>. Once <a target="blank" href=\'https://eldenring.wiki.fextralife.com/radagon+of+the+golden+order\'>Radagon of the Golden Order</a> is defeated, <a target="blank" href=\'https://eldenring.wiki.fextralife.com/elden+beast\'>Elden Beast</a>, the <strong>true</strong> form of the <em>Elden Ring</em>, must be fought.'
+			},
+			tooltip: 'Radagon of the Golden Order',
+			visible: true,
+			type: 'sprite'
+		},
+		{
+			uid: '7721',
+			layers: [
+				'l6a725f29480e7c18049bacb2'
+			],
+			x: 0.486941286,
+			y: 0.439782722,
+			placement: 'center center',
+			src: 'https://static0.fextralifeimages.com/wordpress/wp-content/uploads/mapimages/Elden-Ring-key.png?h=40',
+			popup: {
+				title: 'Elden Remembrance',
+				description: 'Dropped by the <a target="blank" href=\'https://eldenring.wiki.fextralife.com/Elden+Beast\'>Elden Beast</a> upon defeat.'
+			},
+			tooltip: 'Elden Remembrance',
+			visible: true,
+			type: 'sprite'
+		},
+		{
+			uid: '7662',
+			layers: [
+				'l6a725f29480e7c18049bac9c'
+			],
+			x: 0.485483406,
+			y: 0.44092677,
+			placement: 'center center',
+			src: 'https://static0.fextralifeimages.com/wordpress/wp-content/uploads/mapimages/Elden-Ring-grace.png?h=40',
+			popup: {
+				title: 'Fractured Marika',
+				description: '<p>This </p><p><em>Site of Grace</em></p><p> is unlocked once the </p><p><a target="blank" href="https://eldenring.wiki.fextralife.com/Radagon+of+the+Golden+Order">Radagon of the Golden Order</a></p><p> and the </p><p><a target="blank" href="https://eldenring.wiki.fextralife.com/Elden+Beast">Elden Beast</a></p><p> </p><p><a target="blank" href="https://eldenring.wiki.fextralife.com/bosses">Bossfight</a></p><p> is successfully completed.</p>'
+			},
+			tooltip: 'Fractured Marika',
+			visible: true,
+			type: 'sprite'
+		}
+	],
+	tileLayer: {
+		url: [
+			'https://static0.fextralifeimages.com/wordpress/wp-content/uploads/mapimages/Elden-Ring-Ashen-Capital-v1-0256.jpg',
+			'https://static0.fextralifeimages.com/wordpress/wp-content/uploads/mapimages/Elden-Ring-Ashen-Capital-v1-0512.jpg',
+			'https://static0.fextralifeimages.com/wordpress/wp-content/uploads/mapimages/Elden-Ring-Ashen-Capital-v1-1024.jpg',
+			'https://static0.fextralifeimages.com/wordpress/wp-content/uploads/mapimages/Elden-Ring-Ashen-Capital-v1-2048.jpg',
+			'https://static0.fextralifeimages.com/wordpress/wp-content/uploads/mapimages/Elden-Ring-Ashen-Capital-v1-4096.jpg',
+			'https://static0.fextralifeimages.com/wordpress/wp-content/uploads/mapimages/Elden-Ring-Ashen-Capital-v1-8192.jpg'
+		],
+		originalWidth: 8192,
+		originalHeight: 8192
+	},
+	progressTracking: true
+});
+window["vm6a67bcf49240c157fd42bdc6"].load();
+
+    let VALNET_MAP_NAMESPACE = "valnet_interactivemaps";
+    if(!window[VALNET_MAP_NAMESPACE]) {
+        window[VALNET_MAP_NAMESPACE] = {
+            isListeningForLoadEvents: false,
+            mapIdsToLoad: [],
+            getUserState: (idMap) => {
+                const markers = window[idMap].markers.reduce((acc, marker) => {
+                    if(marker.status === 'complete') {
+                        acc[marker.uid] = { status: marker.status };
+                    }
+                    return acc;
+                }, {});
+                return { markers };
+            },
+            saveUserState: (idMap) => {
+                window.dispatchEvent(new CustomEvent("vn_user_map:save", {
+                    detail: { map_id: idMap, state: window[VALNET_MAP_NAMESPACE].getUserState(idMap) }
+                }));
+            },
+            loadUserState: (idMap, state) => {
+                if(!state) {
+                    return;
+                }
+                if(typeof state.markers !== 'object') {
+                    return;
+                }
+                const markers = window[idMap].markers.map(marker => {
+                    if(state.markers[marker.uid]) {
+                        marker = {
+                            ...marker,
+                            ...state.markers[marker.uid]
+                        };
+                    }
+                    return marker;
+                });
+                window[idMap].setView({ markers });
+            },
+            initUserState: (idMap) => {
+                if(window[VALNET_MAP_NAMESPACE].mapIdsToLoad.includes(idMap)) return;
+                window[VALNET_MAP_NAMESPACE].mapIdsToLoad.push(idMap);
+                window.dispatchEvent(new CustomEvent("vn_user_map:init", {
+                    detail: { map_id: idMap }
+                }));
+            }
+        };
+    }
+    if(!window[VALNET_MAP_NAMESPACE].isListeningForLoadEvents) {
+        window.addEventListener("vn_user_map:load", (event) => {
+            if(!event.detail) return;
+            if(!window[VALNET_MAP_NAMESPACE].mapIdsToLoad.includes(event.detail.map_id)) return;
+            window[VALNET_MAP_NAMESPACE].loadUserState(event.detail.map_id, event.detail.state);
+        });
+        window[VALNET_MAP_NAMESPACE].isListeningForLoadEvents = true;
+    }
+    if(window["vm6a67bcf49240c157fd42bdc6"].config.progressTracking) {
+        window[VALNET_MAP_NAMESPACE].initUserState("vm6a67bcf49240c157fd42bdc6");
+        window["vm6a67bcf49240c157fd42bdc6"].onMarkerStatusChange((marker) => {
+            window[VALNET_MAP_NAMESPACE].saveUserState("vm6a67bcf49240c157fd42bdc6");
+        });
+    }
+
+
+
+})();

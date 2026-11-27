@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Split map + step card</title>
+<link rel="stylesheet" href="../node_modules/leaflet/dist/leaflet.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Marcellus&family=Source+Sans+3:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#141414;--panel:#1b1a18;--panel2:#262421;--line:#39342b;--gold:#e0c284;--gold2:#b89a5a;--text:#efe9db;--muted:#a39c8c;--red:#e0664f;--green:#86c591;--blue:#7fb6dc}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0;background:var(--bg);color:var(--text);font-family:"Source Sans 3",system-ui,sans-serif;font-size:18px;line-height:1.4;overflow:hidden}
+button{font:inherit;color:inherit;cursor:pointer}
+#app{position:absolute;inset:0;display:grid;grid-template-columns:minmax(0,1fr) 400px;grid-template-rows:minmax(0,1fr) auto}
+#mapwrap{position:relative;min-height:0}
+#map{position:absolute;inset:0;background:#1b1a18}
+.leaflet-container{font-family:inherit;background:#1b1a18}
+.leaflet-control-attribution{background:rgba(20,20,20,.7)!important;color:#8d8676!important;font-size:11px}
+.leaflet-control-attribution a{color:#b89a5a!important}
+/* map header: region name + search, like the sketch */
+#maphead{position:absolute;left:14px;right:14px;top:14px;z-index:500;display:flex;gap:10px;align-items:center;pointer-events:none}
+#maphead>*{pointer-events:auto}
+#regionname{font-family:Marcellus,serif;font-size:22px;letter-spacing:.12em;text-transform:uppercase;background:rgba(20,19,17,.9);border:1px solid var(--line);border-radius:12px;padding:0 16px;height:48px;display:flex;align-items:center;color:var(--gold)}
+#search{margin-left:auto;width:300px;height:48px;border-radius:12px;border:1px solid var(--line);background:rgba(20,19,17,.9);color:var(--muted);display:flex;align-items:center;padding:0 14px;font-size:16px}
+#mapctl{position:absolute;left:14px;bottom:26px;z-index:500;display:flex;gap:8px}
+#mapctl button{height:50px;min-width:50px;padding:0 14px;border-radius:12px;border:1px solid var(--line);background:rgba(20,19,17,.9);font-size:20px}
+#mapctl button.txt{font-size:15px}
+/* the step card */
+#card{background:var(--panel);border-left:1px solid var(--line);display:flex;flex-direction:column;min-height:0;padding:18px 18px 14px;gap:14px}
+#stepno{font-size:14px;letter-spacing:.14em;text-transform:uppercase;color:var(--gold2);padding-bottom:12px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between}
+#title{font-family:Marcellus,serif;font-weight:400;font-size:32px;line-height:1.12;margin:0}
+#how{margin:0;color:#d3ccbc;font-size:17px}
+.lbl{font-size:13px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
+#grab{display:flex;flex-direction:column;gap:6px;overflow:auto;min-height:0}
+.g{display:flex;align-items:center;gap:10px;font-size:18px;font-weight:600}
+.g .ic{width:56px;height:56px;flex:none;display:grid;place-items:center;background:radial-gradient(circle,#3a352b,#1a1815 70%);border:1px solid var(--line);border-radius:8px}.g .ic svg{display:block}.g .ic img{width:52px;height:52px;object-fit:contain}
+.g .cat{font-weight:400;color:var(--muted);font-size:14px;margin-left:auto}
+#miss{border-radius:10px;padding:9px 12px;font-size:16px;border:1px solid var(--line);color:var(--green)}
+#miss.bad{border-color:var(--red);background:#2a1814;color:var(--text)}
+#miss.bad b{color:var(--red)}
+#spacer{flex:1}
+#done{height:84px;border-radius:14px;border:0;background:var(--gold);color:#1c1608;font-family:Marcellus,serif;font-size:32px;letter-spacing:.12em}
+#row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+#row button{height:52px;border-radius:12px;border:1px solid var(--line);background:var(--panel2);font-size:17px}
+#next{border-top:1px solid var(--line);padding-top:12px;font-size:17px;color:var(--muted)}
+#next b{color:var(--text);font-weight:600}
+#next i{font-style:normal;color:var(--red)}
+/* tabs */
+#tabs{grid-column:1/-1;display:flex;background:var(--panel);border-top:1px solid var(--line)}
+#tabs button{flex:1;height:56px;border:0;background:none;color:var(--muted);font-size:16px;border-top:3px solid transparent}
+#tabs button.on{color:var(--gold);border-top-color:var(--gold)}
+/* markers */
+.target{width:44px;height:44px;border-radius:50%;border:4px solid var(--gold);background:rgba(224,194,132,.25);box-shadow:0 0 0 8px rgba(224,194,132,.22),0 0 18px rgba(0,0,0,.6)}
+.you{width:24px;height:24px;border-radius:50%;background:var(--blue);border:4px solid #0d1a22;box-shadow:0 0 0 6px rgba(127,182,220,.35)}
+.tag{font-weight:700;font-size:15px;white-space:nowrap;text-shadow:0 0 4px #000,0 0 4px #000,0 0 6px #000}
+.tag.t{color:#f3dca4;font-size:17px;transform:translateX(-50%);background:rgba(14,13,11,.82);border:1px solid #b89a5a;border-radius:8px;padding:3px 10px;text-shadow:none}.tag.y{color:#cfeaff}.tag.n{color:#d8d2c2;font-weight:600}
+.nextdot{width:16px;height:16px;border-radius:50%;background:#1c1608;border:3px solid var(--gold2)}
+@media (max-width:700px){
+  #app{grid-template-columns:1fr;grid-template-rows:42% minmax(0,1fr) auto}
+  #card{border-left:0;border-top:1px solid var(--line);padding:12px 14px;gap:10px}
+  #title{font-size:25px}#how{display:none}#done{height:66px;font-size:26px}
+  #search{width:auto;flex:1}#regionname{font-size:16px;height:44px}#search{height:44px}
+  #tabs button{font-size:13.5px}
+}
+/* ---- shared type scale: 14 / 16 / 18 / 24 / 32, buttons always sans 700 centred ---- */
+button{display:flex;align-items:center;justify-content:center;font-weight:700;line-height:1;-webkit-font-smoothing:antialiased}
+#done{font-family:"Source Sans 3",system-ui,sans-serif;font-weight:700;font-size:28px;letter-spacing:.14em}
+#row button{font-size:18px}#tabs button{font-size:16px;font-weight:600}#mapctl button.txt{font-size:16px}
+.g{font-size:18px}.g .cat{font-size:14px}#how{font-size:16px}#stepno{font-size:14px;font-weight:700}#miss{font-size:16px;font-weight:600}#next{font-size:16px}
+/* ---- style 1: Carved (ornate frame, engraved feel) ---- */
+body.s1 #title{font-family:Cinzel,serif;font-weight:700;font-size:28px;letter-spacing:.04em;text-transform:uppercase}
+body.s1 #card{margin:10px;border:1px solid var(--gold2);outline:1px solid var(--gold2);outline-offset:-6px;border-radius:4px;background:linear-gradient(#211f1b,#171614);padding:24px 22px 18px}
+body.s1 #done{border-radius:4px;background:linear-gradient(#ecd49b,#c9a558);box-shadow:inset 0 0 0 2px #1c1608,inset 0 0 0 3px #f1dcaa;font-family:Cinzel,serif}
+body.s1 #row button,body.s1 #mapctl button,body.s1 #regionname,body.s1 #search{border-radius:4px;border-color:var(--gold2)}
+body.s1 #regionname{font-family:Cinzel,serif;font-weight:700}
+body.s1 #stepno{justify-content:center;gap:14px}body.s1 #stepno span:last-child{display:none}
+body.s1 #stepno:before,body.s1 #stepno:after{content:"";flex:1;height:1px;background:linear-gradient(90deg,transparent,var(--gold2));align-self:center}
+body.s1 #stepno:after{transform:scaleX(-1)}
+/* ---- style 2: Clean (flat, modern, sans only) ---- */
+body.s2 #title{font-family:"Source Sans 3",sans-serif;font-weight:700;font-size:32px;letter-spacing:0}
+body.s2 #card{background:#191817;gap:16px}
+body.s2 #done{border-radius:36px;letter-spacing:.06em;height:76px}
+body.s2 #row button{border-radius:26px;border:0;background:#2b2926}
+body.s2 #regionname{font-family:"Source Sans 3",sans-serif;font-weight:700;letter-spacing:.04em;border-radius:24px;border:0;font-size:18px}
+body.s2 #search,body.s2 #mapctl button{border-radius:24px;border:0}
+body.s2 #miss{border:0;background:#1f2a21;border-radius:12px}
+body.s2 #grab{background:#22201e;border-radius:14px;padding:10px 12px;gap:10px}
+body.s2 #stepno{border:0;padding:0}body.s2 #next{border:0;background:#22201e;border-radius:12px;padding:12px}
+/* ---- style 3: HUD (card floats over a full-bleed map, like an in-game menu) ---- */
+body.s3 #app{grid-template-columns:1fr}
+body.s3 #mapwrap{grid-column:1;grid-row:1}
+body.s3 #card{grid-column:1;grid-row:1;justify-self:end;width:400px;margin:14px;z-index:600;background:rgba(14,13,11,.86);backdrop-filter:blur(6px);border:1px solid rgba(224,194,132,.45);border-radius:2px;padding:20px}
+body.s3 #title{font-family:Marcellus,serif;font-size:30px;padding-bottom:10px;border-bottom:1px solid transparent;border-image:linear-gradient(90deg,var(--gold),transparent) 1}
+body.s3 #done{border-radius:0;background:linear-gradient(90deg,rgba(224,194,132,0),rgba(224,194,132,.95) 18%,rgba(224,194,132,.95) 82%,rgba(224,194,132,0));height:68px}
+body.s3 #row button{border-radius:0;background:rgba(40,37,32,.8);border:0;border-bottom:1px solid var(--gold2)}
+body.s3 .g{padding:6px 8px;background:linear-gradient(90deg,rgba(224,194,132,.10),transparent)}
+body.s3 #regionname,body.s3 #search,body.s3 #mapctl button{border-radius:2px;background:rgba(14,13,11,.86)}
+body.s3 #maphead{right:440px}body.s3 #tabs{background:#0f0e0c}
+@media (max-width:700px){body.s3 #card{position:static;width:auto;margin:0;justify-self:stretch;grid-row:2}body.s3 #maphead{right:14px}#done{font-size:24px}}
+/* clean map: no chrome, no text */
+#maphead,#mapctl,.tag{display:none!important}
+</style>
+</head>
+<body>
+<div id="app">
+  <div id="mapwrap">
+    <div id="map"></div>
+    <div id="maphead"><div id="regionname">Limgrave</div><div id="search">Search…</div></div>
+    <div id="mapctl"><button>−</button><button>+</button><button class="txt">Recenter</button><button class="txt" id="allbtn">Show all markers</button></div>
+  </div>
+  <div id="card">
+    <div id="stepno"><span></span><span></span></div>
+    <h2 id="title"></h2>
+    <p id="how"></p>
+    <div><div class="lbl">Grab</div><div id="grab"></div></div>
+    <div id="miss"></div>
+    <div id="spacer"></div>
+    <button id="done">DONE</button>
+    <div id="row"><button>Skip</button><button>Later</button></div>
+    <div id="next"></div>
+  </div>
+  <div id="tabs"><button class="on">Route</button><button>Bosses</button><button>Collection</button><button>Quests</button><button>Gauntlet</button></div>
+</div>
+<script src="../node_modules/leaflet/dist/leaflet.js"></script>
+<script src="icons.js"></script>
+<script src="art.data.js"></script>
+<script src="overland.data.js"></script>
+<script src="wt.data.js"></script>
+<script>
+var q = new URLSearchParams(location.search); document.body.className = 's' + (q.get('style') || '1'); var D = window.MAPDATA, WT = window.WT, W = 256, bounds = [[-W, 0], [0, W]];
+var byId = {}; D.markers.forEach(function (m) { byId[m.id] = m; });
+function onMap(S) { var a = []; S.markers.forEach(function (o) { var h = o.hits.filter(function (x) { return x.map === 'overland'; })[0]; if (h && byId[h.id]) a.push(byId[h.id]); }); return a; }
+var si = +(q.get('s') || 5), S = WT[si], all = onMap(S);
+var PLACE = { 'Locations': 1, 'Sites of Grace': 1 }, SKIP = { 'NPCs': 1 };
+var place = all.filter(function (m) { return PLACE[m.cat]; })[0] || all[0];
+var grabs = all.filter(function (m) { return !PLACE[m.cat] && !SKIP[m.cat]; });
+function far(list){ var best = null, bd = 1e9; list.forEach(function (m) { if (!place) return; var d = Math.hypot(m.x - place.x, m.y - place.y); if (d > 0.006 && d < 0.08 && d < bd) { bd = d; best = m; } }); return best; }
+var prev = far(onMap(WT[si - 1]).concat(onMap(WT[si - 2]))), nextS = WT[si + 1], nextM = far(onMap(nextS).concat(onMap(WT[si + 2])));
+var bossNext = onMap(nextS).some(function (m) { return m.cat === 'Bosses'; });
+function el(t, c, txt) { var e = document.createElement(t); if (c) e.className = c; if (txt != null) e.textContent = txt; return e; }
+var sn = document.getElementById('stepno').children; sn[0].textContent = 'Step ' + (si + 1) + ' of ' + WT.length; sn[1].textContent = Math.round(si / WT.length * 100) + '%';
+document.getElementById('title').textContent = place ? place.title : S.title;
+var how = S.text.filter(function (t) { return !/click on the image|elden ring map/i.test(t); })[0] || '';
+document.getElementById('how').textContent = how.length > 190 ? how.slice(0, 190).replace(/\s+\S*$/, '') + '…' : how;
+var gb = document.getElementById('grab');
+grabs.forEach(function (m) { var r = el('div', 'g'); var ic = el('span', 'ic'); if (window.ART && ART[m.title]) { var im = el('img'); im.src = '../assets/items/' + ART[m.title]; im.alt = ''; ic.appendChild(im); } else ic.innerHTML = symbol(m.cat, 34); r.appendChild(ic); r.appendChild(document.createTextNode(m.title)); r.appendChild(el('span', 'cat', m.cat.replace(/s$/, ''))); gb.appendChild(r); });
+var miss = document.getElementById('miss');
+if (q.get('miss')) { miss.className = 'bad'; miss.appendChild(el('b', null, 'Missable: ')); miss.appendChild(document.createTextNode('example warning text shown only when something here can be lost.')); }
+else miss.textContent = 'Missable: none';
+var nx = document.getElementById('next'); nx.appendChild(document.createTextNode('Next: ')); nx.appendChild(el('b', null, nextS.title)); if (bossNext) { nx.appendChild(document.createTextNode(' ')); nx.appendChild(el('i', null, '(boss)')); }
+
+var map = L.map('map', { crs: L.CRS.Simple, minZoom: 0, maxZoom: 5.25, zoomSnap: 0.25, zoomControl: false, maxBounds: [[-W * 1.3, -W * .3], [W * .3, W * 1.3]] });
+map.attributionControl.setPrefix(false).addAttribution('Map and data: <a href="https://eldenring.wiki.fextralife.com/Interactive+Map">Fextralife Elden Ring Wiki</a>');
+var shown = {};
+function ensure(level) { for (var i = 0; i <= level && i < D.images.length; i++) if (!shown[i]) shown[i] = L.imageOverlay(D.images[i], bounds, { zIndex: i + 1 }).addTo(map); }
+function levelFor(z) { var px = W * Math.pow(2, z) * (window.devicePixelRatio || 1), i = 0; while (i < D.images.length - 1 && 256 * Math.pow(2, i) < px) i++; return i; }
+map.on('zoomend', function () { ensure(levelFor(map.getZoom())); });
+function ll(m) { return [-m.y * W, m.x * W]; }
+function div(html, size, anchor) { return L.divIcon({ className: '', html: html, iconSize: size, iconAnchor: anchor }); }
+var pts = [];
+if (prev && place) { pts.push(ll(prev)); L.polyline([ll(prev), ll(place)], { color: '#e0c284', weight: 5 }).addTo(map); }
+if (place && nextM) L.polyline([ll(place), ll(nextM)], { color: '#e0c284', weight: 3, dashArray: '8 9', opacity: .75 }).addTo(map);
+grabs.forEach(function (m) { L.marker(ll(m), { icon: div(symbol(m.cat, 34), [34, 34]) }).addTo(map); pts.push(ll(m)); });
+if (nextM) { L.marker(ll(nextM), { icon: div('<div class="nextdot"></div>', [16, 16]) }).addTo(map); var nextLbl = L.marker(ll(nextM), { icon: div('<div class="tag n">then: ' + nextS.title.replace(/</g, '') + '</div>', [10, 10], [-16, 10]) }).addTo(map); pts.push(ll(nextM)); }
+if (place) { L.marker(ll(place), { icon: div('<div class="target"></div>', [44, 44]), zIndexOffset: 900 }).addTo(map); L.marker(ll(place), { icon: div('<div class="tag t">GO HERE: ' + place.title.replace(/</g, '') + '</div>', [10, 10], [0, 62]) }).addTo(map); pts.push(ll(place)); }
+if (prev) { L.marker(ll(prev), { icon: div('<div class="you"></div>', [24, 24]), zIndexOffset: 1000 }).addTo(map); L.marker(ll(prev), { icon: div('<div class="tag y">You</div>', [10, 10], [48, 10]) }).addTo(map); }
+if (q.get('all')) { var skip = { 'Consumables': 1, 'Crafting Materials': 1, 'Upgrade Materials': 1, 'Summoning Pools': 1 }; D.markers.forEach(function (m) { if (!skip[m.cat] && m.icon) L.marker(ll(m), { icon: L.icon({ iconUrl: m.icon, iconSize: [22, 22] }), opacity: .7, zIndexOffset: -500 }).addTo(map); }); document.getElementById('allbtn').textContent = 'Hide other markers'; }
+map.fitBounds(L.latLngBounds(pts).pad(0.5), { maxZoom: 5 }); if (typeof nextLbl !== 'undefined' && place) { var a = map.latLngToContainerPoint(ll(place)), b = map.latLngToContainerPoint(ll(nextM)); if (Math.abs(a.y - 50 - b.y) < 34 && b.x < a.x + 150 && b.x > a.x - 320) map.removeLayer(nextLbl); } ensure(levelFor(map.getZoom()));
+</script>
+</body>
+</html>
