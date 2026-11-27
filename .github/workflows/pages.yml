@@ -25,5 +25,20 @@ jobs:
       - uses: actions/upload-pages-artifact@v3
         with:
           path: app
+      # The upload is large (about 140 MB); now and then GitHub cannot find it straight after the upload.
+      # Wait a little, try, and try twice more before giving up, so one hiccup does not send a "run failed" e-mail.
+      - run: sleep 20
+      - id: first
+        continue-on-error: true
+        uses: actions/deploy-pages@v4
+      - if: steps.first.outcome == 'failure'
+        run: sleep 60
+      - id: second
+        if: steps.first.outcome == 'failure'
+        continue-on-error: true
+        uses: actions/deploy-pages@v4
+      - if: steps.first.outcome == 'failure' && steps.second.outcome == 'failure'
+        run: sleep 120
       - id: deployment
+        if: steps.first.outcome == 'failure' && steps.second.outcome == 'failure'
         uses: actions/deploy-pages@v4
