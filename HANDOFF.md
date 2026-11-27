@@ -1,4 +1,4 @@
-# Handoff: Elden Ring route companion
+﻿# Handoff: Elden Ring route companion
 
 Written 2026-11-27 for a new Claude Code session on a different PC. Read this fully before doing anything.
 
@@ -40,7 +40,10 @@ In progress, the map repaint:
 - Method that works: tools/repaint-map.mjs. Each 8192 px map is cut into a 4x4 grid of 2816 px tiles (1024 px overlap), each repainted by the OpenAI image API (model gpt-image-2, images/edits), tone-matched in the overlaps and cross-faded in a 256 px band. Output: assets/maps2/<name>-8192.jpg plus shots/repaint-<name>.jpg and shots/repaint-<name>-seams.jpg for inspection.
 - What failed, do not retry: 1024 px tiles (64 per map) gave visible tone jumps between tiles; a low-resolution whole-map colour guide hallucinated features; 3840x3840 tiles exceed the API's pixel budget.
 - A single 2816 px tile measured within 2 px of the original everywhere. Accept a map only if no seam is visible in the seams sheet and the reported worst local shift is a few pixels at most.
-- Check assets/maps2 to see which maps are finished. Run the missing ones: `node tools/repaint-map.mjs <name> assets/maps/<file>-8192.jpg` for overland, underground, ashen, shadow (file names are in assets/maps). Raw tiles are cached in assets/repaint, which is not in the repository, so a map that was not finished before the move starts again.
+- RESULT OF THE FIRST FULL RUN (overland, 16 tiles): REJECTED, not shown to the owner as finished. The overview (shots/repaint-overland.jpg) looks good, but the seam close-ups (shots/repaint-overland-seams.jpg) show doubled features where tiles overlap: two whirlpools, a ghost tower, a doubled banner, sea drawn over land near the Erdtree. Cause: tiles that are mostly sea or cloud drift far more than the 2 px seen on the land-heavy test tile (the alignment check hit its 16 px search limit on 8 of 16 tiles; real drift is larger). Tone also varied a lot between tiles (gains up to 1.69). The model also recoloured the Mountaintops green, against "keep each region's colour family".
+- NEXT STEP for the repaint: register every repainted tile back onto the original before blending. Estimate the warp between the original tile and its repaint (dense optical flow or feature matching, e.g. OpenCV via Python, which is not installed yet) and warp the repaint to the original geometry; then tone-match and cross-fade as now. The 16 raw overland tiles are in assets/repaint/overland and are in the repository, so this needs no new API calls. Only run the other three maps after overland passes: no doubled features anywhere along the joins, checked by eye at full resolution.
+- Fallback the owner has not chosen but which is exact and seamless: a colour regrade of the original map ("Vivid") plus AI upscaling.
+- Check assets/maps2 to see which maps are finished (overland-8192.jpg there is the rejected stitch). Run the missing ones: `node tools/repaint-map.mjs <name> assets/maps/<file>-8192.jpg` for overland, underground, ashen, shadow (file names are in assets/maps). Raw tiles are cached in assets/repaint and are in the repository, so finished tiles are never paid for twice.
 
 Not started:
 - Cutting the finished maps into a tile pyramid for Leaflet (a single 8192 px image is too heavy for a phone), plus an extra sharpened zoom level using tools/bin/realesrgan (Real-ESRGAN, needs the graphics card).
