@@ -71,7 +71,7 @@
     const P = pts.map(p => map.project(p, FITZOOM)); let near = Infinity;
     for (let i = 1; i < P.length; i++) for (let j = i + 1; j < P.length; j++) { const d = P[i].distanceTo(P[j]); if (d > 2 && d < near) near = d; }
     const want = near < SIZE ? Math.min(MAXZOOM, FITZOOM + Math.ceil(Math.log2(SIZE / near))) : FITZOOM;
-    map.fitBounds(L.latLngBounds(pts), { paddingTopLeft: [px, py + 20], paddingBottomRight: [px + 56, py], maxZoom: want, animate: false });
+    map.fitBounds(L.latLngBounds(pts), { paddingTopLeft: [px, py + 20], paddingBottomRight: [px + 40, py], maxZoom: want, animate: false });
   }
   function drawAll() {
     allLayer.clearLayers(); if (!S.all || !mapName) return;
@@ -89,7 +89,7 @@
   }
   $('#recentre').onclick = () => { const s = currentStep(); if (s) { if (S.tab !== 'route') { S.tab = 'route'; render(); } else drawStep(s, true); } };
   $('#zin').onclick = () => map.zoomIn(1); $('#zout').onclick = () => map.zoomOut(1);
-  function placeMapButton() { const r = $('#map').getBoundingClientRect(); ['#recentre', '#zout', '#zin'].forEach((id, k) => { const b = $(id); b.style.left = (r.right - 64) + 'px'; b.style.top = (r.bottom - 64 - k * 56) + 'px'; }); }
+  function placeMapButton() { const r = $('#map').getBoundingClientRect(); ['#recentre', '#zout', '#zin'].forEach((id, k) => { const b = $(id); b.style.left = (r.right - 48) + 'px'; b.style.top = (r.bottom - 48 - k * 44) + 'px'; }); }
   addEventListener('resize', () => { placeMapButton(); map.invalidateSize(); });
 
   // ---------- rows ----------
@@ -114,7 +114,7 @@
   function checkHTML(m) {
     return `<button class="chk${S.got[m.i] ? ' got' : ''}" data-i="${m.i}"><img class="ci" data-pan="${m.i}" src="icons/${m.f}.png" alt=""><span class="cn">${esc(m.title)}</span><span class="cc">${esc(m.label)}</span><span class="box" data-tick="1" aria-hidden="true"></span></button>${openInfo === m.i ? `<div class="info">${esc(m.desc || "The wiki map has no extra note for this one.")}</div>` : ""}`;
   }
-  const shot = f => f ? `<img class="shot" loading="lazy" src="walk/${esc(f)}" alt="">` : '';
+  const shot = (f, cls) => f ? `<img class="shot ${cls || ''}" loading="lazy" src="walk/${esc(f)}" alt="">` : '';
   function zoomPicture(src) { const sh = $('#sheet'); sh.hidden = false; sh.innerHTML = `<img class="bigshot" src="${src}" alt="">`; sh.onclick = () => { sh.hidden = true; sh.innerHTML = ''; }; }
   function renderRoute() {
     const pane = $('#pane'), s = currentStep(), total = ROUTE.length, dn = doneCount();
@@ -124,15 +124,14 @@
     const para = s.text.length ? s.text : ['Explore this place and pick up everything listed above.'];
     pane.innerHTML = `
       <div class="head">
-        <div class="steprow"><span class="over gold">Step ${pos} of ${total}</span><span style="display:flex;align-items:center"><span class="meta">${Math.round(dn / total * 100)}%</span><button class="gear" aria-label="Settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1 7 17M17 7l2.1-2.1"/></svg></button></span></div>
+        <div class="steprow"><span class="over gold">Step ${pos} of ${total}<span class="reg"> &middot; ${esc(s.region)}</span></span><span style="display:flex;align-items:center"><span class="meta">${Math.round(dn / total * 100)}%</span><button class="gear" aria-label="Settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1 7 17M17 7l2.1-2.1"/></svg></button></span></div>
         <div class="bar"><i style="width:${dn / total * 100}%"></i></div>
         <h1 class="title">${esc(s.title)}</h1>
-        <div class="region">${esc(s.region)} &middot; ${esc(MAPNAME[s.map])}</div>
       </div>
       <div class="body">
         <div class="sechead"><span class="over">Walkthrough</span>${grab.length ? `<button class="link" id="jump">To do &middot; ${grab.length - open} of ${grab.length} &darr;</button>` : ''}</div>
-        <div class="dir">${shot(s.imgs[0])}${para.map(p => `<p>${esc(p)}</p>`).join('')}${s.imgs.slice(1).map(shot).join('')}</div>
-        ${s.place && (s.place.walk.length || s.place.notes.length || s.place.img) ? `<div class="over sechead">${esc(s.place.title)} in detail</div><div class="dir">${shot(s.place.img)}${s.place.walk.map(p => p.startsWith('## ') ? `<h3>${esc(p.slice(3))}</h3>` : `<p>${esc(p)}</p>`).join('')}${s.place.notes.length ? `<h3>Notes</h3><ul>${s.place.notes.map(p => `<li>${esc(p)}</li>`).join('')}</ul>` : ''}</div>` : ''}
+        <div class="dir">${shot(s.imgs[0], 'lead')}${para.map(p => `<p>${esc(p)}</p>`).join('')}${s.imgs.length > 1 ? `<div class="strip">${s.imgs.slice(1).map(f => shot(f, 'thumb')).join('')}</div>` : ''}</div>
+        ${s.place && (s.place.walk.length || s.place.notes.length || s.place.img) ? `<div class="over sechead">${esc(s.place.title)} in detail</div><div class="dir">${shot(s.place.img, 'lead')}${s.place.walk.map(p => p.startsWith('## ') ? `<h3>${esc(p.slice(3))}</h3>` : `<p>${esc(p)}</p>`).join('')}${s.place.notes.length ? `<h3>Notes</h3><ul>${s.place.notes.map(p => `<li>${esc(p)}</li>`).join('')}</ul>` : ''}</div>` : ''}
         ${s.miss ? `<div class="miss"><b>Missable:</b> ${esc(s.miss)}</div>` : ''}
         <div class="sechead" id="todo"><span class="over">To do here &middot; ${grab.length - open} of ${grab.length}</span>${grab.length > 1 ? `<button class="link" id="allb">${open ? 'Tick all' : 'Untick all'}</button>` : ''}</div>
         ${grab.map(checkHTML).join('') || '<div class="none">Nothing to pick up here.</div>'}
