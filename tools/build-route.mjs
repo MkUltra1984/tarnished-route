@@ -32,8 +32,9 @@ const SPEEDRUN = new Set(['Entry to Cliffside', 'Cliffside to Rampart Tower', 'R
 const clean = s => (s || '').replace(/<[^>]+>/g, ' ').replace(/&amp;/g, '&').replace(/&nbsp;/g, ' ').replace(/\s+/g, ' ').trim();
 const tidy = t => t.replace(/^[^.]*Click on the image above to enlarge it\.\s*/i, '').replace(/(You can )?click HERE for the map'?s coordinates\.?\s*/gi, '')
   .replace(/\[\s*(Elden Ring )?Map (Coordinates|Link)[^\]]*\]/gi, '').replace(/\[\s*Map\s*\]/gi, '').replace(/\(\s*\)/g, '').replace(/\s+([.,;:!?])/g, '$1').replace(/\s{2,}/g, ' ').trim();
-const norm = s => clean(s).toLowerCase().replace(/[’`]/g, "'").trim();
-const bare = s => s.replace(/\s*\([^)]*\)\s*$/, '').trim();
+const norm = s => clean(s).toLowerCase().replace(/[‘’`]/g, "'").trim();
+// a marker's plain name: without "(First Location)", "[2]", " - Crumbling Farum Azula" and the like, so it can be found in the text
+const bare = s => s.replace(/[‘’]/g, "'").replace(/\s*\([^)]*\)\s*$/, '').replace(/\s*\[\d+\]\s*$/, '').replace(/\s+-\s+.*$/, '').trim();
 const slugOf = href => decodeURIComponent(href.replace(/^\//, '')).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 80);
 const readJson = (f, d) => fs.existsSync(f) ? JSON.parse(fs.readFileSync(f, 'utf8')) : d;
 const WALKIMG = readJson('data/walk-images.json', {}), PLACES = readJson('data/places.json', {});
@@ -210,13 +211,20 @@ for (let i = 0; i < steps.length; i++) {
   const st = steps[i], firstHome = st.text.map(p => p.length > 60 ? shown.get(pkey(p)) : undefined).find(x => x !== undefined);
   st.text = st.text.filter(p => p.startsWith('## ') || p.length <= 60 || !shown.has(pkey(p)));
   st.text = st.text.filter((p, j) => !(p.startsWith('## ') && (st.text[j + 1] || '## ').startsWith('## ')));
-  if (st.place) st.place.walk = st.place.walk.filter(p => p.startsWith('## ') || p.length <= 60 || !shown.has(pkey(p)));
   if (!st.text.some(p => !p.startsWith('## ')) && firstHome) {      // everything it had to say is already in another step: it is that step
     firstHome.m.push(...st.m.filter(k => !firstHome.m.includes(k)));
     if (st.place) { const extra = [...st.place.walk, ...st.place.notes].filter(p => p.startsWith('## ') || !shown.has(pkey(p))); if (extra.some(p => !p.startsWith('## '))) { firstHome.text.push('## ' + st.place.title, ...extra); extra.forEach(p => shown.set(pkey(p), firstHome)); } }
     log.push(`merged into "${firstHome.title}" (same text): ${st.title}`); steps.splice(i, 1); i--; continue;
   }
-  for (const p of [...st.text, ...(st.place ? st.place.walk : [])]) if (p.length > 60 && !shown.has(pkey(p))) shown.set(pkey(p), st);
+  for (const p of st.text) if (p.length > 60 && !shown.has(pkey(p))) shown.set(pkey(p), st);
+}
+// a dungeon's own page repeats the parts that already are steps of their own: its "in detail" block keeps only what is new
+for (const st of steps) {
+  if (!st.place) continue;
+  let w = st.place.walk.filter(p => p.startsWith('## ') || p.length <= 60 || !shown.has(pkey(p)));
+  w = w.filter((p, j) => !(p.startsWith('## ') && (w[j + 1] || '## ').startsWith('## ')));
+  st.place.walk = w; for (const p of w) if (p.length > 60) shown.set(pkey(p), st);
+  if (!w.some(p => !p.startsWith('## ')) && !st.place.notes.length && !st.place.img) st.place = null;
 }
 // ---- one marker, one step: where it is the pin, else the first step that named it ----
 const owner = new Map(); for (const st of steps) owner.set(st.pin, st);
@@ -226,7 +234,7 @@ for (const k of owner.keys()) claimed.add(k);
 // ---- every remaining marker: to a nearby step whose text talks about it, otherwise to the step that has something closest ----
 let attached = 0, byText = 0, orphan = 0;
 const pts = steps.map(st => st.m.map(k => all.get(k)));
-const lower = steps.map(st => [...st.text, ...(st.place ? [...st.place.walk, ...st.place.notes] : [])].join(' ').toLowerCase());
+const lower = steps.map(st => [...st.text, ...(st.place ? [...st.place.walk, ...st.place.notes] : [])].join(' ').toLowerCase().replace(/[‘’]/g, "'"));
 for (const mk of all.values()) {
   if (owner.has(mk.key)) continue;
   const nm = bare(mk.title).toLowerCase(); let best = -1, bd = 9, tbest = -1, td = 9;

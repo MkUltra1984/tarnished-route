@@ -47,10 +47,19 @@ for (const [slug, [href, text]] of hrefs) {
     await sleep(700);
   }
   const $ = cheerio.load(html), root = $('#mw-content-text').length ? $('#mw-content-text') : $('#wiki-content-block').length ? $('#wiki-content-block') : $('body');
-  const walk = [], notes = []; let mode = null;
+  const walk = [], notes = []; let mode = null, sectioned = false;
   root.find('h2, h3, h4, p, li').each((_, el) => {
     const name = el.tagName.toLowerCase(), t = clean($(el).text());
-    if (name === 'h2' || name === 'h3') { mode = /walkthrough/i.test(t) && !/video|speed ?run/i.test(t) ? walk : /\bnotes\b/i.test(t) ? notes : null; return; }
+    if (name === 'h2' || name === 'h3') {
+      // Two page styles. Caves and ruins: one "Walkthrough for X" heading. Legacy dungeons: a "Full X Walkthrough" heading
+      // followed by one heading per part of the dungeon, which all belong to the walkthrough until the summary lists start.
+      const stop = /video|speed ?run|trivia|\bmaps?\b|\bguide\b|lore|gallery|npcs|merchants|bosses|all items|^items|enemies|creatures|general information/i.test(t);
+      if (/walkthrough/i.test(t) && !/video|speed ?run/i.test(t)) { mode = walk; sectioned = name === 'h2'; }
+      else if (/\bnotes\b/i.test(t)) { mode = notes; sectioned = false; }
+      else if (mode === walk && sectioned && name === 'h3' && !stop && t.length > 2) walk.push('## ' + t);
+      else { mode = null; sectioned = false; }
+      return;
+    }
     if (!mode || !t || t.length < 3) return;
     if (name === 'p' && $(el).parents('li').length) return;
     if (name === 'li' && $(el).find('li').length) return;
@@ -75,7 +84,7 @@ for (const [slug, [href, text]] of hrefs) {
     } catch (e) { console.log('no picture for', href, e.message); }
   }
   if (walk.length) withWalk++; if (img) pics++;
-  out[slug] = { title: (clean($('h1').first().text()) || text).replace(/\s*\|.*$/, '').trim() || text, href, walk: walk.slice(0, 80), notes: notes.slice(0, 20), img, links };
+  out[slug] = { title: (clean($('h1').first().text()) || text).replace(/\s*\|.*$/, '').trim() || text, href, walk: walk.slice(0, 400), notes: notes.slice(0, 20), img, links };
 }
 fs.writeFileSync('data/places.json', JSON.stringify(out));
 console.log(`fetched ${fetched}, cached ${cached}, no such page ${missing}; ${withWalk} pages have a walkthrough, ${pics} have a picture`);

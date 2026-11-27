@@ -60,9 +60,9 @@ say(`C. Map markers: ${MK.list.length}; ${MK.list.length - none - multi} are in 
 if (none || multi) hardFail++;
 
 // D. list against text
-const kind = i => MK.cats[MK.list[i][3]].kind, name = i => clean(MK.list[i][4]).replace(/\s*\([^)]*\)\s*$/, '').toLowerCase();
+const kind = i => MK.cats[MK.list[i][3]].kind, name = i => clean(MK.list[i][4]).replace(/[‘’]/g, "'").replace(/\s*\([^)]*\)\s*$/, '').replace(/\s*\[\d+\]\s*$/, '').replace(/\s+-\s+.*$/, '').trim().toLowerCase();
 let obj = 0, namedHere = 0, namedElsewhere = 0, unnamed = 0; const worst = [];
-const lower = stepText.map(ps => ps.join(' ').toLowerCase());
+const lower = stepText.map(ps => ps.join(' ').toLowerCase().replace(/[‘’]/g, "'"));
 const allText = lower.join(' ');
 R.forEach((s, si) => {
   let u = 0, n = 0;
@@ -70,7 +70,7 @@ R.forEach((s, si) => {
     if (lower[si].includes(nm)) namedHere++; else if (allText.includes(nm)) { namedElsewhere++; n++; } else { unnamed++; u++; } }
   if (n >= 4) worst.push([n, `${si + 1}. ${s.title}: ${n} objectives that only another step's text talks about`]);
 });
-say(`D. Objectives (${obj}): ${namedHere} are named in the text of their own step; ${namedElsewhere} are listed in one step but only named in another step's text; ${unnamed} are never named in any text (they come from the wiki map only).`);
+say(`D. Objectives (${obj}): ${namedHere} are named in the text of their own step; ${namedElsewhere} are listed in one step but only named in another step's text; ${unnamed} are not named in the route's text under their map name (map-only, item lists, or a different spelling).`);
 worst.sort((a, b) => b[0] - a[0]).slice(0, 25).forEach(w => say('   - ' + w[1]));
 
 // E. place steps against the place page's own lists

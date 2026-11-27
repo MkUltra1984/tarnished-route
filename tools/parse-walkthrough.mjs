@@ -10,7 +10,7 @@ const root = $('#wiki-content-block').length ? $('#wiki-content-block') : $('bod
 // marker index from every extracted map
 const maps = ['overland', 'underground', 'ashen', 'shadow'].filter(n => fs.existsSync(`data/map-${n}.json`));
 const byTitle = new Map();
-const norm = s => s.toLowerCase().replace(/&amp;/g, '&').replace(/[’`]/g, "'").replace(/\s+/g, ' ').trim();
+const norm = s => s.toLowerCase().replace(/&amp;/g, '&').replace(/[‘’`]/g, "'").replace(/\s+/g, ' ').trim();
 for (const n of maps) {
   const d = JSON.parse(fs.readFileSync(`data/map-${n}.json`, 'utf8'));
   for (const m of d.markers) { const k = norm(m.title); if (!byTitle.has(k)) byTitle.set(k, []); byTitle.get(k).push({ map: n, id: m.id, cat: m.cat, x: m.x, y: m.y }); }
