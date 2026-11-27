@@ -100,3 +100,9 @@ Open, in the owner's words or mine:
 - Map uses whole zoom levels only (half steps showed hairline gaps between tiles). Phone symbols are 30 px, tablet 40 px. Tight clusters zoom in deeper automatically.
 - Owner accepted category symbols in lists instead of real item pictures.
 - The owner checks from a phone: send screenshots with SendUserFile.
+
+## UPDATE 5, 2026-11-28
+- Live at https://mkultra1984.github.io/tarnished-route/ (repository is public; GitHub Pages deploys app/ on every push that touches it, via .github/workflows/pages.yml).
+- History was rewritten to GitHub's no-reply author address before going public; keep using that identity (it is set in this repository's git config).
+- The app updates itself: the deploy writes app/version.json, the app checks it on open, on return to the foreground and every 5 minutes, and reloads when it changed. Check with tools/test-update.mjs.
+
