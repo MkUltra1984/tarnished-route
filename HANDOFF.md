@@ -73,3 +73,30 @@ The map images, marker text and walkthrough text come from the Fextralife Elden 
 - The owner also said: start generating the app assets now (symbols for all categories, route markers, tab icons, interface pieces, app icon). Generate one style anchor in the map's style, get it approved on a contact sheet rendered on the real map at real size (48 px), then generate the full set using the approved anchor as the reference image (images/edits) so the set is consistent. gpt-image-1.5 supports transparent backgrounds.
 - After all custom assets are approved, re-run the UX review, then build the app.
 - The project was moved to this PC through a private GitHub repository. The owner works from this PC from now on.
+## UPDATE 3, evening of 2026-11-27: the app exists now. Read this first.
+
+Owner decisions made in this session (they replace anything above that conflicts):
+- Map: original wiki maps upscaled x2 with Real-ESRGAN (tools/upscale-map.mjs, 2048 px blocks with 64 px real padding, no seams found). Tiles in app/tiles, zoom 0 to 6, 89 MB, built by tools/build-tiles.mjs. assets/maps-up is ignored by git and can be rebuilt.
+- Symbols: style "m3" (assets/anchor/m3.png), crisp, as compact discs with a thin rim (tools/tight-symbols.mjs -> app/icons). ONE fixed size on screen (40 px); the map zooms per step so that step's objectives fit. Plus, minus and re-centre buttons on the map.
+- Rim colours: red bosses and invaders, gold gear, blue spells, green talismans, white places and NPCs, violet items. Violet and NPC white were my proposal; the owner has seen them but not explicitly confirmed.
+- Step card (the owner rejected the DESIGN.md card): wider right panel; wiki walkthrough text first, in full, no "More"; then a compact list where EVERY objective has its own tick box; tapping an objective unfolds the wiki note for it and finds it on the map; tapping a map symbol opens the same note. One button: "Done" when all are ticked, otherwise "Next step, N left open"; steps with open objectives come back at the end of the route. Undo for 4 seconds.
+- The owner is impatient with approval rounds: build, verify in the headless browser, then show. Still never show broken work.
+
+What exists: app/ (index.html, app.css, app.js, sw.js, manifest, data/, icons/, tiles/, fonts/, vendor/leaflet). Data is built by tools/build-route.mjs (233 steps, 5,111 markers). Test with `node tools/serve.mjs` and `node tools/test-app.mjs` (all checks pass on tablet and phone sizes).
+
+Open, in the owner's words or mine:
+- Owner wants the wiki's walkthrough images, the detailed per-region / per-dungeon walkthrough pages with per-item info, and location pictures. Only the two overview walkthrough pages are in raw/; the detailed pages and images still have to be fetched from the wiki (politely) and wired into steps and item notes.
+- Characters that change location: the wiki map has one marker per location ("... (First Location)"), each is its own objective in the nearest step. There is no quest-state logic yet.
+- Walkthrough text is raw wiki prose (leftovers like "[ Map Coordinates for ...]" need cleaning). Missable line is a keyword heuristic.
+- Item pictures in the list (tools/fetch-item-art.mjs) not fetched yet; rows show the category symbol.
+- Quests tab is only a list of NPC markers; Gauntlet tab is a placeholder text. Remembrance symbol, route markers and app icon are first drafts.
+- Nothing is committed or pushed since the session started; hosting (GitHub Pages) not set up. Ask before pushing.
+- The OpenAI key was pasted into the chat in plain text; the owner was told to rotate it.
+
+## UPDATE 4, late 2026-11-27
+- Wiki pictures: tools/walk-images.mjs downloaded the pictures of every walkthrough section into app/walk (24 MB); 135 of 233 steps show them. tools/fetch-places.mjs saved the wiki's own page for 230 places (raw/places, data/places.json); 94 steps show its extra walkthrough text, notes or picture under "<place> in detail".
+- Walkthrough text is cleaned of wiki leftovers. The keyword "Missable" guess was removed: the wiki walkthrough pages never mark anything as missable, so the app shows no missable warnings. A real source for missables is still needed.
+- Quests tab: one block per character with every location in route order. Gauntlet tab: 160 distinct bosses in route order (not yet "lore strength" order; Boss Arena mod not set up).
+- Map uses whole zoom levels only (half steps showed hairline gaps between tiles). Phone symbols are 30 px, tablet 40 px. Tight clusters zoom in deeper automatically.
+- Owner accepted category symbols in lists instead of real item pictures.
+- The owner checks from a phone: send screenshots with SendUserFile.

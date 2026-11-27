@@ -1,0 +1,31 @@
+﻿<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><title>Map upscale test</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#141414;color:#efe9db;font-family:system-ui,sans-serif;padding:24px}
+h1{font-family:Georgia,serif;font-weight:400;font-size:26px;margin:0 0 4px;color:#e0c284}
+p{margin:0 0 16px;color:#a39c8c;font-size:15px}
+.grid{display:grid;grid-template-columns:150px 1fr 1fr;gap:12px}
+.h{font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:#a39c8c;align-self:end}
+.row{font-family:Georgia,serif;font-size:22px;color:#e0c284;align-self:center}
+.map{position:relative;height:380px;border-radius:8px;overflow:hidden;background-repeat:no-repeat}
+.m{position:absolute;width:48px;height:48px;margin:-24px 0 0 -24px}
+</style></head><body>
+<h1>Map upscale test: original vs upscaled</h1>
+<p>One crop of Limgrave, shown as on the tablet. Left: the original wiki map. Right: the same crop after the local upscaler (no repaint, same geometry). Symbols are the chosen "Soft" level at 48 px.</p>
+<div class="grid" id="g"><div></div><div class="h">Original</div><div class="h">Upscaled</div></div>
+<script>
+var names = ['boss', 'weapon', 'spell', 'talisman', 'grace', 'armor', 'shield', 'ashofwar', 'spiritash', 'invader', 'npc'];
+[['Normal zoom', 0.5], ['Fully zoomed in', 1]].forEach(function (row) {
+  var t = document.createElement('div'); t.className = 'row'; t.textContent = row[0]; g.appendChild(t);
+  ['crop-orig.png', 'crop-up2.jpg'].forEach(function (f) {
+    var d = document.createElement('div'); d.className = 'map'; g.appendChild(d);
+    var w = d.clientWidth, h = d.clientHeight, sc = row[1];
+    d.style.backgroundImage = 'url(../assets/maptest/' + f + ')'; d.style.backgroundSize = (1280 * sc) + 'px ' + (800 * sc) + 'px';
+    d.style.backgroundPosition = Math.round(w / 2 - 640 * sc) + 'px ' + Math.round(h / 2 - 440 * sc) + 'px'; d.style.backgroundColor = '#222';
+    var seed = 5; function rnd() { seed = (seed * 16807) % 2147483647; return seed / 2147483647; }
+    for (var k = 0; k < 6; k++) { var i = document.createElement('img'); i.className = 'm'; i.src = '../assets/anchor/soft/s1-' + names[k * 2 % 11] + '.png';
+      i.style.left = Math.round(w * (0.1 + (k % 3 + rnd() * 0.6) * 0.28)) + 'px'; i.style.top = Math.round(h * (0.2 + ((k / 3 | 0) + rnd() * 0.5) * 0.4)) + 'px'; d.appendChild(i); }
+  });
+});
+</script></body></html>

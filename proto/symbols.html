@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><title>Symbols on the map</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#141414;color:#efe9db;font-family:system-ui,sans-serif;padding:28px}
+h1{font-family:Georgia,serif;font-weight:400;font-size:28px;margin:0 0 4px;color:#e0c284}
+p{margin:0 0 18px;color:#a39c8c;font-size:15px}
+.cap{font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:#a39c8c;margin:0 0 8px}
+.big{display:flex;flex-wrap:wrap;gap:14px;background:#232120;border-radius:8px;padding:16px;margin-bottom:22px}
+.big figure{margin:0;text-align:center;font-size:12px;color:#a39c8c;width:104px}
+.big img{width:96px;height:96px;display:block;margin:0 auto 4px}
+.maps{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}
+.map{position:relative;height:330px;border-radius:8px;overflow:hidden;background-size:4096px 4096px}
+.m{position:absolute;width:48px;height:48px;margin:-24px 0 0 -24px}
+.lab{position:absolute;left:8px;top:8px;background:rgba(0,0,0,.6);padding:3px 8px;border-radius:4px;font-size:12px}
+</style></head><body>
+<h1 id="t"></h1>
+<p>Top: every symbol large. Below: the same symbols at real size (48 px) on the four real maps.</p>
+<div class="cap">Large (96 px)</div>
+<div class="big" id="big"></div>
+<div class="cap">Real size on the maps</div>
+<div class="maps" id="maps"></div>
+<script>
+var q = new URLSearchParams(location.search), set = q.get('set') || 'm3', dir = q.get('dir') || '../assets/anchor/';
+var names = (q.get('names') || 'boss,weapon,spell,talisman,grace,armor').split(',');
+document.getElementById('t').textContent = q.get('title') || 'Map symbols';
+names.forEach(function (n) { var f = document.createElement('figure'); f.innerHTML = '<img src="' + dir + set + '-' + n + '.png">' + n; document.getElementById('big').appendChild(f); });
+var MAPS = [['Lands Between: Limgrave', 'Elden-Ring-Overland-v1', -1560, -3020], ['Lands Between: sea and snow', 'Elden-Ring-Overland-v1', -2500, -900],
+  ['Underground', 'Elden-Ring-Underground-v1', -1900, -2650], ['Realm of Shadow', 'Elden-Ring-Realm-of-Shadow-v1', -1650, -1900]];
+// fixed pseudo-random spots so every sheet is comparable
+var seed = 7; function rnd() { seed = (seed * 16807) % 2147483647; return seed / 2147483647; }
+MAPS.forEach(function (mp) {
+  var d = document.createElement('div'); d.className = 'map';
+  d.style.backgroundImage = 'url(../assets/maps/' + mp[1] + '-4096.jpg)'; d.style.backgroundPosition = mp[2] + 'px ' + mp[3] + 'px';
+  var cols = 6, rows = Math.ceil(names.length / cols) < 3 ? 3 : Math.ceil(names.length / cols), k = 0;
+  for (var r = 0; r < rows; r++) for (var c = 0; c < cols; c++) {
+    var i = document.createElement('img'); i.className = 'm'; i.src = dir + set + '-' + names[k++ % names.length] + '.png';
+    i.style.left = (8 + (c + 0.25 + rnd() * 0.5) * (84 / cols)) + '%'; i.style.top = (10 + (r + 0.2 + rnd() * 0.6) * (84 / rows)) + '%'; d.appendChild(i);
+  }
+  var l = document.createElement('div'); l.className = 'lab'; l.textContent = mp[0]; d.appendChild(l);
+  document.getElementById('maps').appendChild(d);
+});
+</script></body></html>

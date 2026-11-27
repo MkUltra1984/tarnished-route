@@ -4,3 +4,7 @@ assets/maptest/
 # never commit secrets
 .env
 *.key
+assets/maps-up/
+shots/app-*.png
+assets/anchor/*.log
+assets/symbols/raw/*.log

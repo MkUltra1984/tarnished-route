@@ -1,0 +1,39 @@
+﻿<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><title>Marker size</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#141414;color:#efe9db;font-family:system-ui,sans-serif;padding:24px}
+h1{font-family:Georgia,serif;font-weight:400;font-size:26px;margin:0 0 4px;color:#e0c284}
+p{margin:0 0 16px;color:#a39c8c;font-size:15px}
+.grid{display:grid;grid-template-columns:150px 1fr 1fr 1fr;gap:12px}
+.h{font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:#a39c8c;align-self:end}
+.row{font-family:Georgia,serif;font-size:22px;color:#e0c284;align-self:center}
+.row small{display:block;font-family:system-ui,sans-serif;font-size:13px;color:#a39c8c;margin-top:4px}
+.map{position:relative;height:300px;border-radius:8px;overflow:hidden;background:#222 url(../assets/maptest/crop-up2.jpg) no-repeat}
+.m{position:absolute}
+.m img{display:block;width:100%;height:100%;position:relative}
+.tip{position:absolute;left:50%;bottom:-5px;width:0;height:0;margin-left:-4px;border-left:4px solid transparent;border-right:4px solid transparent;border-top:7px solid #1d1711}
+</style></head><body>
+<h1>How big should the map symbols be?</h1>
+<p>Symbols keep the same size on screen at every zoom. Middle column is what the app shows by default: only the current step's markers. Left and right are the crowded "show all" case. Rim colours of some symbols are not final.</p>
+<div class="grid" id="g"><div></div><div class="h">All markers, normal zoom</div><div class="h">One step only (Church of Elleh), zoomed in</div><div class="h">All markers, zoomed in</div></div>
+<script src="../assets/maptest/crop-markers.js"></script>
+<script>
+var ROWS = [['A', '28 px', '', 28, false], ['B', '24 px', '', 24, false], ['C', '20 px', '', 20, false], ['D', '20 px with tip', 'the point marks the exact spot', 20, true], ['E', '16 px', '', 16, false]];
+ROWS.forEach(function (row) {
+  var t = document.createElement('div'); t.className = 'row'; t.innerHTML = row[0] + ' · ' + row[1] + '<small>' + row[2] + '</small>'; g.appendChild(t);
+  [[0.5, 640, 400, 1], [1, 300, 300, 0], [1, 300, 300, 1]].forEach(function (v) {
+    var d = document.createElement('div'); d.className = 'map'; g.appendChild(d);
+    var w = d.clientWidth, h = d.clientHeight, sc = v[0], ox = Math.round(w / 2 - v[1] * sc), oy = Math.round(h / 2 - v[2] * sc), s = row[3];
+    d.style.backgroundSize = (1280 * sc) + 'px ' + (800 * sc) + 'px'; d.style.backgroundPosition = ox + 'px ' + oy + 'px';
+    CROP.forEach(function (k) {
+      if (!k.f) return; if (!v[3] && Math.hypot(k.x - 215, k.y - 290) > 95) return;
+      var m = document.createElement('div'); m.className = 'm'; m.style.width = m.style.height = s + 'px';
+      var x = Math.round(ox + k.x * sc), y = Math.round(oy + k.y * sc);
+      m.style.left = (x - s / 2) + 'px'; m.style.top = (row[4] ? y - s - 5 : y - s / 2) + 'px';
+      m.innerHTML = (row[4] ? '<div class="tip"></div>' : '') + '<img src="../assets/anchor/soft/s0-' + k.f + '.png">'; d.appendChild(m);
+    });
+  });
+});
+</script></body></html>
+

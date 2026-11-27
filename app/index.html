@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<meta name="theme-color" content="#16150F">
+<meta name="robots" content="noindex, nofollow">
+<title>Tarnished Route</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/app-192.png">
+<link rel="stylesheet" href="vendor/leaflet.css">
+<link rel="stylesheet" href="app.css">
+</head>
+<body>
+<div id="app">
+  <div id="map" aria-label="Map"></div>
+  <button id="zin" class="mapbtn" aria-label="Zoom in"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></button>
+  <button id="zout" class="mapbtn" aria-label="Zoom out"><svg viewBox="0 0 24 24"><path d="M5 12h14"/></svg></button>
+  <button id="recentre" class="mapbtn" aria-label="Re-centre the map"><img src="icons/tab-recentre.png" alt=""></button>
+  <section id="pane"></section>
+  <nav id="tabs"></nav>
+</div>
+<div id="sheet" hidden></div>
+<script src="vendor/leaflet.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

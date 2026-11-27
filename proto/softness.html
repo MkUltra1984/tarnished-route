@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><title>Symbol softness</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#141414;color:#efe9db;font-family:system-ui,sans-serif;padding:24px}
+h1{font-family:Georgia,serif;font-weight:400;font-size:26px;margin:0 0 4px;color:#e0c284}
+p{margin:0 0 16px;color:#a39c8c;font-size:15px}
+.grid{display:grid;grid-template-columns:150px 1fr 1fr;gap:12px;align-items:stretch}
+.h{font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:#a39c8c;align-self:end}
+.row{font-family:Georgia,serif;font-size:22px;color:#e0c284;align-self:center}
+.row small{display:block;font-family:system-ui,sans-serif;font-size:13px;color:#a39c8c;margin-top:4px}
+.map{position:relative;height:250px;border-radius:8px;overflow:hidden;background-image:url(../assets/maps/Elden-Ring-Overland-v1-8192.jpg)}
+.m{position:absolute;width:48px;height:48px;margin:-24px 0 0 -24px}
+</style></head><body>
+<h1>How crisp should the symbols be?</h1>
+<p>Same symbols, same spots, real size (48 px), on the original map as the app will show it. Left: normal zoom. Right: zoomed all the way in, where the map is at its softest.</p>
+<div class="grid" id="g"><div></div><div class="h">Normal zoom</div><div class="h">Fully zoomed in</div></div>
+<script>
+var names = ['boss', 'weapon', 'spell', 'talisman', 'grace', 'armor', 'shield', 'ashofwar', 'spiritash', 'invader', 'npc'];
+var ROWS = [['A', 'Crisp', 'as generated'], ['B', 'Soft', 'slightly blurred, lower contrast'], ['C', 'Softer', 'matches the map at full zoom'], ['D', 'Softest', '']];
+// the same map point (Limgrave) centred in both views: point in 8192 px map coordinates
+var PX = 3640, PY = 6340;
+ROWS.forEach(function (row, li) {
+  var t = document.createElement('div'); t.className = 'row'; t.innerHTML = row[0] + ' · ' + row[1] + '<small>' + row[2] + '</small>'; g.appendChild(t);
+  [0.5, 1].forEach(function (scale) {
+    var d = document.createElement('div'); d.className = 'map'; g.appendChild(d);
+    var w = d.clientWidth, h = d.clientHeight;
+    d.style.backgroundSize = (8192 * scale) + 'px ' + (8192 * scale) + 'px';
+    d.style.backgroundPosition = Math.round(w / 2 - PX * scale) + 'px ' + Math.round(h / 2 - PY * scale) + 'px';
+    var seed = 11; function rnd() { seed = (seed * 16807) % 2147483647; return seed / 2147483647; }
+    var cols = 6, rows = 2, k = 0;
+    for (var r = 0; r < rows; r++) for (var c = 0; c < cols; c++) {
+      if (k >= names.length) break;
+      var i = document.createElement('img'); i.className = 'm'; i.src = '../assets/anchor/soft/s' + li + '-' + names[k++] + '.png';
+      i.style.left = Math.round(w * (0.06 + (c + 0.25 + rnd() * 0.5) * (0.9 / cols))) + 'px'; i.style.top = Math.round(h * (0.12 + (r + 0.2 + rnd() * 0.6) * (0.8 / rows))) + 'px'; d.appendChild(i);
+    }
+  });
+});
+</script></body></html>
