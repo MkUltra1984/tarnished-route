@@ -12,7 +12,7 @@
   const BOSSES = M.filter(m => m.cat === 'Bosses');
 
   // ---------- saved progress ----------
-  const KEY = 'tarnished-route-v1';
+  const KEY = 'tarnished-route-v2';   // v2: steps are saved by their stable id, so rebuilding the route keeps your progress
   const S = Object.assign({ st: {}, got: {}, hist: [], size: 18, extras: false, all: false, tab: 'route' }, JSON.parse(localStorage.getItem(KEY) || '{}'));
   const save = () => localStorage.setItem(KEY, JSON.stringify(S));
   const q = new URLSearchParams(location.search);
@@ -27,7 +27,7 @@
     }
     return s || null;
   }
-  const nextAfter = s => ROUTE.find(x => x.id !== s.id && !S.st[x.id] && x.id > s.id) || ROUTE.find(x => x.id !== s.id && !S.st[x.id]);
+  const nextAfter = s => { const at = ROUTE.indexOf(s); return ROUTE.find((x, i) => i > at && !S.st[x.id]) || ROUTE.find(x => x !== s && !S.st[x.id]); };
   const doneCount = () => ROUTE.filter(x => S.st[x.id] === 'd').length;
   const grabOf = s => [...new Set([...s.m, ...s.n])].map(i => M[i]).filter(m => m.kind === 'g');
   const extraOf = s => s.n.map(i => M[i]).filter(m => m.kind === 'x');
@@ -153,7 +153,7 @@
       </div>
       <div class="body">
         <div class="sechead"><span class="over">Walkthrough</span>${grab.length ? `<button class="link" id="jump">To do &middot; ${grab.length - open} of ${grab.length} &darr;</button>` : ''}</div>
-        <div class="dir">${shot(s.imgs[0], 'lead')}${para.map(p => `<p>${esc(p)}</p>`).join('')}${s.imgs.length > 1 ? `<div class="strip">${s.imgs.slice(1).map(f => shot(f, 'thumb')).join('')}</div>` : ''}</div>
+        <div class="dir">${shot(s.imgs[0], 'lead')}${para.map(p => p.startsWith('## ') ? `<h3>${esc(p.slice(3))}</h3>` : `<p>${esc(p)}</p>`).join('')}${s.imgs.length > 1 ? `<div class="strip">${s.imgs.slice(1).map(f => shot(f, 'thumb')).join('')}</div>` : ''}</div>
         ${s.place && (s.place.walk.length || s.place.notes.length || s.place.img) ? `<div class="over sechead">${esc(s.place.title)} in detail</div><div class="dir">${shot(s.place.img, 'lead')}${s.place.walk.map(p => p.startsWith('## ') ? `<h3>${esc(p.slice(3))}</h3>` : `<p>${esc(p)}</p>`).join('')}${s.place.notes.length ? `<h3>Notes</h3><ul>${s.place.notes.map(p => `<li>${esc(p)}</li>`).join('')}</ul>` : ''}</div>` : ''}
         ${s.miss ? `<div class="miss"><b>Missable:</b> ${esc(s.miss)}</div>` : ''}
         <div class="sechead" id="todo"><span class="over">To do here &middot; ${grab.length - open} of ${grab.length}</span>${grab.length > 1 ? `<button class="link" id="allb">${open ? 'Tick all' : 'Untick all'}</button>` : ''}</div>
