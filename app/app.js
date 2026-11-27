@@ -232,5 +232,23 @@
     const s = currentStep(); if (s && (S.tab === 'route' || !mapName)) drawStep(s, true);
   }
   render();
-  if ('serviceWorker' in navigator && location.protocol === 'https:') navigator.serviceWorker.register('sw.js');
+  // ---------- automatic updates ----------
+  // Every deploy writes a new version.json. The app checks it when it opens, when it comes back to the foreground and
+  // every few minutes; when the version changed it reloads itself and picks up the new files. Progress is kept.
+  let seen = null, reloading = false;
+  const reload = () => { if (!reloading) { reloading = true; location.reload(); } };
+  async function checkVersion() {
+    try {
+      const r = await fetch('version.json?t=' + Date.now(), { cache: 'no-store' }); if (!r.ok) return;
+      const v = (await r.json()).v; if (seen == null) { seen = v; return; }
+      if (v !== seen) { const reg = navigator.serviceWorker && await navigator.serviceWorker.getRegistration(); if (reg) await reg.update().catch(() => {}); reload(); }
+    } catch (e) { /* offline: keep going with what we have */ }
+  }
+  if ('serviceWorker' in navigator && location.protocol === 'https:') {
+    const hadWorker = !!navigator.serviceWorker.controller;
+    navigator.serviceWorker.register('sw.js', { updateViaCache: 'none' });
+    navigator.serviceWorker.addEventListener('controllerchange', () => { if (hadWorker) reload(); });   // a new worker took over
+  }
+  checkVersion(); setInterval(checkVersion, 5 * 60 * 1000);
+  document.addEventListener('visibilitychange', () => { if (!document.hidden) checkVersion(); });
 })();

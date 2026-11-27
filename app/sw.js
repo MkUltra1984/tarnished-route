@@ -1,14 +1,20 @@
-// Offline support: the app shell and data are cached on install; map tiles and pictures are cached as they are viewed.
-const CACHE = 'tarnished-route-1';
+// Offline support with automatic updates.
+// App files and data: always asked from the network first (revalidated, never a stale copy); the cached copy is only used offline.
+// Map tiles and walkthrough pictures: served from the cache once seen, because they are large and do not change between app updates.
+const APP = 'app-v2', BIG = 'big-v2';
 const SHELL = ['./', 'index.html', 'app.css', 'app.js', 'vendor/leaflet.js', 'vendor/leaflet.css', 'fonts/inter.woff2', 'fonts/marcellus.woff2', 'data/route.json', 'data/markers.json', 'manifest.webmanifest'];
-self.addEventListener('install', e => e.waitUntil(caches.open(CACHE).then(c => c.addAll(SHELL)).then(() => self.skipWaiting())));
-self.addEventListener('activate', e => e.waitUntil(caches.keys().then(k => Promise.all(k.filter(n => n !== CACHE).map(n => caches.delete(n)))).then(() => self.clients.claim())));
+self.addEventListener('install', e => e.waitUntil(caches.open(APP).then(c => c.addAll(SHELL.map(u => new Request(u, { cache: 'reload' })))).then(() => self.skipWaiting())));
+self.addEventListener('activate', e => e.waitUntil(caches.keys().then(k => Promise.all(k.filter(n => n !== APP && n !== BIG).map(n => caches.delete(n)))).then(() => self.clients.claim())));
 self.addEventListener('fetch', e => {
-  if (e.request.method !== 'GET' || new URL(e.request.url).origin !== location.origin) return;
-  const isAsset = /\/(tiles|icons|items|fonts|vendor)\//.test(e.request.url);
-  e.respondWith(caches.open(CACHE).then(async c => {
-    const hit = await c.match(e.request);
-    const net = fetch(e.request).then(r => { if (r.ok) c.put(e.request, r.clone()); return r; }).catch(() => hit);
-    return isAsset ? (hit || net) : net.then(r => r || hit); // assets: cache first; app and data: fresh first, cache when offline
+  const url = new URL(e.request.url);
+  if (e.request.method !== 'GET' || url.origin !== location.origin) return;
+  if (url.pathname.endsWith('/version.json')) return;                       // the update check always goes straight to the network
+  if (/\/(tiles|walk)\//.test(url.pathname)) {
+    e.respondWith(caches.open(BIG).then(async c => (await c.match(e.request)) || fetch(e.request).then(r => { if (r.ok) c.put(e.request, r.clone()); return r; })));
+    return;
+  }
+  e.respondWith(caches.open(APP).then(async c => {
+    try { const r = await fetch(e.request, { cache: 'no-cache' }); if (r.ok) c.put(e.request, r.clone()); return r; }
+    catch (err) { const hit = await c.match(e.request, { ignoreSearch: e.request.mode === 'navigate' }); if (hit) return hit; throw err; }
   }));
 });
