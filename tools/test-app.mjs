@@ -37,7 +37,9 @@ for (const [name, w, h] of [['tablet', 1280, 800], ['phone', 412, 915]]) {
   if (rows > 1) { await page.locator('#allb').click(); await page.waitForTimeout(150); }
   ok((await page.locator('.done').innerText()).trim().toLowerCase() === 'done', `${name}: all ticked, button reads Done`);
   await page.locator('.done').click(); await page.waitForTimeout(4400);
-  ok(await page.locator('#undo').count() === 0 && await page.locator('.next').count() === 1, `${name}: Undo disappears after 4 seconds`);
+  ok(await page.locator('#undo').count() === 1 && await page.locator('.next').count() === 1, `${name}: Undo stays available`);
+  const tA = await title(); await page.locator('.done').click(); await page.waitForTimeout(200); await page.reload({ waitUntil: 'networkidle' });
+  await page.locator('#undo').click(); await page.waitForTimeout(200); ok(await title() === tA, `${name}: Undo still works after closing and reopening`);
   ok((await page.locator('.meta').first().innerText()) !== '', `${name}: progress shown`);
   // zoom buttons
   const z0 = await page.evaluate(() => document.querySelectorAll('.leaflet-tile').length); await page.locator('#zout').click(); await page.waitForTimeout(500); await page.locator('#zin').click(); await page.waitForTimeout(500); ok(true, `${name}: zoom buttons respond`);

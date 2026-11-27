@@ -13,7 +13,7 @@
 
   // ---------- saved progress ----------
   const KEY = 'tarnished-route-v1';
-  const S = Object.assign({ st: {}, got: {}, size: 18, extras: false, all: false, tab: 'route' }, JSON.parse(localStorage.getItem(KEY) || '{}'));
+  const S = Object.assign({ st: {}, got: {}, hist: [], size: 18, extras: false, all: false, tab: 'route' }, JSON.parse(localStorage.getItem(KEY) || '{}'));
   const save = () => localStorage.setItem(KEY, JSON.stringify(S));
   const q = new URLSearchParams(location.search);
   let peek = q.has('step') ? +q.get('step') : null;          // look at a step without changing progress
@@ -110,7 +110,7 @@
   // ---------- Route tab ----------
   // Every objective has its own tick. "Next step" moves on: a step with everything ticked is done; a step with open
   // objectives is remembered and comes back at the end of the route with only what is still open.
-  let undo = null, undoTimer = 0, openInfo = null;   // openInfo: the objective whose wiki note is unfolded
+  let openInfo = null;   // openInfo: the objective whose wiki note is unfolded
   function checkHTML(m) {
     return `<button class="chk${S.got[m.i] ? ' got' : ''}" data-i="${m.i}"><img class="ci" data-pan="${m.i}" src="icons/${m.f}.png" alt=""><span class="cn">${esc(m.title)}</span><span class="cc">${esc(m.label)}</span><span class="box" data-tick="1" aria-hidden="true"></span></button>${openInfo === m.i ? `<div class="info">${esc(m.desc || "The wiki map has no extra note for this one.")}</div>` : ""}`;
   }
@@ -140,7 +140,7 @@
       </div>
       <div class="foot">
         <button class="done">${open && grab.length ? `Next step<small>${open} left open</small>` : 'Done'}</button>
-        ${undo ? `<div class="undo"><span>${undo.how === 'd' ? 'Step done.' : 'Moved on, open items kept.'}</span><button id="undo">Undo</button></div>` : `<div class="next">${nx ? `Next: <b>${esc(nx.title)}</b>${nx.boss ? '<em>Boss</em>' : ''}` : 'Last step'}</div>`}
+        <div class="undo"><span class="next">${nx ? `Next: <b>${esc(nx.title)}</b>${nx.boss ? '<em>Boss</em>' : ''}` : 'Last step'}</span>${S.hist.length ? '<button id="undo">&#8630; Undo</button>' : ''}</div>
       </div>`;
     $('.body', pane).scrollTop = keep;
     pane.querySelectorAll('.chk').forEach(r => r.onclick = e => {
@@ -156,12 +156,11 @@
     const jump = $('#jump', pane); if (jump) jump.onclick = () => $('#todo', pane).scrollIntoView({ behavior: 'smooth', block: 'start' });
     pane.querySelectorAll('.shot').forEach(im => im.onclick = () => zoomPicture(im.src));
     $('.done', pane).onclick = () => finish(s, open && grab.length ? 'l' : 'd');
-    const u = $('#undo', pane); if (u) u.onclick = () => { clearTimeout(undoTimer); const k = undo; undo = null; delete S.st[k.id]; peek = null; save(); renderRoute(); drawStep(currentStep(), true); };
+    const u = $('#undo', pane); if (u) u.onclick = () => { const id = S.hist.pop(); delete S.st[id]; peek = null; openInfo = null; save(); renderRoute(); drawStep(currentStep(), true); };
   }
   function finish(s, how) {
-    clearTimeout(undoTimer); peek = null;
-    S.st[s.id] = how; undo = { id: s.id, how };
-    undoTimer = setTimeout(() => { undo = null; if (S.tab === 'route') renderRoute(); }, 4000);
+    peek = null;
+    S.st[s.id] = how; S.hist.push(s.id); if (S.hist.length > 200) S.hist.shift();
     save(); openInfo = null; const b = $('.body'); if (b) b.scrollTop = 0; renderRoute(); const n = currentStep(); if (n) drawStep(n, true);
   }
   function focusRow(i) { if (openInfo !== i && M[i].kind === 'g') { openInfo = i; if (S.tab === 'route') renderRoute(); } const r = $(`.chk[data-i="${i}"], .row[data-i="${i}"]`); if (r) { r.scrollIntoView({ block: 'nearest', behavior: 'smooth' }); r.classList.add('flash'); setTimeout(() => r.classList.remove('flash'), 900); } pulse(markerOf.get(i)); }
@@ -219,7 +218,7 @@
     const redraw = () => { const s = currentStep(); if (s && S.tab === 'route') drawStep(s, false); else drawAll(); openSettings(); };
     sh.querySelectorAll('#al .btn').forEach(b => b.onclick = () => { S.all = !!+b.dataset.v; save(); redraw(); });
     $('#close').onclick = () => sh.hidden = true; sh.onclick = e => { if (e.target === sh) sh.hidden = true; };
-    let armed = false; $('#reset').onclick = e => { if (!armed) { armed = true; e.target.textContent = 'Tap again to erase everything'; return; } S.st = {}; S.got = {}; save(); sh.hidden = true; peek = null; render(); };
+    let armed = false; $('#reset').onclick = e => { if (!armed) { armed = true; e.target.textContent = 'Tap again to erase everything'; return; } S.st = {}; S.got = {}; S.hist = []; save(); sh.hidden = true; peek = null; render(); };
   }
 
   // ---------- shell ----------
@@ -249,6 +248,7 @@
     navigator.serviceWorker.register('sw.js', { updateViaCache: 'none' });
     navigator.serviceWorker.addEventListener('controllerchange', () => { if (hadWorker) reload(); });   // a new worker took over
   }
+  if (navigator.storage && navigator.storage.persist) navigator.storage.persist().catch(() => {});
   checkVersion(); setInterval(checkVersion, 5 * 60 * 1000);
   document.addEventListener('visibilitychange', () => { if (!document.hidden) checkVersion(); });
 })();

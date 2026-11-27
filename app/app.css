@@ -180,3 +180,8 @@ button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:poin
 .gt small{display:block;font-size:13px;line-height:18px;color:var(--text-3);font-weight:600}
 .gs{font-size:13px;font-weight:700;color:var(--text-3)}
 .grow.ok .gs{color:var(--ok)}.grow.ok .gt{color:var(--text-3)}.grow.ok img{opacity:.45}
+
+/* permanent Undo beside the Next line */
+.undo{height:auto;min-height:32px;gap:12px}
+.undo .next{margin:0;min-width:0;flex:1}
+.undo button{height:40px;padding:0 0 0 12px;white-space:nowrap;flex:none}
