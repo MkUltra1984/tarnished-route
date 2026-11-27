@@ -1,4 +1,4 @@
-﻿# Handoff: Elden Ring route companion
+# Handoff: Elden Ring route companion
 
 Written 2026-11-27 for a new Claude Code session on a different PC. Read this fully before doing anything.
 
@@ -64,3 +64,12 @@ Not started:
 ## A note on content
 
 The map images, marker text and walkthrough text come from the Fextralife Elden Ring Wiki. The owner chose public web hosting; keep the address unlisted and credit the wiki in the app.
+
+## UPDATE, later on 2026-11-27: read this before the sections above
+
+- MAP DECISION CHANGED: the owner dropped the AI repaint. The app uses the ORIGINAL wiki map, unchanged. Ignore the repaint "next step" above; do not spend more on it. assets/maps2 and assets/repaint are leftovers from the rejected experiment.
+- The original maps are already cut into tile pyramids for the app: app/tiles/<map>/<z>/<y>/<x>.jpg, 256 px tiles, zoom levels 0 to 5 (level 5 = native 8192 px), built by tools/build-tiles.mjs. Use them with a Leaflet tile layer in CRS.Simple. About 31 MB for all four maps.
+- SYMBOL DIRECTION (owner's words): markers "in the style of the map", they should "blend in easily with the map while still being easily readable on first glance". That means inked, parchment-toned cartography symbols (closest earlier candidate: assets/anchor/b.png), with rim colour per group as already approved. Trimmed 96 px candidates are in assets/anchor/<a|b|c>-<boss|weapon|grace|key>.png.
+- The owner also said: start generating the app assets now (symbols for all categories, route markers, tab icons, interface pieces, app icon). Generate one style anchor in the map's style, get it approved on a contact sheet rendered on the real map at real size (48 px), then generate the full set using the approved anchor as the reference image (images/edits) so the set is consistent. gpt-image-1.5 supports transparent backgrounds.
+- After all custom assets are approved, re-run the UX review, then build the app.
+- The project was moved to this PC through a private GitHub repository. The owner works from this PC from now on.
