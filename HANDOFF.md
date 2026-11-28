@@ -241,3 +241,19 @@ Not done: nobody has started the game with it yet. The Gauntlet tab in the app s
   under the gesture bar). Sideways phones get map and text side by side.
 - Offered, not done: shortening all walkthrough texts with a language model (3,092 paragraphs, ~180,000 words), with an
   automatic name/number check and a Short/Full switch. Waiting for the owner's go.
+
+## UPDATE 15 (2026-11-28): the route now follows Redmaw
+- Owner: "follow the Elden Ring Redmaw 100% walkthrough for order of acquiring, then use Fextra's descriptions, and
+  if they are not there use Redmaw's". Redmaw = Elden Ring Completion Sheets, https://eldenring.redmaw.dev,
+  github.com/rdmaw/elden-ring-completion-sheets (no licence file; credited in Settings). Saved in raw/redmaw/.
+- `tools/build-route-redmaw.mjs` writes app/data/route.json: 1,324 steps (946 base, 378 expansion). Every sheet line
+  that names an objective ends a step. Names are matched to the wiki map's markers (nearest unused one of that name);
+  mentions ("use a Stonesword Key", "die to ...", notes) are not pick-ups; only red names can be bosses.
+  Text of a step = the wiki's note per named thing, Redmaw's line where the wiki has none.
+  People / bosses the sheet never names get their own step behind the nearest step; other unnamed things are
+  "nearby, on the way" of the nearest step. Report: data/redmaw-report.txt.
+- Build order now: `node tools/build-route.mjs` (markers.json, boss drops; also the OLD wiki-ordered route and its
+  check-route.mjs), then `node tools/build-route-redmaw.mjs`, which replaces route.json. The old route's extras in
+  boss-drops.mjs (dungeon clean-up, small steps) only matter for the old route.
+- Known weak spots: 349 objectives are not named by the sheet in a way the matcher finds; a few names are matched to
+  the wrong one of several same-named markers. Step ids changed, so saved step progress restarts (ticks are kept).

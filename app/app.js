@@ -284,7 +284,7 @@
       <button class="btn danger" id="reset">Start new playthrough</button>
       <p class="credit" style="margin-top:8px">Clears every tick and puts the route back to step 1.</p>
       <div class="opt">Markers on the map</div>${seg('al', [[0, 'This step only'], [1, 'Everything']], S.all ? 1 : 0)}
-      <p class="credit">Map images, marker positions and walkthrough text come from the <a href="https://eldenring.wiki.fextralife.com/" target="_blank" rel="noopener">Fextralife Elden Ring Wiki</a>. Elden Ring is a trademark of its owners; this is a personal fan tool.</p></div>`;
+      <p class="credit">The order of the route follows <a href="https://eldenring.redmaw.dev/" target="_blank" rel="noopener">Redmaw's Elden Ring Completion Sheets</a>, and where the wiki has no note the step shows Redmaw's own line. Map images, marker positions and descriptions come from the <a href="https://eldenring.wiki.fextralife.com/" target="_blank" rel="noopener">Fextralife Elden Ring Wiki</a>. Elden Ring is a trademark of its owners; this is a personal fan tool.</p></div>`;
     document.querySelectorAll('#al .btn').forEach(b => b.onclick = () => { S.all = !!+b.dataset.v; save(); drawAll(); renderSettings(); });
     let armed = false; $('#reset').onclick = e => { if (!armed) { armed = true; e.target.textContent = 'Tap again to erase all progress'; return; } S.st = {}; S.got = {}; S.hist = []; S.tab = 'route'; save(); peek = null; openInfo = null; showOpen = false; render(); };
   }
