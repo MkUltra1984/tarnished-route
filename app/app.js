@@ -29,7 +29,7 @@
     if (peek != null && ROUTE[peek]) return ROUTE[peek];
     let s = ROUTE.find(x => !S.st[x.id]);
     if (!s) { // end of the list: bring back "Later" steps first, then skipped ones
-      for (const kind of ['l', 's']) { const ids = Object.keys(S.st).filter(k => S.st[k] === kind); if (ids.length) { ids.forEach(k => delete S.st[k]); save(); return currentStep(); } }
+      for (const kind of ['l', 's']) { const ids = Object.keys(S.st).filter(k => S.st[k] === kind); if (ids.length) { ids.forEach(k => delete S.st[k]); S.hist = S.hist.filter(id => S.st[id]); save(); return currentStep(); } }
     }
     return s || null;
   }
@@ -221,7 +221,7 @@
       renderRoute();
     });
     pane.querySelectorAll('[data-card]').forEach(b => b.onclick = () => openCard(M[+b.dataset.card]));
-    const allb = $('#allb', pane); if (allb) allb.onclick = () => { grab.forEach(m => { if (open) S.got[m.i] = 1; else delete S.got[m.i]; }); settle(grab[0].i); save(); renderRoute(); drawStep(s, false); };
+    const allb = $('#allb', pane); if (allb) allb.onclick = () => { grab.forEach(m => { if (open) S.got[m.i] = 1; else delete S.got[m.i]; }); grab.forEach(m => settle(m.i)); save(); renderRoute(); drawStep(s, false); };
     const xt = $('#xt', pane); if (xt) xt.onclick = () => { S.extras = !S.extras; save(); renderRoute(); drawStep(s, false); };
     const ob = $('#openb', pane); if (ob) ob.onclick = () => { showOpen = true; renderRoute(); };
     const jump = $('#jump', pane); if (jump) jump.onclick = () => $('#todo', pane).scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -231,8 +231,9 @@
   }
   function finish(s, how) {
     $('#pane').scrollTop = 0;
+    if (peek != null) { peek = Math.min(ROUTE.length - 1, peek + 1); openInfo = null; showOpen = false; renderRoute(); drawStep(currentStep(), true); return; }
     peek = null;
-    showOpen = false; S.st[s.id] = how; S.hist.push(s.id); if (S.hist.length > 200) S.hist.shift();
+    showOpen = false; S.st[s.id] = how; if (S.hist[S.hist.length - 1] !== s.id) S.hist.push(s.id); if (S.hist.length > 200) S.hist.shift();
     save(); openInfo = null; const b = $('.body'); if (b) b.scrollTop = 0; renderRoute(); const n = currentStep(); if (n) drawStep(n, true);
   }
   function focusRow(i) { if (openInfo !== i && M[i].kind === 'g') { openInfo = i; if (S.tab === 'route') renderRoute(); } const r = $(`.chk[data-i="${i}"], .row[data-i="${i}"]`); if (r) { r.scrollIntoView({ block: 'nearest', behavior: 'smooth' }); r.classList.add('flash'); setTimeout(() => r.classList.remove('flash'), 900); } pulse(markerOf.get(i)); }

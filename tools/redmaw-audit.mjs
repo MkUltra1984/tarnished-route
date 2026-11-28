@@ -10,7 +10,7 @@ const dropOf = new Map(); for (const b in MK.drops || {}) for (const i of MK.dro
 const linkCount = new Map(); let sheetText = '';
 for (const f of ['walkthrough', 'dlc-walkthrough']) { const $ = cheerio.load(fs.readFileSync(`raw/redmaw/${f}.html`, 'utf8')); $('li').each((_, li) => { sheetText += ' ' + norm($(li).text()); $(li).find('a').each((_, a) => { const k = norm($(a).text().replace(/\s+x\d+$/i, '')); linkCount.set(k, (linkCount.get(k) || 0) + 1); }); }); }
 const total = new Map(); L.forEach((m, i) => { if (kind(i) !== 'g') return; const k = norm(strip(m[4])); total.set(k, (total.get(k) || 0) + 1); });
-const own = new Set(); R.forEach(s => { if (!s.extra) s.m.forEach(i => own.add(i)); });
+const own = new Set(); R.forEach(s => { if (!s.extra || String(s.id).startsWith('rm:split:')) s.m.forEach(i => own.add(i)); });   // a step split off from a sheet step is still the sheet's
 const why = { 'named in the sheet, but fewer times than the map has markers (the sheet groups several, or the map has duplicates)': [], 'the sheet uses the name, the matcher skipped it (mention filter, distance, or enemy colour)': [], 'the sheet says it in running text without a link': [], 'not in the sheet at all': [] };
 L.forEach((m, i) => { if (kind(i) !== 'g' || own.has(i) || dropOf.has(i)) return; const k = norm(strip(m[4])), links = linkCount.get(k) || 0, have = total.get(k);
   const row = `${m[3]}: ${plain(m[4])}`;

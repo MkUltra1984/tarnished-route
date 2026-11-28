@@ -50,6 +50,7 @@ const KIND = { 'NPCs': 'Talk to ', 'NPC Invaders': 'Invader: ', 'Bosses': 'Boss:
 for (const [file, game, maps] of [['walkthrough', 'base', ['overland', 'underground', 'ashen']], ['dlc-walkthrough', 'dlc', ['shadow']]]) {
   const $ = cheerio.load(fs.readFileSync(`raw/redmaw/${file}.html`, 'utf8'));
   let cur = null;   // where the walkthrough currently is: the last thing it named
+  const recent = [];   // the last lines of the sheet, as context for names that many markers share
   const dist = i => cur && cur.map === mapOf(i) ? Math.hypot(L[i][1] - cur.x, L[i][2] - cur.y) : 5;
   $('h3').each((_, h3) => {
     const region = plain($(h3).clone().children('button, span').remove().end().text()).replace(/\s*\d+\/\d+$/, '');
@@ -79,7 +80,7 @@ for (const [file, game, maps] of [['walkthrough', 'base', ['overland', 'undergro
       const optional = li.find('.badge').filter((_, b) => /optional/i.test($(b).text())).length > 0;
       const body = li.clone(); body.find('.badge').remove(); const text = plain(body.text()), low = text.toLowerCase();
       const marks = [], note = /^\s*(note|tip|warning)\b/i.test(text);
-      const MENTION = /\b(needs?|requires?|requiring|using|use|used|uses|bought|buy|sells?|sold|give|giving|offer|spend|equip|equipped|without|instead of|such as|die to|avoid|avoiding|ignore|skip|run past|sneak past|if you (?:have|picked|chose))\b[^,]*$/i;
+      const MENTION = /\b(needs?|requires?|requiring|using|use|used|uses|bought|buy|sells?|sold|give|giving|offer|spend|equip|equipped|without|instead of|such as|die to|avoid|avoiding|ignore|skip|run past|sneak past|if you (?:have|picked|chose))\b(?:\s+(?:a|an|the|your|his|her|their|him|them|two|three|both|some|one|\d+))*\s*$/i;
       const foe = i => L[i][3] === 'Bosses' || L[i][3] === 'NPC Invaders';
       const take = pick => { used.add(pick); marks.push(pick); stats.matched++; cur = { map: mapOf(pick), x: L[pick][1], y: L[pick][2] }; for (const d of DROPS[pick] || []) if (!used.has(d)) { used.add(d); marks.push(d); } };
       // 1. the names the line links
@@ -90,7 +91,8 @@ for (const [file, game, maps] of [['walkthrough', 'base', ['overland', 'undergro
         const red = /\bred\b/.test($(a).attr('class') || '');
         // a name that is only mentioned (something to use, give, buy or need) is not a pick-up
         const html = $.html(li), at = html.indexOf($.html(a)), before = plain(html.slice(0, at)).split(/[.;!?]\s/).pop() || ''; if (MENTION.test(before)) return;
-        const free = c.filter(i => !used.has(i) && maps.includes(mapOf(i)) && (red ? foe(i) || L[i][3] === 'NPCs' : !foe(i))); if (free.length) todo.push({ c, free, red }); });
+        if (red && /\b(past|around|away from|behind|near|next to|beside|below|above|under|beneath|towards?|in front of|guarded by|guarding|patrolled by|between)(?:\s+(?:the|a|an|two|three|four|several|some|both))?\s*$/i.test(before)) return;
+        const free = c.filter(i => !used.has(i) && maps.includes(mapOf(i)) && (red ? foe(i) || L[i][3] === 'NPCs' : !foe(i))); if (free.length) todo.push({ c, free, red, n: Math.min(6, +(($(a).text().match(/sx(d+)$/i) || [, 1])[1])) }); });
       // a thing the wiki says is dropped by someone is only meant by a line that speaks of a fight
       if (!KILL.test(text)) for (const t of todo) if (!t.red) t.free = t.free.filter(i => !DROPPED.test(plain(L[i][5] || '')) || t.c.length === 1);
       // a boss's drop can only be meant where the line also names that boss ("receive a Talisman Pouch" from someone is not Godfrey's)
@@ -99,19 +101,35 @@ for (const [file, game, maps] of [['walkthrough', 'base', ['overland', 'undergro
       const anchors = []; for (const [name, list2] of placeNames) { const p = low.indexOf(name); if (p < 0) continue; for (const i of list2) if (maps.includes(mapOf(i))) anchors.push({ map: mapOf(i), x: L[i][1], y: L[i][2] }); }
       // where the line is: the places and unique things it names; only without any of these, where the line before was
       const near = i => anchors.length ? Math.min(...anchors.map(a => a.map === mapOf(i) ? Math.hypot(L[i][1] - a.x, L[i][2] - a.y) : 5)) : dist(i);
-      for (const t of todo) { if (!t.free.length) { t.done = true; continue; } if (t.free.length !== 1 || t.c.length > 1 && (!cur || dist(t.free[0]) > 0.15) && kind(t.free[0]) !== 'g') continue; const i = t.free[0]; if (used.has(i)) continue; t.done = true; take(i); anchors.push({ map: mapOf(i), x: L[i][1], y: L[i][2] }); }
+      for (const t of todo) { if (!t.free.length) { t.done = true; continue; } if (t.free.length !== 1 || t.c.length > 1) continue; const i = t.free[0]; if (used.has(i)) continue; t.done = true; take(i); anchors.push({ map: mapOf(i), x: L[i][1], y: L[i][2] }); }
       // a drop named in the line points at its boss ("kill the Deathbird for Blue-Feathered Branchsword")
       for (const t of todo) { if (t.done || !t.red) continue; const viaDrop = t.free.find(b => (DROPS[b] || []).some(d => marks.includes(d) || todo.some(o => o !== t && o.c.includes(d)))); if (viaDrop != null && !used.has(viaDrop)) { t.done = true; take(viaDrop); anchors.push({ map: mapOf(viaDrop), x: L[viaDrop][1], y: L[viaDrop][2] }); } }
-      // of several markers with one name, the nearest to where the line is; too far away is a mention, not a pick-up
-      for (const t of todo) { if (t.done) continue; const free = t.free.filter(i => !used.has(i)); if (!free.length) continue; const pick = free.sort((p, q) => near(p) - near(q))[0], d = near(pick);
-        if (t.c.length >= 3 && d > 0.04) continue; if (t.c.length === 2 && d > 0.15) continue; if (d > 4 && kind(pick) !== 'g' && t.c.length > 1) continue;
-        take(pick); anchors.push({ map: mapOf(pick), x: L[pick][1], y: L[pick][2] }); }
+      // Of several markers with one name: the wiki's markers usually carry their place in the name ("Stonesword Key -
+      // Stormhill Shack", "Golden Seed (Ordina Liturgical Town)"). A marker whose place is spoken of in this stretch of
+      // the sheet (the section title, the last lines, this line) is the one meant; among those, and where no place
+      // helps, the nearest to where the line is. Too far away without such a hint is a mention, not a pick-up.
+      const ctx = (region + ' . ' + recent.join(' . ') + ' . ' + text).toLowerCase();
+      const hintOf = i => { const t = plain(L[i][4]), m = t.match(/\(([^)]+)\)\s*$/) || t.match(/\s+-\s+(.+)$/); if (!m) return null; const h = m[1].replace(/^\d+x\s*/i, '').replace(/\s*\([A-Z]\)$/, '').trim().toLowerCase(); return h.replace(/[^a-z]/g, '').length >= 6 ? h : null; };
+      const says = i => { const h = hintOf(i); if (!h) return 0; if (ctx.includes(h)) return 2; const w = h.split(/[^a-z']+/).filter(x => x.length >= 6 && !GENERIC.has(x)); return w.length && w.every(x => ctx.includes(x)) ? 1 : 0; };
+      for (const t of todo) { if (t.done) continue; const free = t.free.filter(i => !used.has(i)); if (!free.length) continue;
+        const pick = free.sort((p, q) => (says(q) - says(p)) || (near(p) - near(q)))[0], d = near(pick), sure = says(pick);
+        // a marker of another place is not meant when the line's own place is known and differs
+        if (!sure && t.c.length >= 3 && free.some(i => says(i)) ) continue;
+        if (t.c.length >= 3 && d > (sure ? 0.25 : 0.04)) continue; if (t.c.length === 2 && d > (sure ? 0.4 : 0.15)) continue; if (d > 4 && kind(pick) !== 'g' && t.c.length > 1) continue;
+        // a named place that contradicts: the nearest marker says "X - Caelid" while the section is somewhere else entirely
+        if (!sure && t.c.length >= 3 && hintOf(pick) && d > 0.02 && free.length > 1) { const other = free.filter(i => i !== pick && !hintOf(i) && near(i) <= 0.04).sort((p, q) => near(p) - near(q))[0]; if (other != null && near(other) < d + 0.01) { take(other); anchors.push({ map: mapOf(other), x: L[other][1], y: L[other][2] }); continue; } }
+        take(pick); anchors.push({ map: mapOf(pick), x: L[pick][1], y: L[pick][2] });
+        if (kind(pick) === 'g') for (let q = 1; q < t.n; q++) { const more = t.free.filter(i => !used.has(i) && mapOf(i) === mapOf(pick) && Math.hypot(L[i][1] - L[pick][1], L[i][2] - L[pick][2]) < 0.02).sort((a, b) => Math.hypot(L[a][1] - L[pick][1], L[a][2] - L[pick][2]) - Math.hypot(L[b][1] - L[pick][1], L[b][2] - L[pick][2]))[0]; if (more == null) break; take(more); } }
       // 2. names the line says without linking them: only things that are right here
-      if (!note && cur) for (const [name, list2] of plainNames) { const p = low.indexOf(name); if (p < 0) continue; if (p > 0 && /[a-z]/.test(low[p - 1]) || /[a-z]/.test(low[p + name.length] || '')) continue;
+      const linked = new Set(li.find('a').map((_, a) => norm($(a).text().replace(/s+xd+$/i, ''))).get());
+      if (!note && cur) for (const [name, list2] of plainNames) { const p = low.indexOf(name); if (p < 0 || linked.has(norm(name))) continue; if (p > 0 && /[a-z]/.test(low[p - 1]) || /[a-z]/.test(low[p + name.length] || '')) continue;
         if (MENTION.test(text.slice(0, p).split(/[.;!?]\s/).pop() || '')) continue;
         const free = list2.filter(i => !used.has(i) && maps.includes(mapOf(i)) && !marks.includes(i) && !dropOf.has(i) && (KILL.test(text) || !DROPPED.test(plain(L[i][5] || '')))); if (!free.length) continue; const pick = free.sort((a, b) => near(a) - near(b))[0]; if (near(pick) > 0.03) continue;
+        if (foe(pick) && (!KILL.test(text) || /(past|around|behind|near|next to|beside|guarded by|guarding|towards?|in front of|between)( the| a| an| two)?s*$/i.test(text.slice(0, p)))) continue;   // an enemy named in passing is a landmark
         take(pick); stats.plain++; }
-      pending.push({ id, text, marks, miss, optional, names: new Set(li.find('a').map((_, a) => norm($(a).text().replace(/s+xd+$/i, ''))).get()), red: new Set(li.find('a.red').map((_, a) => norm($(a).text())).get()), note });
+      recent.push(text); if (recent.length > 6) recent.shift();
+      const count = new Map(); li.find('a').each((_, a) => { const t = $(a).text(), k = norm(t.replace(/s+xd+$/i, '')), n = +((t.match(/sx(d+)$/i) || [, 1])[1]); count.set(k, (count.get(k) || 0) + Math.min(n, 6)); });
+      pending.push({ id, text, marks, miss, optional, count, names: new Set(li.find('a').map((_, a) => norm($(a).text().replace(/s+xd+$/i, ''))).get()), red: new Set(li.find('a.red').map((_, a) => norm($(a).text())).get()), note });
       if (marks.some(i => kind(i) === 'g')) close();
     });
     // what is left at the end of a section belongs to its last step
@@ -137,7 +155,8 @@ console.log('same-named picks far from the steps around them:', swapped + lonely
 // step whose line names it, if that step is close to the thing on the map.
 let rescued = 0;
 L.forEach((m, i) => { if (used.has(i) || kind(i) !== 'g' || dropOf.has(i)) return; const keys = new Set([norm(strip(m[4])), norm(m[4]), norm(strip(m[4]).replace(/^ash of war: /i, ''))]), foe = m[3] === 'Bosses' || m[3] === 'NPC Invaders';
-  let best = null, bd = 0.06; for (const l of allLines) { if (l.note || !l.step || l.step.map !== mapOf(i) || (l.step.game === 'dlc') !== (mapOf(i) === 'shadow')) continue; const hit = [...keys].find(k => l.names.has(k)); if (!hit || foe !== l.red.has(hit)) continue; if (!foe && DROPPED.test(plain(m[5] || '')) && !KILL.test(l.text)) continue;
+  let best = null, bd = 0.06; for (const l of allLines) { if (l.note || !l.step || l.step.map !== mapOf(i) || (l.step.game === 'dlc') !== (mapOf(i) === 'shadow')) continue; const lt = l.norm || (l.norm = norm(l.text)); const hit = [...keys].find(k => l.names.has(k)) || [...keys].find(k => k.length >= 9 && lt.includes(k)); if (!hit || (l.names.has(hit) && foe !== l.red.has(hit))) continue; if (!foe && DROPPED.test(plain(m[5] || '')) && !KILL.test(l.text)) continue;
+    { const have = l.step.m.filter(j => j !== i && nameKey(j) === nameKey(i)).length, may = Math.max(1, ...allLines.filter(x => x.step === l.step).map(x => x.count.get(hit) || 0)); if (have >= may) continue; }
     const d = Math.min(Math.hypot(l.step.x - m[1], l.step.y - m[2]), ...l.step.m.map(j => mapOf(j) === mapOf(i) ? Math.hypot(L[j][1] - m[1], L[j][2] - m[2]) : 5)); if (d < bd) { bd = d; best = l.step; } }
   if (!best) return; best.m.push(i); used.add(i); rescued++; for (const d of DROPS[i] || []) if (!used.has(d)) { used.add(d); best.m.push(d); } });
 // markers the sheet never names: to the nearest step on their map, as "nearby, on the way"

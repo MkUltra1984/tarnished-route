@@ -289,3 +289,9 @@ Not done: nobody has started the game with it yet. The Gauntlet tab in the app s
   that speak of a fight; place names in a line say where it is. The same-name "repair" swap was removed: it did harm.
 - Left: 87 long jumps between consecutive steps (the sheet fast-travels; 146 steps carry the grace hint), 41 same-named
   picks that lie far from the steps around them (not verified by hand), 204 objectives the sheet does not place.
+- Third matching round (owner: "get to work"): of several same-named markers the one whose place (in its own name,
+  "Stonesword Key - Stormhill Shack") is spoken of in the section title or the last lines wins; a mention word only
+  counts right before the name; an enemy named as a landmark ("run past the Tree Sentinel") is not a fight; "x2" takes
+  the next ones beside the first; a name the line links is not matched a second time from its text; the last free
+  marker of a shared name is no longer taken blindly. App: "Next step" while looking through ?step= saves nothing;
+  "Tick all" settles every step; Undo list is cleaned when left-open steps come back.
