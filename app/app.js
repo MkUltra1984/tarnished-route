@@ -17,11 +17,12 @@
   // ---------- saved progress ----------
   const KEY = 'tarnished-route-v2';   // v2: steps are saved by their stable id, so rebuilding the route keeps your progress
   const S = Object.assign({ st: {}, got: {}, hist: [], size: 18, extras: false, all: false, tab: 'route' }, JSON.parse(localStorage.getItem(KEY) || '{}'));
-  const save = () => { syncDrops(); localStorage.setItem(KEY, JSON.stringify(S)); };
+  let keptTab = null;   // the tab to remember while a tab from the address (?tab=) is only being looked at
+  const save = () => { syncDrops(); localStorage.setItem(KEY, JSON.stringify(keptTab == null ? S : { ...S, tab: keptTab })); };
   syncDrops();
   const q = new URLSearchParams(location.search);
   let peek = q.has('step') ? +q.get('step') : null;          // look at a step without changing progress
-  if (q.has('tab')) S.tab = q.get('tab');
+  if (q.has('tab')) { keptTab = S.tab; S.tab = q.get('tab'); }
   if (!TABS.some(t => t[0] === S.tab)) S.tab = 'route';
 
   function currentStep() {
@@ -35,7 +36,7 @@
   const nextAfter = s => { const at = ROUTE.indexOf(s); return ROUTE.find((x, i) => i > at && !S.st[x.id]) || ROUTE.find(x => x !== s && !S.st[x.id]); };
   const doneCount = () => ROUTE.filter(x => S.st[x.id] === 'd').length;
   const grabOf = s => [...new Set([...s.m, ...s.n])].map(i => M[i]).filter(m => m.kind === 'g' && !dropOf.has(m.i));
-  const extraOf = s => s.n.map(i => M[i]).filter(m => m.kind === 'x');
+  const extraOf = s => [...new Set([...s.m, ...s.n])].map(i => M[i]).filter(m => m.kind === 'x');
   // The route was rebuilt (new steps, new ids): the saved step position cannot be carried over, the ticks can.
   // Steps whose objectives are all ticked count as done, up to the last such step; steps on the way with something
   // still open count as "left open", so they come back.
@@ -67,7 +68,7 @@
   const markerOf = new Map();
   // hovering shows the name; tapping opens the wiki note that says what to do there
   const tipHTML = m => `<b>${esc(m.title)}</b><i>${esc(m.label)}</i>${m.desc ? `<span>${esc(m.desc)}</span>` : ''}`;
-  const explain = mk => mk.bindTooltip(mk.options.title, { direction: 'top', offset: [0, -SIZE / 2], className: 'tt' }).bindPopup(tipHTML(mk.options.m), { className: 'tip', closeButton: false, offset: [0, -SIZE / 2 + 4], maxWidth: 280, autoPanPadding: [16, 16] });
+  const explain = mk => mk.bindTooltip(esc(mk.options.title), { direction: 'top', offset: [0, -SIZE / 2], className: 'tt' }).bindPopup(tipHTML(mk.options.m), { className: 'tip', closeButton: false, offset: [0, -SIZE / 2 + 4], maxWidth: 280, autoPanPadding: [16, 16] });
   function drawStep(s, fit) {
     setMap(s.map); stepLayer.clearLayers(); markerOf.clear(); spot.clearLayers();
     const show = [...new Set([...s.m, ...s.n])].map(i => M[i]).filter(m => !dropOf.has(m.i) && (s.m.includes(m.i) ? true : m.kind === 'g' || (m.kind === 'x' && S.extras)));
@@ -117,7 +118,7 @@
   function wireRows(root) {
     root.querySelectorAll('.row').forEach(r => r.onclick = e => {
       const m = M[+r.dataset.i];
-      if (e.target.closest('[data-tick]')) { const t = dropOf.has(m.i) ? dropOf.get(m.i) : m.i; if (S.got[t]) delete S.got[t]; else S.got[t] = 1; save(); root.querySelectorAll('.row').forEach(x => x.classList.toggle('got', !!S.got[+x.dataset.i])); const mk = markerOf.get(m.i); if (mk) mk.setIcon(symIcon(m)); refreshCounts(); return; }
+      if (e.target.closest('[data-tick]')) { const t = dropOf.has(m.i) ? dropOf.get(m.i) : m.i; if (S.got[t]) delete S.got[t]; else S.got[t] = 1; settle(t); save(); root.querySelectorAll('.row').forEach(x => x.classList.toggle('got', !!S.got[+x.dataset.i])); const mk = markerOf.get(m.i); if (mk) mk.setIcon(symIcon(m)); refreshCounts(); return; }
       showSpot(m, true); openCard(m);
     });
   }
@@ -141,7 +142,7 @@
       <p class="credit">Picture and text from the <a href="https://eldenring.wiki.fextralife.com/${encodeURIComponent(c.list || CARDS.by[m.title]).replace(/%20/g, '+')}" target="_blank" rel="noopener">Fextralife Elden Ring Wiki</a>.</p></div>`;
     const close = () => { sh.hidden = true; sh.innerHTML = ''; sh.onclick = null; };
     sh.onclick = e => { if (e.target === sh) close(); }; $('.cx', sh).onclick = close; $('#cmap').onclick = () => { close(); showSpot(m, true); };
-    $('#ctick').onclick = () => { const t = dropOf.has(m.i) ? dropOf.get(m.i) : m.i; if (S.got[t]) delete S.got[t]; else S.got[t] = 1; settle(t); save(); close(); render(); };
+    $('#ctick').onclick = () => { const t = dropOf.has(m.i) ? dropOf.get(m.i) : m.i; if (S.got[t]) delete S.got[t]; else S.got[t] = 1; settle(t); save(); close(); if (S.tab === 'route') { renderRoute(); const mk = markerOf.get(m.i); if (mk) mk.setIcon(symIcon(m)); } else { document.querySelectorAll('.row').forEach(x => x.classList.toggle('got', !!S.got[+x.dataset.i])); refreshCounts(); } };
     return true;
   }
 
@@ -179,7 +180,8 @@
   function renderRoute() {
     if (showOpen) return renderOpen();
     const pane = $('#pane'), s = currentStep(), total = ROUTE.length, dn = doneCount();
-    if (!s) { pane.innerHTML = `<div class="listhead"><h1>Route complete</h1></div><div class="list"><p class="lead">Every step is done.</p></div>`; return; }
+    if (!s) { pane.innerHTML = `<div class="listhead"><h1>Route complete</h1></div><div class="list"><p class="lead">Every step is done.</p>${S.hist.length ? '<button class="link wide" id="undo">&#8630; Undo the last step</button>' : ''}</div>`;
+      const u = $('#undo', pane); if (u) u.onclick = () => { const id = S.hist.pop(); delete S.st[id]; save(); renderRoute(); const c = currentStep(); if (c) drawStep(c, true); }; return; }
     const keep = $('.body', pane) ? $('.body', pane).scrollTop : 0;
     const pos = ROUTE.indexOf(s) + 1, grab = grabOf(s), extra = extraOf(s), nx = nextAfter(s), open = grab.filter(m => !S.got[m.i]).length;
     // what the step is about, and what merely lies close to its path
@@ -192,6 +194,7 @@
         <div class="bar"><i style="width:${dn / total * 100}%"></i></div>
         <h1 class="title">${esc(s.title)}</h1>
         ${s.region ? `<div class="reg">${esc(s.region)}</div>` : ''}
+        ${s.travel ? `<div class="travel">Far from the last step. Nearest site of grace: <b>${esc(s.travel)}</b></div>` : ''}
       </div>
       <div class="body">
         <div class="sechead"><span class="over">Walkthrough</span>${grab.length ? `<button class="link" id="jump">To do &middot; ${grab.length - open} of ${grab.length} &darr;</button>` : ''}</div>
@@ -207,7 +210,7 @@
       </div>
       <div class="foot">
         <button class="done">${open && grab.length ? `Next step<small>${open} left open</small>` : 'Done'}</button>
-        <div class="undo"><span class="next">${nx ? `Next: <b>${esc(nx.title)}</b>${nx.boss ? '<em>Boss</em>' : ''}` : 'Last step'}</span>${S.hist.length ? '<button id="undo">&#8630; Undo</button>' : ''}</div>
+        <div class="undo"><span class="next">${nx ? `Next: <b>${esc(nx.title)}</b>${nx.boss ? '<em>Boss</em>' : ''}` : Object.values(S.st).some(v => v === 'l' || v === 's') ? 'Next: what you left open' : 'Last step'}</span>${S.hist.length ? '<button id="undo">&#8630; Undo</button>' : ''}</div>
       </div>`;
     $('.body', pane).scrollTop = keep;
     pane.querySelectorAll('.chk').forEach(r => r.onclick = e => {
@@ -222,11 +225,12 @@
     const xt = $('#xt', pane); if (xt) xt.onclick = () => { S.extras = !S.extras; save(); renderRoute(); drawStep(s, false); };
     const ob = $('#openb', pane); if (ob) ob.onclick = () => { showOpen = true; renderRoute(); };
     const jump = $('#jump', pane); if (jump) jump.onclick = () => $('#todo', pane).scrollIntoView({ behavior: 'smooth', block: 'start' });
-    pane.querySelectorAll('.shot').forEach(im => im.onclick = () => zoomPicture(im.src));
+    pane.querySelectorAll('.shot:not(.cardlead)').forEach(im => im.onclick = () => zoomPicture(im.src));
     $('.done', pane).onclick = () => finish(s, open && grab.length ? 'l' : 'd');
     const u = $('#undo', pane); if (u) u.onclick = () => { const id = S.hist.pop(); delete S.st[id]; peek = null; openInfo = null; save(); renderRoute(); drawStep(currentStep(), true); };
   }
   function finish(s, how) {
+    $('#pane').scrollTop = 0;
     peek = null;
     showOpen = false; S.st[s.id] = how; S.hist.push(s.id); if (S.hist.length > 200) S.hist.shift();
     save(); openInfo = null; const b = $('.body'); if (b) b.scrollTop = 0; renderRoute(); const n = currentStep(); if (n) drawStep(n, true);
@@ -304,7 +308,7 @@
   // ---------- shell ----------
   function render() {
     $('#tabs').innerHTML = TABS.map(t => `<button class="tab${S.tab === t[0] ? ' on' : ''}" data-t="${t[0]}"><span><img src="icons/tab-${t[0]}.png" alt="">${t[1]}</span></button>`).join('');
-    document.querySelectorAll('.tab').forEach(b => b.onclick = () => { S.tab = b.dataset.t; save(); render(); });
+    document.querySelectorAll('.tab').forEach(b => b.onclick = () => { S.tab = b.dataset.t; keptTab = null; save(); render(); $('#pane').scrollTop = 0; });
     refreshCounts = () => {};
     ({ route: renderRoute, bosses: renderBosses, collection: renderCollection, quests: renderQuests, materials: renderMaterials, settings: renderSettings }[S.tab] || renderRoute)();
     placeMapButton();
@@ -326,6 +330,9 @@
   if ('serviceWorker' in navigator && location.protocol === 'https:') {
     const hadWorker = !!navigator.serviceWorker.controller;
     navigator.serviceWorker.register('sw.js', { updateViaCache: 'none' });
+    navigator.serviceWorker.ready.then(() => setTimeout(() => { if (!navigator.serviceWorker.controller) return;
+      const files = ['data/cards.json', 'tiles/meta.json', ...TABS.map(t => `icons/tab-${t[0]}.png`), 'icons/tab-recentre.png', ...Object.values(MK.cats).map(c => `icons/${c.f}.png`)];
+      files.forEach(u => fetch(u).catch(() => {})); }, 2500));
     navigator.serviceWorker.addEventListener('controllerchange', () => { if (hadWorker) reload(); });   // a new worker took over
   }
   if (navigator.storage && navigator.storage.persist) navigator.storage.persist().catch(() => {});

@@ -1,0 +1,142 @@
+1404 steps audited.
+
+E. inserted person/boss steps far from the step before (>0.05 of the map): 14
+   - 146. Boss: Tibia Mariner (Wyndham Ruins) [North Limgrave] is 0.36 from 145. Skeletal Militiaman Ashes, Boss: Tibia Mariner (Limgrave) [North Limgrave]
+   - 147. Talk to D, Hunter of the Dead Summonwater Village [North Limgrave] is 0.36 from 146. Boss: Tibia Mariner (Wyndham Ruins) [North Limgrave]
+   - 235. Fire Monks' Prayerbook [South Liurnia] is 0.11 from 234. Fire Spur Me [South Liurnia]
+   - 254. Boss: Erdtree Avatar (Liurnia Southwest) [West Liurnia] is 0.55 from 253. Boss: Erdtree Avatar (Mountaintops East) [West Liurnia]
+   - 424. Boss: Abductor Virgins [Caelid] is 0.43 from 423. Venomous Fang [Caelid]
+   - 486. Boss: Misbegotten Warrior [Redmane Castle] is 0.53 from 485. Boss: Crucible Knight / Misbegotten Warrior [Redmane Castle]
+   - 709. Azur's Glintstone Set [Mt. Gelmir] is 0.46 from 708. Lusat's Set [Mt. Gelmir]
+   - 730. Talk to Kenneth Haight [Volcano Manor · meeting 3 of 3] is 0.05 from 729. Invader: Old Knight Istvan, Scaled Set +2 [Volcano Manor]
+   - 741. Diallos's Mask [Volcano Manor] is 0.44 from 740. Hoslow's Petal Whip [Volcano Manor]
+   - 749. Talk to Sorceress Sellen [Volcano Manor · meeting 3 of 4] is 0.06 from 748. Albinauric Staff, Albinauric Mask [Volcano Manor]
+   - 841. Talk to Sorceress Sellen [Subterranean Shunning-Grounds · meeting 4 of 4] is 0.08 from 840. Iron Ball, Blackguard's Iron Mask [Subterranean Shunning-Grounds]
+   - 843. Talk to Blackguard Big Boggart [Subterranean Shunning-Grounds] is 0.08 from 842. Talk to Witch-Hunter Jerren [Subterranean Shunning-Grounds · meeting 3 of 3]
+   - 1011. Crimson Amber Medallion [Leyndell, Ashen Capital] is on another map than 1010. Crimson Amber Medallion +2 [Leyndell, Ashen Capital]
+   - 1023. Talk to Nepheli Loux [New Game Plus Preparation · meeting 3 of 3] is 0.14 from 1022. Talk to Nepheli Loux [New Game Plus Preparation · meeting 2 of 3]
+
+F. a person's later place comes before an earlier one: 2
+   - Bloody Finger Hunter Yura: "Bloody Finger Hunter Yura (Second Location)" at step 105, then "Bloody Finger Hunter Yura (First Location)" at step 224
+   - Blaidd: "Blaidd (2nd Location)" at step 58, then "Blaidd (Ranni's Quest - First Location)" at step 415
+
+H. one step whose own objectives lie far apart (>0.06 of the map or on two maps): 2
+   - 301. Invader: Bloody Finger Ravenmount Assassin +4 [Central Liurnia] :: Bloody Finger Ravenmount Assassin; Ash of War: Raptor of the Mists; Furlcalling Finger Remedy F; Furlcalling Finger Remedy E; Furlcalling Finger Remedy - Reve
+   - 1274. Boss: Golden Hippopotamus, Scadutree Fragment +2 [Shadow Keep] :: Golden Hippopotamus; Scadutree Fragment - Dark Chamber, Shadow Keep's Specimen Storehouse; Scadutree Fragment - Shadow Keep, Back Gate; Golden Hippopotamus (0
+
+J. very long fold-out wiki text (>6000 characters) on one step: 6
+   - 174. Claymore [Castle Morne] :: Liberate Castle Morne (12164)
+   - 480. Ash of War: Flaming Strike [Redmane Castle] :: The Radahn Festival in Redmane Castle (7286)
+   - 998. Drake Knight Set [Crumbling Farum Azula] :: Completing the dungeon (6355)
+   - 1078. Black Knight Commander Andreas [East Gravesite Plain] :: Clear Fog Rift Catacombs (6348)
+   - 1227. Black Knight Captain Huw [Rauh Base] :: Path to Scorpion River Catacombs (7218)
+   - 1377. Pest-Thread Spears [Ancient Ruins of Rauh] :: The Western Section Part 2 (6769)
+
+K. titles longer than 60 characters: 1
+   - 1095. Talk to Igon - Ruined Forge Lava Intake (Ruined Forge Lava Intake) +1 [East Gravesite Plain · meeting 1 of 2]
+
+L. missable notes longer than 400 characters: 5
+   - 241. Talk to White Mask Varre Invasion Sign [South Liurnia] (442)
+   - 791. Stonesword Key, Stonesword Key [Leyndell, Royal Capital] (460)
+   - 824. Blessing of the Erdtree [Leyndell, Royal Capital] (424)
+   - 827. Gelmir's Fury [Leyndell, Royal Capital] (405)
+   - 1293. Talk to Hornsent [Shadow Keep · meeting 3 of 3] (579)
+
+O. the same title on more than three steps (hard to tell apart): 10
+   - Talk to Boc the Seamster x6: steps 41, 122, 219, 279, 526, 832
+   - Cracked Pot x5: steps 99, 210, 321, 376, 797
+   - Talk to Bloody Finger Hunter Yura x4: steps 105, 224, 302, 639
+   - Talk to Sorceress Sellen x4: steps 115, 706, 749, 841
+   - Prattling Pate x6: steps 124, 156, 336, 594, 666, 964
+   - Imbued Sword Key x4: steps 263, 325, 473, 1165
+   - Talk to Iron Fist Alexander x6: steps 435, 488, 492, 515, 693, 995
+   - Talk to Brother Corhyn x4: steps 528, 815, 862, 1015
+   - Talk to Millicent x4: steps 604, 649, 860, 970
+   - Forager Brood Cookbook x5: steps 1051, 1125, 1188, 1203, 1206
+
+P. long jumps between consecutive steps (>0.15 of the map): 85
+   - 0.17: 20. Flask of Wondrous Physick, Crimson Crystal Tear +1 [First steps in Limgrave] -> 21. Talk to Gurranq Beast Clergyman [First steps in Limgrave]
+   - 0.45: 21. Talk to Gurranq Beast Clergyman [First steps in Limgrave] -> 22. Talk to Smithing Master Iji [First steps in Limgrave]
+   - 0.20: 27. Memory Stone [First steps in Limgrave] -> 28. Fevor's Cookbook [1] [First steps in Limgrave]
+   - 0.35: 80. Stonesword Key [Early Liurnia and Caelid] -> 81. Poison Armament [Early Liurnia and Caelid]  (no travel word in the text)
+   - 0.31: 92. Boss: Elder Dragon Greyoll [Early Liurnia and Caelid] -> 93. Smithing-Stone Miner's Bell Bearing [2] [Early Liurnia and Caelid]  (no travel word in the text)
+   - 0.30: 93. Smithing-Stone Miner's Bell Bearing [2] [Early Liurnia and Caelid] -> 94. Golden Seed [West Limgrave]  (no travel word in the text)
+   - 0.36: 122. Talk to Boc the Seamster [West Limgrave · meeting 2 of 6] -> 123. Boss: Tree Sentinel (Leyndell, Royal Capital) [North Limgrave]
+   - 0.34: 123. Boss: Tree Sentinel (Leyndell, Royal Capital) [North Limgrave] -> 124. Prattling Pate [North Limgrave]
+   - 0.36: 145. Skeletal Militiaman Ashes, Boss: Tibia Mariner (Limgrave) [North Limgrave] -> 146. Boss: Tibia Mariner (Wyndham Ruins) [North Limgrave]
+   - 0.36: 146. Boss: Tibia Mariner (Wyndham Ruins) [North Limgrave] -> 147. Talk to D, Hunter of the Dead Summonwater Village [North Limgrave]  (no travel word in the text)
+   - 0.16: 149. Nomadic Warrior's Cookbook [14], Missionary's Cookbook [3] [North Limgrave] -> 150. Hand Ballista [Weeping Peninsula]
+   - 0.42: 166. Ambush Shard [Weeping Peninsula] -> 167. Blessed Dew Talisman [Weeping Peninsula]  (no travel word in the text)
+   - 0.41: 168. Boss: Giant Golem [Weeping Peninsula] -> 169. Prattling Pate, Memory Stone +1 [Weeping Peninsula]
+   - 0.20: 180. Boss: Leonine Misbegotten [Castle Morne] -> 181. Boss: Margit, the Fell Omen [Stormveil Castle]
+   - 0.31: 238. Dexterity-knot Crystal Tear [South Liurnia] -> 239. Talk to Blackguard [South Liurnia]
+   - 0.31: 239. Talk to Blackguard [South Liurnia] -> 240. Festering Bloody Finger, Bloody Finger +2 [South Liurnia]
+   - 0.55: 252. Memory Stone [West Liurnia] -> 253. Boss: Erdtree Avatar (Mountaintops East) [West Liurnia]  (no travel word in the text)
+   - 0.55: 253. Boss: Erdtree Avatar (Mountaintops East) [West Liurnia] -> 254. Boss: Erdtree Avatar (Liurnia Southwest) [West Liurnia]  (no travel word in the text)
+   - 0.24: 263. Imbued Sword Key [West Liurnia] -> 264. Boss: Grafted Scion (Tutorial) [West Liurnia]
+   - 0.26: 266. Stormhawk Deenh [West Liurnia] -> 267. Carian Knight's Sword [West Liurnia]
+   - 0.18: 329. Boss: Rennala, Queen of the Full Moon +1 [Academy of Raya Lucaria] -> 330. Ash of War: Thops's Barrier [Academy of Raya Lucaria]
+   - 0.17: 330. Ash of War: Thops's Barrier [Academy of Raya Lucaria] -> 331. Thops's Bell Bearing, Academy Glintstone Staff [Academy of Raya Lucaria]
+   - 0.17: 331. Thops's Bell Bearing, Academy Glintstone Staff [Academy of Raya Lucaria] -> 332. Treespear [East Liurnia]
+   - 0.35: 365. Finger Maiden Set, Sacred Tear [East Liurnia] -> 366. Ash of War: Beast's Roar, Bestial Vitality [East Liurnia]
+   - 0.34: 366. Ash of War: Beast's Roar, Bestial Vitality [East Liurnia] -> 367. Sacrificial Twig [East Liurnia]
+   - 0.18: 378. Frozen Armament [Caria Manor] -> 379. Boss: Onyx Lord [Caria Manor]
+   - 0.17: 379. Boss: Onyx Lord [Caria Manor] -> 380. Albinauric Ashes [Caria Manor]  (no travel word in the text)
+   - 0.34: 398. Boss: Dragonkin Soldier of Nokstella +1 [Ainsel River] -> 399. Furlcalling Finger Remedy, Furlcalling Finger Remedy [Siofra River]
+   - 0.43: 423. Venomous Fang [Caelid] -> 424. Boss: Abductor Virgins [Caelid]
+   - 0.45: 424. Boss: Abductor Virgins [Caelid] -> 425. Boss: Putrid Avatar (Dragonbarrow) [Caelid]
+   - 0.53: 485. Boss: Crucible Knight / Misbegotten Warrior [Redmane Castle] -> 486. Boss: Misbegotten Warrior [Redmane Castle]
+   - 0.53: 486. Boss: Misbegotten Warrior [Redmane Castle] -> 487. Talk to Witch-Hunter Jerren [Redmane Castle · meeting 1 of 3]
+   - 0.53: 489. Talk to Blaidd [Redmane Castle · meeting 4 of 4] -> 490. Seluvis's Introduction [Redmane Castle]
+   - 0.51: 490. Seluvis's Introduction [Redmane Castle] -> 491. Boss: Starscourge Radahn, Remembrance of the Starscourge [Redmane Castle]
+   - 0.37: 493. Twinned Set [Redmane Castle] -> 494. Ghostflame Torch [Nokron]
+   - 0.26: 517. Cracked Pot, Ritual Pot [Carian Study Hall] -> 518. Ash of War: Through and Through [Carian Study Hall]
+   - 0.22: 520. Map (Mt. Gelmir) [Carian Study Hall] -> 521. Talk to Dung Eater (Subterranean Shunning-Grounds) +1 [Carian Study Hall]
+   - 0.18: 534. Boss: Glintstone Dragon Adula (Three Sisters) [Carian Study Hall] -> 535. Invader: Preceptor Miriam [Carian Study Hall]
+   - 0.20: 586. Talk to Ranni the Witch [Moonlight Altar · meeting 2 of 2] -> 587. Royal Greatsword, Blaidd's Set [Moonlight Altar]
+   - 0.35: 612. Ritual Sword Talisman [West Altus] -> 613. Boss: Tibia Mariner (Mountaintops of the Giants) +1 [West Altus]  (no travel word in the text)
+   - 0.35: 613. Boss: Tibia Mariner (Mountaintops of the Giants) +1 [West Altus] -> 614. Pearldrake Talisman +1 [West Altus]  (no travel word in the text)
+   - 0.39: 630. Boss: Elemer of the Briar [The Shaded Castle] -> 631. Beast Claw [The Shaded Castle]
+   - 0.29: 631. Beast Claw [The Shaded Castle] -> 632. Boss: Fallingstar Beast [Central Altus]  (no travel word in the text)
+   - 0.26: 673. Bloody Helice [East Altus] -> 674. Lord of Blood's Favor [East Altus]  (no travel word in the text)
+   - 0.25: 677. Talk to White-Mask Varre [East Altus] -> 678. Larval Tear, Boss: Wormface (Mt. Gelmir) [Mt. Gelmir]
+   - 0.46: 698. Comet Azur, Talk to Primeval Sorcerer Azur [Mt. Gelmir] -> 699. Lost Ashes of War [Mt. Gelmir]  (no travel word in the text)
+   - 0.28: 704. Boss: Crystalians (Trio - Sellia Hideaway) [Mt. Gelmir] -> 705. Witch's Glintstone Crown [Mt. Gelmir]
+   - 0.27: 707. Talk to Witch-Hunter Jerren [Mt. Gelmir · meeting 2 of 3] -> 708. Lusat's Set [Mt. Gelmir]  (no travel word in the text)
+   - 0.46: 708. Lusat's Set [Mt. Gelmir] -> 709. Azur's Glintstone Set [Mt. Gelmir]
+   - 0.36: 728. Talk to Diallos (Volcano Manor) [Volcano Manor · meeting 3 of 3] -> 729. Invader: Old Knight Istvan, Scaled Set +2 [Volcano Manor]
+   - 0.35: 730. Talk to Kenneth Haight [Volcano Manor · meeting 3 of 3] -> 731. Magma Shot [Volcano Manor]  (no travel word in the text)
+   - 0.35: 739. Letter to Bernahl [Volcano Manor] -> 740. Hoslow's Petal Whip [Volcano Manor]  (no travel word in the text)
+   - 0.44: 740. Hoslow's Petal Whip [Volcano Manor] -> 741. Diallos's Mask [Volcano Manor]  (no travel word in the text)
+   - 0.22: 741. Diallos's Mask [Volcano Manor] -> 742. Nomadic Warrior's Cookbook [21] [Volcano Manor]
+   - 0.16: 758. Seedbed Curse [Volcano Manor] -> 759. Map (Leyndell, Royal Capital), Golden Seed +1 [Capital Outskirts]
+   - 0.31: 811. Coded Sword [Leyndell, Royal Capital] -> 812. Seedbed Curse [Leyndell, Royal Capital]  (no travel word in the text)
+   - 0.30: 812. Seedbed Curse [Leyndell, Royal Capital] -> 813. Gargoyle's Halberd +1 [Leyndell, Royal Capital]
+   - 0.23: 826. Rold Medallion [Leyndell, Royal Capital] -> 827. Gelmir's Fury [Leyndell, Royal Capital]
+   - 0.29: 832. Talk to Boc the Seamster [Subterranean Shunning-Grounds · meeting 6 of 6] -> 833. Ritual Pot [Subterranean Shunning-Grounds]  (no travel word in the text)
+   - 0.28: 833. Ritual Pot [Subterranean Shunning-Grounds] -> 834. Boss: Mohg, the Omen, Bloodflame Talons [Subterranean Shunning-Grounds]
+   - 0.30: 839. Fingerprint Stone Shield [Subterranean Shunning-Grounds] -> 840. Iron Ball, Blackguard's Iron Mask [Subterranean Shunning-Grounds]
+   - 0.30: 843. Talk to Blackguard Big Boggart [Subterranean Shunning-Grounds] -> 844. Flamedrake Talisman +1 [Forbidden Lands]  (no travel word in the text)
+   - 0.34: 864. Traveling Maiden Set [West Mountaintops] -> 865. Taker's Cameo [West Mountaintops]  (no travel word in the text)
+   - 0.39: 870. Consort's Set [West Mountaintops] -> 871. Golden Seed [West Mountaintops]
+   - 0.42: 872. Founding Rain of Stars [West Mountaintops] -> 873. Boss: Erdtree Avatar (Caelid) [West Mountaintops]
+   - 0.40: 873. Boss: Erdtree Avatar (Caelid) [West Mountaintops] -> 874. Primal Glintstone Blade [West Mountaintops]  (no travel word in the text)
+   - 0.33: 875. Boss: Death Rite Bird (Central Mountaintops of the Giants) [West Mountaintops] -> 876. Gurranq's Beast Claw, Beastclaw Greathammer [West Mountaintops]
+   - 0.23: 876. Gurranq's Beast Claw, Beastclaw Greathammer [West Mountaintops] -> 877. Furlcalling Finger Remedy [Castle Sol]  (no travel word in the text)
+   - 0.53: 877. Furlcalling Finger Remedy [Castle Sol] -> 878. Sorcerer Painting [Castle Sol]  (no travel word in the text)
+   - 0.25: 908. Boss: Stray Mimic Tear [East Mountaintops] -> 909. Cinquedea, Dragoncrest Shield Talisman [Greyoll's Dragonbarrow]  (no travel word in the text)
+   - 0.38: 911. Bestial Constitution [Greyoll's Dragonbarrow] -> 912. Boss: Putrid Avatar [Greyoll's Dragonbarrow]  (no travel word in the text)
+   - 0.40: 912. Boss: Putrid Avatar [Greyoll's Dragonbarrow] -> 913. Ash of War: Rain of Arrows [Greyoll's Dragonbarrow]  (no travel word in the text)
+   - 0.36: 913. Ash of War: Rain of Arrows [Greyoll's Dragonbarrow] -> 914. Boss: Night's Cavalry (Consecrated Snowfield) [Greyoll's Dragonbarrow]  (no travel word in the text)
+   - 0.36: 914. Boss: Night's Cavalry (Consecrated Snowfield) [Greyoll's Dragonbarrow] -> 915. Bull-Goat's Talisman [Greyoll's Dragonbarrow]
+   - 0.32: 925. Boss: Bell Bearing Hunter (Isolated Merchant Dragonbarrow) [Greyoll's Dragonbarrow] -> 926. Rotten Battle Hammer, Rotten Duelist Helm [Consecrated Snowfield]
+   - 0.28: 983. Boss: Malenia, Blade of Miquella [Elphael, Brace of the Haligtree] -> 984. Omen Set [Elphael, Brace of the Haligtree]
+   - 0.40: 984. Omen Set [Elphael, Brace of the Haligtree] -> 985. Ancient Dragon Prayerbook [Crumbling Farum Azula]
+   - 0.37: 1020. Talk to Hyetta [Endings · meeting 4 of 4] -> 1021. Larval Tear [New Game Plus Preparation]  (no travel word in the text)
+   - 0.17: 1258. Beloved Stardust, Ruins Map (3rd) [East Scadu Altus] -> 1259. Moore's Bell Bearing, Verdigris Greatshield +1 [East Scadu Altus]
+   - 0.21: 1260. Invader: Moore (Enir-Ilim) [East Scadu Altus] -> 1261. Velvet Sword of St Trina [Stone Coffin Fissure]
+   - 0.24: 1267. St. Trina's Smile [Stone Coffin Fissure] -> 1268. Boss: Furnace Golem (Shadow Keep) [Shadow Keep]  (no travel word in the text)
+   - 0.17: 1284. Secret Rite Scroll [Shadow Keep] -> 1285. Revered Spirit Ash [Shadow Keep]  (no travel word in the text)
+   - 0.17: 1285. Revered Spirit Ash [Shadow Keep] -> 1286. Winged Serpent Helm, Ash of War: Flame Spear [Shadow Keep]  (no travel word in the text)
+   - 0.21: 1362. Igon's Greatbow, Igon's Set +1 [Jagged Peak] -> 1363. Salza's Hood, Rain of Fire [Ancient Ruins of Rauh]
+   - 0.23: 1403. Circlet of Light [Enir-Ilim] -> 1404. St. Trina's Blossom [Enir-Ilim]

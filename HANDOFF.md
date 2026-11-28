@@ -270,3 +270,22 @@ Not done: nobody has started the game with it yet. The Gauntlet tab in the app s
 - raw/redmaw/ (the four sheet pages) and raw/index/, raw/cards/ (saved wiki pages) are NOT in the repository. Refetch the
   sheets with: curl -sL https://raw.githubusercontent.com/rdmaw/elden-ring-completion-sheets/HEAD/sheets/<name>.html
   for walkthrough, dlc-walkthrough, npc-walkthrough, questlines.
+
+## UPDATE 16 (2026-11-28): independent recheck, fixes
+- Independent code review (a separate agent, read-only) found 14 defects; fixed: server error / stalled network no
+  longer replaces a saved copy (sw.js, 8 s limit); offline after one visit (cards.json, tiles/meta.json in the shell,
+  icons fetched once the worker controls the page); missable warnings shown in full; sideways phone starts a new step
+  at its top; ticking in Bosses/Collection/Quests settles the step; ?tab= is not remembered; a step's card picture
+  opens the card; ticking through a card keeps the list position; tiles/meta.json is no longer cached for good;
+  end of route says "what you left open" and keeps Undo; tooltip text escaped; materials that are a step's own are
+  listed. Tests: `node tools/test-fixes.mjs`.
+  Not changed: ticks are stored by marker index (stable as long as markers.json is rebuilt from the same wiki data);
+  pressing "Next step" while looking at a step through ?step= still marks that step.
+- Route coherence (`node tools/route-coherence.mjs --all`, data/route-coherence.txt), fixed in build-route-redmaw.mjs:
+  a step's text is now Redmaw's line (where to go, what to do) followed by the wiki's note per thing; a boss and its
+  drops stay together; an objective far from its step's main thing becomes its own step; a person's numbered places
+  come in order (2 left, both in steps the sheet itself orders that way); long or repeated titles are shortened and
+  given their place; a step far from the one before names the nearest site of grace; drops are only matched to lines
+  that speak of a fight; place names in a line say where it is. The same-name "repair" swap was removed: it did harm.
+- Left: 87 long jumps between consecutive steps (the sheet fast-travels; 146 steps carry the grace hint), 41 same-named
+  picks that lie far from the steps around them (not verified by hand), 204 objectives the sheet does not place.

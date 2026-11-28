@@ -1,9 +1,9 @@
-Redmaw route: 1402 steps (1020 base game, 382 expansion) from 4525 lines of the sheet.
-Links in the sheet: 5294; things matched to a map marker: 3453, of these 139 from names the sheet says without a link.
+Redmaw route: 1404 steps (1023 base game, 381 expansion) from 4525 lines of the sheet.
+Links in the sheet: 5294; things matched to a map marker: 3467, of these 146 from names the sheet says without a link.
 Markers: 5111; in exactly one step: 5111; in none: 0; in more than one: 0.
-Second-chance matches (name linked by the sheet, step close by): 49.
-Objectives (bosses, people, items): 2025; named by the sheet and placed in its order: 1921; not named, attached to the nearest step: 210.
+Second-chance matches (name linked by the sheet, step close by): 41.
+Objectives (bosses, people, items): 2025; named by the sheet and placed in its order: 1922; not named, attached to the nearest step: 208.
 Objectives per step: largest own list 5, steps with more than 5 of their own: 0; largest "nearby" list 4, steps with more than 6 nearby: 0.
-Steps with the wiki's detailed place text: 241. Missable steps: 117.
+Steps with the wiki's detailed place text: 241. Missable steps: 119.
 
 Objectives attached to a step that is far away (over 0.08 of the map):
