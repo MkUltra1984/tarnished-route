@@ -111,6 +111,35 @@ for (const [after, st] of extras) steps.splice(steps.indexOf(after) + 1, 0, st);
 for (const s of steps) for (const l of ['m', 'n']) for (const i of [...s[l]]) { if (!dropOf.has(i)) continue; const b = dropOf.get(i), home = steps.find(x => x.m.includes(b) || x.n.includes(b)); if (home && home !== s) { s[l] = s[l].filter(k => k !== i); (home.m.includes(b) ? home.m : home.n).push(i); } }
 for (const s of steps) { s.m = [...new Set(s.m)]; s.n = [...new Set(s.n)].filter(i => !s.m.includes(i)); s.boss = [...s.m].some(i => L[i][3] === 'Bosses'); if (s.optional === undefined) delete s.optional; }
 
+// The wiki's detailed walkthrough of a place ("... in detail") goes to the first step at that place: the step that
+// names the place, else the first step that has the place's marker beside it, else the first step that names
+// something the place's own page lists, close to the place.
+let placed = 0; const placeOf = p => ({ title: p.title, walk: p.walk, notes: p.notes, img: p.img || null });
+for (const st of steps) { if (st.place) { placed++; continue; } for (const i of [...st.m, ...st.n]) if (L[i][3] === 'Locations') { const p = placeByTitle.get(norm(short(L[i][4]))); if (p && !p.taken && (p.walk.length || p.notes.length)) { p.taken = true; st.place = placeOf(p); placed++; break; } } }
+const locOf = new Map(); L.forEach((m, i) => { if (m[3] === 'Locations') locOf.set(norm(short(m[4])), i); });
+for (const p of Object.values(PLACES)) { if (p.taken || !(p.walk.length || p.notes.length)) continue; const li = locOf.get(norm(p.title)); if (li == null) continue; const links = new Set((p.links || []).map(norm));
+  const st = steps.find(x => !x.place && x.map === mapOf(li) && Math.hypot(x.x - L[li][1], x.y - L[li][2]) < 0.03 && x.m.some(i => links.has(norm(short(L[i][4]))))) || steps.find(x => !x.place && x.map === mapOf(li) && Math.hypot(x.x - L[li][1], x.y - L[li][2]) < 0.012);
+  if (st) { p.taken = true; st.place = placeOf(p); placed++; } }
+const unplaced = Object.values(PLACES).filter(p => !p.taken && (p.walk.length || p.notes.length)).map(p => p.title);
+console.log('wiki place pages with a detailed text:', placed + unplaced.length, '| shown in a step:', placed, '| not placed:', unplaced.length, unplaced.slice(0, 12).join('; '));
+
+// The wiki's own walkthrough (its long running text, section by section) stays in the app too. The wiki-ordered
+// route that tools/build-route.mjs builds has already worked out which things each section is about; it is kept in
+// data/route-fextra.json. Each of its sections goes to the step of this route where its things begin
+// ("Wiki walkthrough: ..."): the first step of the stretch of the route that holds most of them.
+if (fs.existsSync('app/data/route.json')) { const old = JSON.parse(fs.readFileSync('app/data/route.json', 'utf8')); if (old.length && !String(old[0].id).startsWith('rm:')) fs.writeFileSync('data/route-fextra.json', JSON.stringify(old)); }
+const stepOfMarker = new Map(); steps.forEach((st, k) => [...st.m, ...st.n].forEach(i => { if (!stepOfMarker.has(i)) stepOfMarker.set(i, k); }));
+let secs = 0, secPlaced = 0, paras = 0;
+if (fs.existsSync('data/route-fextra.json')) for (const o of JSON.parse(fs.readFileSync('data/route-fextra.json', 'utf8'))) {
+  if (o.side || !o.text || !o.text.length || o.text.join(' ').length < 80) continue;
+  { const p = placeByTitle.get(norm(o.title)); if (p && p.taken) continue; }   // that text is already shown as the place's "in detail"
+  secs++;
+  const own = o.m.filter(i => kind(i) === 'g').map(i => stepOfMarker.get(i)).filter(k => k != null), any = o.m.map(i => stepOfMarker.get(i)).filter(k => k != null);
+  const pool = own.length ? own : any; if (!pool.length) continue; const sorted = [...pool].sort((p, q) => p - q), mid = sorted[Math.floor((sorted.length - 1) / 2)];
+  const close = sorted.filter(x => Math.abs(x - mid) <= 25), k = close.length ? close[0] : mid;
+  (steps[k].guide = steps[k].guide || []).push({ title: o.title, text: o.text }); secPlaced++; paras += o.text.length; }
+console.log('wiki walkthrough sections:', secs, '| shown in a step:', secPlaced, '(' + paras + ' paragraphs)');
+
 // "meeting 2 of 5" for people who are met more than once
 const meet = new Map(); steps.forEach(s => { for (const i of s.m) if (L[i][3] === 'NPCs') { const k = short(L[i][4]); if (!meet.has(k)) meet.set(k, []); meet.get(k).push(s); } });
 for (const l of meet.values()) { const u = [...new Set(l)]; if (u.length > 1) u.forEach((s, n) => { if (s.card != null && L[s.card][3] === 'NPCs' && !/meeting/.test(s.region)) s.region = `${s.region} · meeting ${n + 1} of ${u.length}`; }); }

@@ -257,3 +257,6 @@ Not done: nobody has started the game with it yet. The Gauntlet tab in the app s
   boss-drops.mjs (dungeon clean-up, small steps) only matter for the old route.
 - Known weak spots: 349 objectives are not named by the sheet in a way the matcher finds; a few names are matched to
   the wrong one of several same-named markers. Step ids changed, so saved step progress restarts (ticks are kept).
+- The wiki's long texts are kept in the Redmaw route: 239 of its place pages as "... in detail" on the first step at
+  the place, and 170 walkthrough sections as a fold-out "Wiki walkthrough: ..." on the step where their things begin
+  (taken from the wiki-ordered route, saved as data/route-fextra.json by build-route-redmaw.mjs).

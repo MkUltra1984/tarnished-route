@@ -293,3 +293,5 @@ button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:poin
 .tile:has(.art:not(.ph)){background:#3a352b}
 
 .shot.cardlead{object-position:50% 20%;height:170px}.shot.cardlead.item{object-fit:contain;background:#3a352b;padding:12px}
+
+.guide{border-top:1px solid var(--divider);margin-top:12px}.guide summary{padding:12px 0;font-weight:600;color:var(--gold);cursor:pointer;list-style-position:inside}.guide[open] summary{padding-bottom:4px}
