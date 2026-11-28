@@ -466,6 +466,8 @@ steps.forEach((st, i) => { if (st.src !== 'walk' && i && steps[i - 1].game === s
 { const from = steps.find(s => s.title === 'The Chapel of Anticipation'), to = steps.find(s => s.title === 'The Four Belfries');
   const back = new Set(['Grafted Scion (Tutorial)', 'Golden Beast Crest Shield', 'Ornamental Straight Sword', 'Stormhawk Deenh', 'The Stormhawk King']);
   if (from && to) { const mv = from.m.filter(k => back.has(all.get(k).title)); from.m = from.m.filter(k => !mv.includes(k)); to.m.push(...mv);
+    // owner: the starting class does not matter, so the wiki's sentence saying it shapes the game is replaced
+    from.text = from.text.map(p => p.replace(/Keep in mind that your starting Class will have an impact on your overall gameplay[^.]*./, 'Your starting Class does not matter in the long run: it only sets your first equipment and starting stats, and you can level and build your character any way you like.'));
     from.text = [...from.text, 'The Grafted Scion here is meant to kill you. You come back for it, its drops and the items of the chapel much later, through the waygate at The Four Belfries.'];
     log.push('moved to "The Four Belfries": ' + mv.map(k => all.get(k).title).join(', ')); } }
 
