@@ -20,9 +20,10 @@
   // Ticks are saved under a name that does not move when the marker list is rebuilt: map, position, kind and name.
   // (gotV 3. gotV 2 had map and position only, which two things at one spot shared; without gotV: by number.)
   const tickKey = a => a[0] + '_' + a[1] + '_' + a[2] + '_' + a[3] + '_' + a[4], spotKey = a => a[0] + '_' + a[1] + '_' + a[2];
-  if (S.gotV === 3) { const at = new Map(MK.list.map((a, i) => [tickKey(a), i])), g = {}; for (const k in S.got) { const i = at.get(k); if (i != null) g[i] = 1; } S.got = g; }
+  S.skip = S.skip || {};
+  if (S.gotV === 3) { const at = new Map(MK.list.map((a, i) => [tickKey(a), i])); for (const f of ['got', 'skip']) { const g = {}; for (const k in S[f]) { const i = at.get(k); if (i != null) g[i] = 1; } S[f] = g; } }
   else if (S.gotV === 2) { const at = new Map(); MK.list.forEach((a, i) => { const k = spotKey(a); if (!at.has(k)) at.set(k, []); at.get(k).push(i); }); const g = {}; for (const k in S.got) for (const i of at.get(k) || []) g[i] = 1; S.got = g; }
-  const stored = () => { const g = {}; for (const i in S.got) if (S.got[i] && MK.list[i]) g[tickKey(MK.list[i])] = 1; return { ...S, got: g, gotV: 3, tab: keptTab == null ? S.tab : keptTab }; };
+  const stored = () => { const g = {}, k = {}; for (const i in S.got) if (S.got[i] && MK.list[i]) g[tickKey(MK.list[i])] = 1; for (const i in S.skip) if (S.skip[i] && MK.list[i]) k[tickKey(MK.list[i])] = 1; return { ...S, got: g, skip: k, gotV: 3, tab: keptTab == null ? S.tab : keptTab }; };
   let keptTab = null;   // the tab to remember while a tab from the address (?tab=) is only being looked at
   const save = () => { syncDrops(); localStorage.setItem(KEY, JSON.stringify(stored())); };
   syncDrops();
@@ -49,7 +50,7 @@
   (function carryOver() {
     const known = new Set(ROUTE.map(s => s.id)), old = Object.keys(S.st).filter(k => !known.has(k)); if (!old.length && S.routeV === ROUTE.length) return;
     if (old.length) { S.st = {}; S.hist = [];
-      const state = ROUTE.map(s => { const g = grabOf(s); return !g.length ? 0 : g.every(m => S.got[m.i]) ? 2 : g.some(m => S.got[m.i]) ? 1 : -1; });
+      const state = ROUTE.map(s => { const g = grabOf(s); return !g.length ? 0 : g.every(m => S.got[m.i] || S.skip[m.i]) ? 2 : g.some(m => S.got[m.i]) ? 1 : -1; });
       const last = state.lastIndexOf(2); for (let k = 0; k <= last; k++) S.st[ROUTE[k].id] = state[k] === 2 || state[k] === 0 ? 'd' : 'l'; }
     S.routeV = ROUTE.length; save();
   })();
@@ -161,14 +162,15 @@
   // header, and whatever is still open at the very end comes back as its own steps.
   let openInfo = null, showOpen = false;   // openInfo: the objective whose wiki note is unfolded
   const NEAR = 0.04;                        // about 330 px on the 8192 px map: "you are passing by"
-  const leftOpen = () => M.filter(m => m.kind === 'g' && !dropOf.has(m.i) && !S.got[m.i] && stepOf.has(m.i) && S.st[ROUTE[stepOf.get(m.i)].id]);
+  const isOpen = m => !S.got[m.i] && !S.skip[m.i];
+  const leftOpen = () => M.filter(m => m.kind === 'g' && !dropOf.has(m.i) && isOpen(m) && stepOf.has(m.i) && S.st[ROUTE[stepOf.get(m.i)].id]);
   function nearbyLeft(s) {
     const mine = new Set([...s.m, ...s.n]), pts = [[s.x, s.y], ...s.m.map(i => [M[i].x, M[i].y])];
     return leftOpen().filter(m => m.map === s.map && !mine.has(m.i) && pts.some(p => Math.hypot(p[0] - m.x, p[1] - m.y) < NEAR));
   }
   function settle(i) { // a passed step is done exactly when nothing in it is open any more
     const st = stepOf.has(i) ? ROUTE[stepOf.get(i)] : null; if (!st || !S.st[st.id]) return;
-    S.st[st.id] = grabOf(st).some(m => !S.got[m.i]) ? 'l' : 'd';
+    S.st[st.id] = grabOf(st).some(isOpen) ? 'l' : 'd';
   }
   function renderOpen() {
     const all = leftOpen(), by = new Map(); for (const m of all) { const k = stepOf.get(m.i); if (!by.has(k)) by.set(k, []); by.get(k).push(m); }
@@ -180,7 +182,7 @@
   function checkHTML(m, sub) {
     // the symbol already says what kind of thing it is; the second line is only for what the name cannot say
     const note = [typeof sub === 'string' ? sub : '', DROPS[m.i] ? 'Drops ' + DROPS[m.i].map(i => baseName(M[i].title)).join(', ') : ''].filter(Boolean).join(' · ');
-    return `<button class="chk${S.got[m.i] ? ' got' : ''}" data-i="${m.i}"><img class="ci" data-pan="${m.i}" src="icons/${m.f}.png" alt=""><span class="cn">${note ? `<span class="nm">${esc(m.title)}</span><small>${esc(note)}</small>` : esc(m.title)}</span><span class="box" data-tick="1" aria-hidden="true"></span></button>${openInfo === m.i ? `<div class="info">${esc(m.desc || "The wiki map has no extra note for this one.")}${DROPS[m.i] ? `<br><br>Drops, ticked together with the boss: ${esc(DROPS[m.i].map(i => M[i].title).join(', '))}.` : ''}${cardOf(m) ? `<button class="link more" data-card="${m.i}">Picture and details &rsaquo;</button>` : ''}</div>` : ""}`;
+    return `<button class="chk${S.got[m.i] ? ' got' : ''}${S.skip[m.i] && !S.got[m.i] ? ' gone' : ''}" data-i="${m.i}"><img class="ci" data-pan="${m.i}" src="icons/${m.f}.png" alt=""><span class="cn">${note ? `<span class="nm">${esc(m.title)}</span><small>${esc(note)}</small>` : esc(m.title)}</span><span class="box" data-tick="1" aria-hidden="true"></span></button>${openInfo === m.i ? `<div class="info">${esc(m.desc || "The wiki map has no extra note for this one.")}${DROPS[m.i] ? `<br><br>Drops, ticked together with the boss: ${esc(DROPS[m.i].map(i => M[i].title).join(', '))}.` : ''}${cardOf(m) ? `<button class="link more" data-card="${m.i}">Picture and details &rsaquo;</button>` : ''}${S.got[m.i] ? '' : `<button class="link more" data-skip="${m.i}">${S.skip[m.i] ? 'Bring it back' : 'Not for me: forget this one'}</button>`}</div>` : ""}`;
   }
   const shot = (f, cls) => f ? `<img class="shot ${cls || ''}" loading="lazy" src="walk/${esc(f)}" alt="">` : '';
   function zoomPicture(src) { const sh = $('#sheet'); sh.hidden = false; sh.innerHTML = `<img class="bigshot" src="${src}" alt="">`; sh.onclick = () => { sh.hidden = true; sh.innerHTML = ''; }; }
@@ -190,9 +192,9 @@
     if (!s) { pane.innerHTML = `<div class="listhead"><h1>Route complete</h1></div><div class="list"><p class="lead">Every step is done.</p>${S.hist.length ? '<button class="link wide" id="undo">&#8630; Undo the last step</button>' : ''}</div>`;
       const u = $('#undo', pane); if (u) u.onclick = () => { const id = S.hist.pop(); delete S.st[id]; save(); renderRoute(); const c = currentStep(); if (c) drawStep(c, true); }; return; }
     const keep = $('.body', pane) ? $('.body', pane).scrollTop : 0;
-    const pos = ROUTE.indexOf(s) + 1, grab = grabOf(s), extra = extraOf(s), nx = nextAfter(s), open = grab.filter(m => !S.got[m.i]).length;
+    const pos = ROUTE.indexOf(s) + 1, grab = grabOf(s), extra = extraOf(s), nx = nextAfter(s), open = grab.filter(isOpen).length;
     // what the step is about, and what merely lies close to its path
-    const own = new Set(s.m), here = grab.filter(m => own.has(m.i)), onway = grab.filter(m => !own.has(m.i)), got = l => l.filter(m => S.got[m.i]).length;
+    const own = new Set(s.m), here = grab.filter(m => own.has(m.i)), onway = grab.filter(m => !own.has(m.i)), got = l => l.filter(m => S.got[m.i]).length, due = l => l.filter(m => !S.skip[m.i] || S.got[m.i]).length;
     const para = s.text.length ? s.text : ['Explore this place and pick up everything listed below.'];
     const back = nearbyLeft(s), openAll = leftOpen().length;
     pane.innerHTML = `
@@ -209,9 +211,9 @@
         ${s.place && (s.place.walk.length || s.place.notes.length || s.place.img) ? `<div class="over sechead">${esc(s.place.title)} in detail</div><div class="dir">${shot(s.place.img, 'lead')}${s.place.walk.map(p => p.startsWith('## ') ? `<h3>${esc(p.slice(3))}</h3>` : `<p>${esc(p)}</p>`).join('')}${s.place.notes.length ? `<h3>Notes</h3><ul>${s.place.notes.map(p => `<li>${esc(p)}</li>`).join('')}</ul>` : ''}</div>` : ''}
         ${(s.guide || []).map(g => `<details class="guide"><summary>Wiki walkthrough: ${esc(g.title)}</summary><div class="dir">${g.text.map(p => `<p>${esc(p)}</p>`).join('')}</div></details>`).join('')}
         ${s.miss ? `<div class="miss"><b>Missable:</b> ${esc(s.miss)}</div>` : ''}
-        <div class="sechead" id="todo"><span class="over">To do here &middot; ${got(here)} of ${here.length}</span>${grab.length > 1 ? `<button class="link" id="allb">${open ? 'Tick all' : 'Untick all'}</button>` : ''}</div>
+        <div class="sechead" id="todo"><span class="over">To do here &middot; ${got(here)} of ${due(here)}</span>${grab.length > 1 ? `<button class="link" id="allb">${open ? 'Tick all' : 'Untick all'}</button>` : ''}</div>
         ${here.map(checkHTML).join('') || '<div class="none">Nothing to pick up here.</div>'}
-        ${onway.length ? `<div class="sechead"><span class="over">Nearby, on the way &middot; ${got(onway)} of ${onway.length}</span></div>${onway.map(checkHTML).join('')}` : ''}
+        ${onway.length ? `<div class="sechead"><span class="over">Nearby, on the way &middot; ${got(onway)} of ${due(onway)}</span></div>${onway.map(checkHTML).join('')}` : ''}
         ${back.length ? `<div class="sechead"><span class="over warn">Left open nearby &middot; ${back.length}</span></div>${back.map(m => checkHTML(m, 'from ' + ROUTE[stepOf.get(m.i)].title)).join('')}` : ''}
         ${extra.length ? `<button class="link wide" id="xt">${S.extras ? 'Hide' : 'Show'} ${extra.length} nearby materials</button>${S.extras ? extra.map(checkHTML).join('') : ''}` : ''}
       </div>
@@ -223,12 +225,13 @@
     pane.querySelectorAll('.chk').forEach(r => r.onclick = e => {
       const m = M[+r.dataset.i];
       if (!e.target.closest('[data-tick]')) { openInfo = openInfo === m.i ? null : m.i; renderRoute(); if (openInfo != null) showSpot(m, true); return; }   // the row explains it and finds it on the map
-      if (S.got[m.i]) delete S.got[m.i]; else S.got[m.i] = 1; settle(m.i); save();                                                                      // the box ticks it
+      if (S.got[m.i]) delete S.got[m.i]; else { S.got[m.i] = 1; delete S.skip[m.i]; } settle(m.i); save();   // the box ticks it
       const mk = markerOf.get(m.i); if (mk) mk.setIcon(symIcon(m));
       renderRoute();
     });
     pane.querySelectorAll('[data-card]').forEach(b => b.onclick = () => openCard(M[+b.dataset.card]));
-    const allb = $('#allb', pane); if (allb) allb.onclick = () => { grab.forEach(m => { if (open) S.got[m.i] = 1; else delete S.got[m.i]; }); grab.forEach(m => settle(m.i)); save(); renderRoute(); drawStep(s, false); };
+    pane.querySelectorAll('[data-skip]').forEach(b => b.onclick = () => { const i = +b.dataset.skip; if (S.skip[i]) delete S.skip[i]; else S.skip[i] = 1; openInfo = null; settle(i); save(); renderRoute(); });
+    const allb = $('#allb', pane); if (allb) allb.onclick = () => { grab.forEach(m => { if (S.skip[m.i]) return; if (open) S.got[m.i] = 1; else delete S.got[m.i]; }); grab.forEach(m => settle(m.i)); save(); renderRoute(); drawStep(s, false); };
     const xt = $('#xt', pane); if (xt) xt.onclick = () => { S.extras = !S.extras; save(); renderRoute(); drawStep(s, false); };
     const ob = $('#openb', pane); if (ob) ob.onclick = () => { showOpen = true; renderRoute(); };
     const jump = $('#jump', pane); if (jump) jump.onclick = () => $('#todo', pane).scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -309,7 +312,7 @@
       <div class="opt">Markers on the map</div>${seg('al', [[0, 'This step only'], [1, 'Everything']], S.all ? 1 : 0)}
       <p class="credit">The order of the route follows <a href="https://eldenring.redmaw.dev/" target="_blank" rel="noopener">Redmaw's Elden Ring Completion Sheets</a>, and where the wiki has no note the step shows Redmaw's own line. Map images, marker positions and descriptions come from the <a href="https://eldenring.wiki.fextralife.com/" target="_blank" rel="noopener">Fextralife Elden Ring Wiki</a>. Elden Ring is a trademark of its owners; this is a personal fan tool.</p></div>`;
     document.querySelectorAll('#al .btn').forEach(b => b.onclick = () => { S.all = !!+b.dataset.v; save(); drawAll(); renderSettings(); });
-    let armed = false; $('#reset').onclick = e => { if (!armed) { armed = true; e.target.textContent = 'Tap again to erase all progress'; return; } S.st = {}; S.got = {}; S.hist = []; S.again = 0; S.tab = 'route'; keptTab = null; save(); peek = null; openInfo = null; showOpen = false; render(); };
+    let armed = false; $('#reset').onclick = e => { if (!armed) { armed = true; e.target.textContent = 'Tap again to erase all progress'; return; } S.st = {}; S.got = {}; S.skip = {}; S.hist = []; S.again = 0; S.tab = 'route'; keptTab = null; save(); peek = null; openInfo = null; showOpen = false; render(); };
   }
 
 

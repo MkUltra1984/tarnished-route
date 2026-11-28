@@ -299,3 +299,7 @@ button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:poin
 /* a missable warning is never cut off */
 .miss{display:block;-webkit-line-clamp:unset;overflow:visible;font-size:15px;line-height:22px}
 .travel{margin-top:6px;font-size:14px;line-height:20px;color:var(--text-2)}.travel b{color:var(--gold);font-weight:600}
+
+/* a forgotten objective: there, but out of the way */
+.chk.gone .cn,.chk.gone .ci{opacity:.4}.chk.gone .box{border-style:dashed;opacity:.5}.chk.gone .box::after{content:"\2013";color:var(--text-3);font-weight:700}
+.link.more[data-skip]{color:var(--text-3)}
