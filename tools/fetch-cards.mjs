@@ -105,7 +105,7 @@ function parse(html, boss) {
         if (/negations|absorptions|resistances/i.test(t) && (mode === 'combat' || mode === 'neg')) { mode = 'neg'; push(out.facts, '## ' + t.replace(/\s*\(or Absorptions\)/i, ''), 40); return; }
       }
       const key = boss ? (/fight strategy|^strategy|strategy tips|best tips/i.test(t) ? 'strat' : /combat information/i.test(t) ? 'combat' : tag === 'h3' && /boss(\s*\([^)]*\))? in elden ring/i.test(t) ? 'facts' : null)
-        : (/where to find/i.test(t) ? 'where' : /\beffect\b/i.test(t) ? 'effect' : null);
+        : (/where to find|\blocations? in elden ring|how to get/i.test(t) ? 'where' : /\beffect\b/i.test(t) ? 'effect' : null);
       if (key && seen.has(key)) { mode = null; return; }
       if (key) seen.add(key);
       mode = key; return;

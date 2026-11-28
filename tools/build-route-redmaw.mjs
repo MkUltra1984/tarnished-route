@@ -30,6 +30,20 @@ const strip = t => { let p; t = plain(t); do { p = t; t = t.replace(/\s*\([^)]*\
 const short = t => { let p, x = plain(t); do { p = x; x = x.replace(/\s*\([^)]*\)\s*$/, '').replace(/\s+-\s+.*$/, '').trim(); } while (x !== p); return x; };
 const DROPS = MK.drops || {}, dropOf = new Map(); for (const b in DROPS) for (const i of DROPS[b]) dropOf.set(i, +b);
 
+// Complete lists. Redmaw's item sheets (weapons, armor, talismans, spells, ashes, key items, miscellaneous) name every
+// thing 100% needs. Whatever has no marker by now (bought from merchants, dropped by ordinary enemies, starting gear,
+// remembrance trades) starts as a thing to tick that has no place on the map (map -1). Further down, a line of the walkthrough that
+// names it gives it a place and a step; a merchant who sells it gives it the merchant's place.
+let listOnly = 0;
+{ const have = new Set(); L.forEach(m => { for (const k of [norm(strip(m[4])), norm(m[4]), norm(strip(m[4]).replace(/^ash of war: /i, '')), norm(strip(m[4]).split(',')[0])]) have.add(k); });
+  const sets = [...have].filter(k => k.endsWith('set')).map(k => k.slice(0, -3)), hash = t => { let h = 2166136261; for (const c of t) { h ^= c.charCodeAt(0); h = Math.imul(h, 16777619); } return (h >>> 0) / 4294967296; };
+  for (const [file, cat] of [['weapons', 'Weapons'], ['armor', 'Armor'], ['talismans', 'Talismans'], ['spells', 'Spells'], ['ashes', null], ['key-items', 'Key Items'], ['miscellaneous-items', 'Key Items']]) {
+    const f = 'raw/redmaw/' + file + '.html'; if (!fs.existsSync(f)) continue; const $ = cheerio.load(fs.readFileSync(f, 'utf8'));
+    $('input[type=checkbox]').each((_, box) => { const li = $(box).closest('li').clone(); li.find('ul,ol').remove(); const a = li.find('a[href*="wiki.gg"]').first(); if (!a.length) return;
+      const t = plain(a.text()).replace(/\s+x\d+$/i, ''), k = norm(t); if (t.length < 3 || t.length > 70 || /^coming soon/i.test(t)) return;
+      if (have.has(k) || have.has(norm(strip(t))) || have.has(k + 'set') || have.has(k + 'ashes') || have.has('ashofwar' + k) || (file === 'armor' && sets.some(x => x.length >= 6 && k.startsWith(x)))) return;
+      const c = cat || (/^ash of war/i.test(t) ? 'Ashes of War' : 'Spirit Ashes'), gesture = file === 'miscellaneous-items' && $(box).closest('ul,ol').prevAll('h3,h4').first().text().toLowerCase().includes('gesture');
+      have.add(k); L.push([-1, +hash(c + ':' + t).toFixed(9), 0, c, gesture ? t + ' (Gesture)' : t, '', 'rm', 'list']); listOnly++; }); } }
 // every marker under the names it can be called by
 const byName = new Map();
 L.forEach((m, i) => { for (const k of new Set([norm(strip(m[4])), norm(m[4]), norm(strip(m[4]).replace(/^ash of war: /i, '')), norm(strip(m[4]).split(',')[0])])) { if (k.length < 3) continue; if (!byName.has(k)) byName.set(k, []); byName.get(k).push(i); } });
@@ -47,7 +61,7 @@ const allLines = [], madeNew = new Set();
 // the spot of the line before, which may be far away after a fast travel
 const placeNames = (() => { const m = new Map(); L.forEach((x, i) => { if (kind(i) !== 'p' || !['Locations', 'Sites of Grace'].includes(x[3])) return; const k = short(x[4]).toLowerCase(); if (k.replace(/[^a-z]/g, '').length < 8) return; if (!m.has(k)) m.set(k, []); m.get(k).push(i); }); return [...m.entries()].filter(e => e[1].length <= 2).sort((p, q) => q[0].length - p[0].length); })();
 const DROPPED = /dropped by|drops? from|after defeating|upon defeat|upon defeating|reward for defeating|by defeating/i, KILL = /\b(kill|kills|killing|defeat|defeating|slay|invade|beat|fight)\b/i;
-let added = 0;
+let added = 0, fromLists = 0;
 const used = new Set(), steps = [], stats = { lines: 0, links: 0, matched: 0, plain: 0 };
 // objective names as they would stand in running text (lower case, at least 7 letters, longest first)
 const plainNames = (() => { const m = new Map(); L.forEach((x, i) => { if (kind(i) !== 'g') return; const k = strip(x[4]).toLowerCase(); if (k.replace(/[^a-z]/g, '').length < 7) return; if (!m.has(k)) m.set(k, []); m.get(k).push(i); }); return [...m.entries()].sort((p, q) => q[0].length - p[0].length); })();
@@ -67,7 +81,9 @@ for (const [file, game, maps] of [['walkthrough', 'base', ['overland', 'undergro
       if (!pending.length) return;
       // objectives without a marker on the wiki's map: a marker of their own, at the spot of the step
       { const spot = pending.flatMap(l => l.marks)[0], here = spot != null ? { m: L[spot][0], x: L[spot][1], y: L[spot][2] } : cur ? { m: MK.maps.indexOf(cur.map), x: cur.x, y: cur.y } : { m: MK.maps.indexOf(maps[0]), x: 0.5, y: 0.5 }; let k = 0;
-        for (const l of pending) for (const f of l.fresh || []) { k++; const i = L.length; L.push([here.m, +(here.x + 0.0007 * k).toFixed(5), +(here.y + 0.0004 * k).toFixed(5), f.cat, f.gesture ? f.name + ' (Gesture)' : f.name, l.text, 'rm']); used.add(i); l.marks.push(i); added++; } }
+        for (const l of pending) for (const f of l.fresh || []) { k++; const px = +(here.x + 0.0007 * k).toFixed(5), py = +(here.y + 0.0004 * k).toFixed(5);
+          if (f.idx != null) { const m = L[f.idx]; m[0] = here.m; m[1] = px; m[2] = py; m[5] = l.text; m[7] = 'sheet'; l.marks.push(f.idx); fromLists++; continue; }
+          const i = L.length; L.push([here.m, px, py, f.cat, f.gesture ? f.name + ' (Gesture)' : f.name, l.text, 'rm']); used.add(i); l.marks.push(i); added++; } }
       const marks = [...new Set(pending.flatMap(l => l.marks))], g = marks.filter(i => kind(i) === 'g' && !dropOf.has(i)), lead = g[0] ?? marks[0];
       const names = (g.length ? g : marks.filter(i => kind(i) === 'g')).map(i => (KIND[L[i][3]] || '') + nameOf(i));
       const title = names.length ? names.slice(0, 2).join(', ') + (names.length > 2 ? ` +${names.length - 2}` : '') : region;
@@ -97,6 +113,9 @@ for (const [file, game, maps] of [['walkthrough', 'base', ['overland', 'undergro
       li.find('a').each((_, a) => { stats.links++; const href = decodeURIComponent((($(a).attr('href') || '').match(/wiki\.gg\/wiki\/([^#?]+)/) || [, ''])[1]).replace(/_/g, ' ');
         const c = lookup($(a).text()) || (href && lookup(href)) || lookupPerson($(a).text()) || (href && lookupPerson(href));
         if (!c && !note) { const nm = plain($(a).text()).replace(/\s+x\d+$/i, ''), so = SHEET_ONLY[nm]; if (so && so.cat && !madeNew.has(nm)) { const html = $.html(li), at = html.indexOf($.html(a)), before = plain(html.slice(0, at)).split(/[.;!?]\s/).pop() || ''; if (!MENTION.test(before)) { madeNew.add(nm); fresh.push({ name: nm, cat: so.cat, gesture: so.gesture }); } } }
+        if (c && !note) { const lo = c.filter(i => L[i][0] < 0 && !used.has(i)), placed = c.filter(i => L[i][0] >= 0 && !used.has(i) && maps.includes(mapOf(i)));
+          if (lo.length && !placed.length) { const html = $.html(li), at = html.indexOf($.html(a)), before = plain(html.slice(0, at)).split(/[.;!?]\s/).pop() || '';
+            if (!MENTION.test(before) || /\b(buy|buying|bought|purchase|purchasing)\b[^,]*$/i.test(before)) { used.add(lo[0]); fresh.push({ idx: lo[0] }); } return; } }
         if (!c || note) return;
         // Redmaw prints enemies in red: only a red name can be a boss or invader to defeat, and a red name is nothing to pick up
         const red = /\bred\b/.test($(a).attr('class') || '');
@@ -166,7 +185,7 @@ console.log('same-named picks far from the steps around them:', swapped + lonely
 // travelled, so "the nearest one" was not the right one, or the line read like a mention): each goes to the nearest
 // step whose line names it, if that step is close to the thing on the map.
 let rescued = 0;
-L.forEach((m, i) => { if (used.has(i) || kind(i) !== 'g' || dropOf.has(i)) return; const keys = new Set([norm(strip(m[4])), norm(m[4]), norm(strip(m[4]).replace(/^ash of war: /i, ''))]), foe = m[3] === 'Bosses' || m[3] === 'NPC Invaders';
+L.forEach((m, i) => { if (m[0] < 0 || used.has(i) || kind(i) !== 'g' || dropOf.has(i)) return; const keys = new Set([norm(strip(m[4])), norm(m[4]), norm(strip(m[4]).replace(/^ash of war: /i, ''))]), foe = m[3] === 'Bosses' || m[3] === 'NPC Invaders';
   let best = null, bd = 0.06; for (const l of allLines) { if (l.note || !l.step || l.step.map !== mapOf(i) || (l.step.game === 'dlc') !== (mapOf(i) === 'shadow')) continue; const lt = l.norm || (l.norm = norm(l.text)); const hit = [...keys].find(k => l.names.has(k)) || [...keys].find(k => k.length >= 9 && lt.includes(k)); if (!hit || (l.names.has(hit) && foe !== l.red.has(hit))) continue; if (!foe && DROPPED.test(plain(m[5] || '')) && !KILL.test(l.text)) continue;
     { const have = l.step.m.filter(j => j !== i && nameKey(j) === nameKey(i)).length, may = Math.max(1, ...allLines.filter(x => x.step === l.step).map(x => x.count.get(hit) || 0)); if (have >= may) continue; }
     const d = Math.min(Math.hypot(l.step.x - m[1], l.step.y - m[2]), ...l.step.m.map(j => mapOf(j) === mapOf(i) ? Math.hypot(L[j][1] - m[1], L[j][2] - m[2]) : 5)); if (d < bd) { bd = d; best = l.step; } }
@@ -175,7 +194,7 @@ L.forEach((m, i) => { if (used.has(i) || kind(i) !== 'g' || dropOf.has(i)) retur
 let leftG = 0, leftOther = 0; const far = [], extras = [];
 const byMap = new Map(); steps.forEach(s => { if (!byMap.has(s.map)) byMap.set(s.map, []); byMap.get(s.map).push(s); });
 const isDlc = i => mapOf(i) === 'shadow';
-L.forEach((m, i) => { if (used.has(i)) return;
+L.forEach((m, i) => { if (m[0] < 0 || used.has(i)) return;
   if (dropOf.has(i)) { const s = steps.find(x => x.m.includes(dropOf.get(i)) || x.n.includes(dropOf.get(i))); if (s) { s.m.includes(dropOf.get(i)) ? s.m.push(i) : s.n.push(i); used.add(i); return; } }
   const pool = (byMap.get(mapOf(i)) || []).filter(s => (s.game === 'dlc') === isDlc(i)); if (!pool.length) { far.push(m[4]); return; }
   let best = null, bd = 9; for (const s of pool) { const d = Math.hypot(s.x - m[1], s.y - m[2]); if (d < bd) { bd = d; best = s; } }
@@ -184,6 +203,24 @@ L.forEach((m, i) => { if (used.has(i)) return;
     extras.push([best, st]); used.add(i); leftG++; return; }
   best.n.push(i); used.add(i); if (kind(i) === 'g') leftG++; else leftOther++; if (bd > 0.08 && kind(i) === 'g') far.push(`${m[4]} (${bd.toFixed(2)} from "${best.title}")`); });
 for (const [after, st] of extras) steps.splice(steps.indexOf(after) + 1, 0, st);
+// Merchants. Redmaw's merchants sheet says who sells what, and for how much. A thing from the lists that nobody has
+// placed yet and that a merchant sells gets the merchant's spot, "Sold by ...", and is listed in the step where that
+// merchant is met ("Sold here"), without counting as open: you buy when you can afford it.
+let sold = 0, soldNoStep = 0;
+if (fs.existsSync('raw/redmaw/merchants.html')) { const $ = cheerio.load(fs.readFileSync('raw/redmaw/merchants.html', 'utf8'));
+  $('h3').each((_, h3) => { const h = $(h3).clone(); h.find('button').remove(); const place = plain(h.find('.secondary').text()).replace(/^\(|\)$/g, ''); h.find('.secondary').remove(); const name = plain(h.text()); if (!name) return;
+    const ALIAS = { 'Knight Bernahl': 'Bernahl', 'Nomadic Merchant|Weeping Peninsula': 'Nomadic Merchant Castle Morne Rampart', 'Nomadic Merchant|South Liurnia': 'Nomadic Merchant Liurnia of the Lakes', 'Nomadic Merchant|North Liurnia': 'Nomadic Merchant North Liurnia of the Lakes',
+      'Nomadic Merchant|North Caelid': 'Wandering Merchant Caelid Highway North', 'Nomadic Merchant|South Caelid': 'Nomadic Merchant Caelid South', 'Nomadic Merchant|Altus Plateau': 'Nomadic Merchant West Altus Plateau', 'Hermit Merchant|Capital Outskirts': 'Hermit Merchant',
+      'Hermit Merchant|Mountaintops of the Giants': 'Hermit Merchant Mountaintops East', 'Abandoned Merchant': 'Wandering Merchant Siofra River', 'Count Ymir, High Priest': 'Count Ymir', 'Isolated Merchant|Weeping Peninsula': 'Isolated Merchant' };
+    const al = ALIAS[name + '|' + place] || ALIAS[name], exact = al ? L.map((m, i) => i).filter(i => L[i][3] === 'NPCs' && plain(L[i][4]) === al) : null;
+    const who = exact && exact.length ? exact : lookup(name + ' ' + place) || lookup(name) || lookupPerson(name), npc = who ? who.filter(i => L[i][3] === 'NPCs' && L[i][0] >= 0) : [];
+    const hold = /^(Twin Maiden Husks|Finger Reader Enia|Brother Corhyn)$/.test(name) ? steps.find(x => (x.lines || []).some(l => /roundtable hold/i.test(l.text)) && x.m.length) : null;
+    const st = hold || (npc.length ? steps.find(x => x.m.some(i => npc.includes(i))) || steps.find(x => x.n.some(i => npc.includes(i))) : null), at = st ? (npc.find(i => st.m.includes(i) || st.n.includes(i)) ?? st.m[0]) : null;
+    let k = 0; $(h3).nextAll('ul, ol').first().find('input[type=checkbox]').each((_, box) => { const li = $(box).closest('li').clone(); li.find('ul,ol').remove(); const a = li.find('a[href*="wiki.gg"]').first(); if (!a.length) return;
+      const c = lookup(a.text()); const i = c && c.find(j => L[j][0] < 0 && !used.has(j)); if (i == null) return;
+      const price = plain(li.text()).split(':').slice(1).join(':').trim(), cond = plain($(box).closest('ul,ol').parent('li').clone().children('ul,ol').remove().end().text());
+      L[i][5] = 'Sold by ' + name + (hold ? ' in the Roundtable Hold' : place && !/remembrances|equipment/i.test(place) ? ' (' + place + ')' : '') + (price ? ' for ' + price : '') + '.' + (cond && cond.length < 200 ? ' ' + cond.replace(/:$/, '.') : '');
+      used.add(i); if (st) { k++; L[i][0] = L[at][0]; L[i][1] = +(L[at][1] + 0.0006 * (k % 9)).toFixed(5); L[i][2] = +(L[at][2] + 0.0006 * Math.floor(k / 9) + 0.0006).toFixed(5); L[i][7] = 'sold'; (st.sell = st.sell || []).push(i); sold++; } else soldNoStep++; }); }); }
 // ---------- making the steps fit together ----------
 const holder = i => steps.find(x => x.m.includes(i) || x.n.includes(i)), takeOut = (st, i) => { st.m = st.m.filter(k => k !== i); st.n = st.n.filter(k => k !== i); };
 // a. A boss and its drops are one thing. A step that holds a drop pulls in the boss when the boss was only "nearby"
@@ -276,25 +313,12 @@ for (const s of steps) delete s.lines;
 const ids = new Set(); for (const s of steps) { while (ids.has(s.id)) s.id += '+'; ids.add(s.id); s.x = +s.x.toFixed(5); s.y = +s.y.toFixed(5); }
 fs.writeFileSync('app/data/route.json', JSON.stringify(steps));
 MK.cats['Sites of Grace'].kind = 'g';   // the app lists every site of grace to be ticked
-// Complete lists. Redmaw's item sheets (weapons, armor, talismans, spells, ashes, key items, miscellaneous) name every
-// thing 100% needs. Whatever has no marker by now (bought from merchants, dropped by ordinary enemies, starting gear,
-// remembrance trades) is added to the Collection as a thing to tick that has no place on the map: map -1.
-let listOnly = 0;
-{ const have = new Set(); L.forEach(m => { for (const k of [norm(strip(m[4])), norm(m[4]), norm(strip(m[4]).replace(/^ash of war: /i, '')), norm(strip(m[4]).split(',')[0])]) have.add(k); });
-  const sets = [...have].filter(k => k.endsWith('set')).map(k => k.slice(0, -3)), hash = t => { let h = 2166136261; for (const c of t) { h ^= c.charCodeAt(0); h = Math.imul(h, 16777619); } return (h >>> 0) / 4294967296; };
-  for (const [file, cat] of [['weapons', 'Weapons'], ['armor', 'Armor'], ['talismans', 'Talismans'], ['spells', 'Spells'], ['ashes', null], ['key-items', 'Key Items'], ['miscellaneous-items', 'Key Items']]) {
-    const f = 'raw/redmaw/' + file + '.html'; if (!fs.existsSync(f)) continue; const $ = cheerio.load(fs.readFileSync(f, 'utf8'));
-    $('input[type=checkbox]').each((_, box) => { const li = $(box).closest('li').clone(); li.find('ul,ol').remove(); const a = li.find('a[href*="wiki.gg"]').first(); if (!a.length) return;
-      const t = plain(a.text()).replace(/\s+x\d+$/i, ''), k = norm(t); if (t.length < 3 || t.length > 70 || /^coming soon/i.test(t)) return;
-      if (have.has(k) || have.has(norm(strip(t))) || have.has(k + 'set') || have.has(k + 'ashes') || have.has('ashofwar' + k) || (file === 'armor' && sets.some(x => x.length >= 6 && k.startsWith(x)))) return;
-      const c = cat || (/^ash of war/i.test(t) ? 'Ashes of War' : 'Spirit Ashes'), gesture = file === 'miscellaneous-items' && $(box).closest('ul,ol').prevAll('h3,h4').first().text().toLowerCase().includes('gesture');
-      have.add(k); L.push([-1, +hash(c + ':' + t).toFixed(9), 0, c, gesture ? t + ' (Gesture)' : t, '', 'rm', 'list']); listOnly++; }); } }
 fs.writeFileSync('app/data/markers.json', JSON.stringify(MK));
-console.log('things added to the Collection that have no place on the map:', listOnly);
+console.log('things from the complete lists:', listOnly, '| given a step by a line of the walkthrough:', fromLists, '| sold by a merchant met in a step:', sold, '| sold by a merchant without a step:', soldNoStep, '| still without a place:', L.filter(m => m[0] < 0).length);
 console.log('objectives added from the sheet (no marker on the wiki map):', added, '| sites of grace named by a step:', steps.reduce((n, st) => n + st.m.filter(i => L[i][3] === 'Sites of Grace').length, 0), 'of', L.filter(m => m[3] === 'Sites of Grace').length);
 
 // report
-const inSteps = new Map(); steps.forEach(s => [...s.m, ...s.n].forEach(i => inSteps.set(i, (inSteps.get(i) || 0) + 1)));
+const inSteps = new Map(); steps.forEach(s => [...s.m, ...s.n, ...(s.sell || [])].forEach(i => inSteps.set(i, (inSteps.get(i) || 0) + 1)));
 const gAll = L.map((_, i) => i).filter(i => kind(i) === 'g'), gOwn = gAll.filter(i => steps.some(s => s.m.includes(i))).length;
 const sizes = steps.map(s => s.m.filter(i => kind(i) === 'g' && !dropOf.has(i)).length), nearby = steps.map(s => s.n.filter(i => kind(i) === 'g' && !dropOf.has(i)).length);
 const R = [

@@ -312,3 +312,13 @@ Not done: nobody has started the game with it yet. The Gauntlet tab in the app s
   `node tools/completion-audit.mjs` compares the sheets with the markers (16 left, mostly plural boss names).
 - Ticks are saved by map + position + kind + name (gotV 3); gotV 2 and number-keyed saves are still read.
 - Cards for the 693 Collection-only things fetched (all have a card, 690 a picture); app/cards is 30 MB, cards.json v 4.
+- Merchants (owner: "do I get guided to where this is?"): raw/redmaw/merchants.html says who sells what and for how
+  much. The complete lists are now read before the walkthrough: 105 list things get a step from a walkthrough line,
+  314 are sold by a merchant met in a step (marker at the merchant, a[7] 'sold', step field `sell`, shown as the
+  fold-out "Sold here", not counted as open), 346 are still without a place (237 armour pieces, 83 weapons: drops of
+  ordinary enemies and starting gear). The Roundtable Hold's sellers hang on the step that first goes there.
+- fetch-cards: the "where to find" text is also read from "<name> Location in Elden Ring" headings (1,951 of 2,016
+  item cards have it now).
+- Not used from Redmaw's site: achievements (72), questlines (587 lines by person), npc-walkthrough (604),
+  new-game-plus (68), resources (reference tables), bosses sheet (207, the app uses the wiki's), the 🏆 and Optional
+  badges, his videos and images.

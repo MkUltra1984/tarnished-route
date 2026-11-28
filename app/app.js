@@ -8,7 +8,7 @@
   const [ROUTE, MK, TILES, CARDS] = await Promise.all([json('data/route.json'), json('data/markers.json'), json('tiles/meta.json', {}), json('data/cards.json', { by: {}, pages: {} })]);
   const MAPNAME = { overland: 'The Lands Between', underground: 'Underground', ashen: 'Leyndell, Ashen Capital', shadow: 'Realm of Shadow' };
   const TABS = [['route', 'Route'], ['bosses', 'Bosses'], ['collection', 'Collection'], ['quests', 'Quests'], ['materials', 'Materials'], ['settings', 'Settings']];
-  const M = MK.list.map((a, i) => ({ i, map: MK.maps[a[0]], x: a[1], y: a[2], cat: a[3], title: a[4], desc: a[5], f: MK.cats[a[3]].f, label: MK.cats[a[3]].label, kind: MK.cats[a[3]].kind }));
+  const M = MK.list.map((a, i) => ({ i, src: a[7], map: MK.maps[a[0]], x: a[1], y: a[2], cat: a[3], title: a[4], desc: a[5], f: MK.cats[a[3]].f, label: MK.cats[a[3]].label, kind: MK.cats[a[3]].kind }));
   const BOSSES = M.filter(m => m.cat === 'Bosses');
   // a boss's own drops are not objectives of their own: they are ticked together with the boss
   const DROPS = MK.drops || {}, dropOf = new Map(); for (const b in DROPS) for (const i of DROPS[b]) dropOf.set(i, +b);
@@ -214,6 +214,7 @@
         <div class="sechead" id="todo"><span class="over">To do here &middot; ${got(here)} of ${due(here)}</span>${grab.length > 1 ? `<button class="link" id="allb">${open ? 'Tick all' : 'Untick all'}</button>` : ''}</div>
         ${here.map(checkHTML).join('') || '<div class="none">Nothing to pick up here.</div>'}
         ${onway.length ? `<div class="sechead"><span class="over">Nearby, on the way &middot; ${got(onway)} of ${due(onway)}</span></div>${onway.map(checkHTML).join('')}` : ''}
+        ${(s.sell || []).length ? `<details class="guide sold"${S.soldOpen ? ' open' : ''}><summary>Sold here &middot; ${s.sell.filter(i => S.got[i]).length} of ${s.sell.length} bought</summary><p class="soldnote">Buy these when you can afford them. They do not hold the step open.</p>${s.sell.map(i => checkHTML(M[i], M[i].desc.replace(/^Sold by .*? for /, '').replace(/.$/, ''))).join('')}</details>` : ''}
         ${back.length ? `<div class="sechead"><span class="over warn">Left open nearby &middot; ${back.length}</span></div>${back.map(m => checkHTML(m, 'from ' + ROUTE[stepOf.get(m.i)].title)).join('')}` : ''}
         ${extra.length ? `<button class="link wide" id="xt">${S.extras ? 'Hide' : 'Show'} ${extra.length} nearby materials</button>${S.extras ? extra.map(checkHTML).join('') : ''}` : ''}
       </div>
@@ -230,6 +231,7 @@
       renderRoute();
     });
     pane.querySelectorAll('[data-card]').forEach(b => b.onclick = () => openCard(M[+b.dataset.card]));
+    const sd = $('.sold', pane); if (sd) sd.ontoggle = () => { S.soldOpen = sd.open ? 1 : 0; };
     pane.querySelectorAll('[data-skip]').forEach(b => b.onclick = () => { const i = +b.dataset.skip; if (S.skip[i]) delete S.skip[i]; else S.skip[i] = 1; openInfo = null; settle(i); save(); renderRoute(); });
     const allb = $('#allb', pane); if (allb) allb.onclick = () => { grab.forEach(m => { if (S.skip[m.i]) return; if (open) S.got[m.i] = 1; else delete S.got[m.i]; }); grab.forEach(m => settle(m.i)); save(); renderRoute(); drawStep(s, false); };
     const xt = $('#xt', pane); if (xt) xt.onclick = () => { S.extras = !S.extras; save(); renderRoute(); drawStep(s, false); };
@@ -261,7 +263,7 @@
     const all = M.filter(m => cats.includes(m.cat));
     if (openCat) {
       const l = M.filter(m => m.cat === openCat).sort((a, b) => a.title.localeCompare(b.title));
-      listPage(openCat, count(l) + ' collected', `<button class="back">&lsaquo; All categories</button>` + l.map(m => rowHTML(m, MAPNAME[m.map] || 'Not on the map: bought, dropped or handed over')).join(''));
+      listPage(openCat, count(l) + ' collected', `<button class="back">&lsaquo; All categories</button>` + l.map(m => rowHTML(m, m.src && m.desc ? m.desc : MAPNAME[m.map] || 'Not on the map: bought, dropped or handed over')).join(''));
       $('.back').onclick = () => { openCat = null; renderCollection(); }; refreshCounts = () => $('#cnt').textContent = count(l) + ' collected'; return;
     }
     listPage('Collection', count(all) + ' collected', cats.map(c => { const l = M.filter(m => m.cat === c); return `<button class="group" data-c="${esc(c)}"><span><img src="icons/${MK.cats[c].f}.png" alt="">${esc(c)}</span><span class="meta">${count(l)}</span></button>`; }).join(''));
