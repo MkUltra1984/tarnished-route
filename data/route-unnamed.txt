@@ -1,0 +1,380 @@
+Armor: Alberich's Set
+Armor: Ansbach's Attire - Enir-Ilim
+Armor: Ansbach's Boots - Enir-Ilim
+Armor: Ansbach's Manchettes - Enir-Ilim
+Armor: Ash of War Scarab
+Armor: Azur's Glintstone Set
+Armor: Black Wolf Mask
+Armor: Blackguard's Iron Mask
+Armor: Blaidd's Set (No helmet)
+Armor: Bull-Goat Set
+Armor: Crucible Tree Set
+Armor: Dryleaf Arm Wraps
+Armor: Dryleaf Cuissardes
+Armor: Dryleaf Robe
+Armor: Eccentric Set
+Armor: Fire Prelate Set
+Armor: Glintstone Scarab
+Armor: Gloried Attire
+Armor: Godskin Apostle Set
+Armor: Gravebird Anklets
+Armor: Gravebird Bracelets - Ruined Forge Lava Intake
+Armor: Gravebird Helm - Enir-Ilim
+Armor: Gravebird's Blackquill Armor
+Armor: Greathood
+Armor: Haligtree Knight Helm
+Armor: Highland Attire
+Armor: Hoslow's Set
+Armor: Igon's Set
+Armor: Iji's Mirrorhelm
+Armor: Incantation Scarab
+Armor: Juvenile Scholar Cap
+Armor: Juvenile Scholar Robe
+Armor: Leather Arm Wraps
+Armor: Leather Arm Wraps
+Armor: Leather Crown
+Armor: Leather Headband
+Armor: Leather Leg Wraps
+Armor: Leather Leg Wraps
+Armor: Leather Set (No Helmet)
+Armor: Leather-Draped Tabard
+Armor: Leda's Armor - Enir-Ilim
+Armor: Lusat's Set
+Armor: Marais Mask
+Armor: Marais Robe
+Armor: Marionette Soldier Birdhelm
+Armor: Mask of Confidence
+Armor: Nox Monk Armor
+Armor: Pelt of Ralva
+Armor: Raging Wolf Set
+Armor: Ronin's Set
+Armor: Rotten Duelist Helm
+Armor: Scaled Set
+Armor: St. Trina's Blossom - Stone Coffin Fissure
+Armor: Twinned Set
+Armor: Twinned Set
+Armor: Upper-Class Robe
+Armor: Wise Man's Mask - Enir-Ilim
+Ashes of War: Ash of War The Poison Flower Blooms Twice
+Ashes of War: Ash of War: Barbaric Roar
+Ashes of War: Ash of War: Barricade Shield
+Ashes of War: Ash of War: Blood Blade
+Ashes of War: Ash of War: Carian Sovereignty
+Ashes of War: Ash of War: Chilling Mist
+Ashes of War: Ash of War: Cragblade
+Ashes of War: Ash of War: Determination
+Ashes of War: Ash of War: Earthshaker
+Ashes of War: Ash of War: Enchanted Shot
+Ashes of War: Ash of War: Flame of the Redmanes
+Ashes of War: Ash of War: Golden Land
+Ashes of War: Ash of War: Golden Land
+Ashes of War: Ash of War: Golden Vow
+Ashes of War: Ash of War: Gravitas
+Ashes of War: Ash of War: Hoarfrost Stomp
+Ashes of War: Ash of War: Lifesteal Fist
+Ashes of War: Ash of War: Lightning Ram
+Ashes of War: Ash of War: Lightning Slash
+Ashes of War: Ash of War: Mighty Shot
+Ashes of War: Ash of War: Palm Blast
+Ashes of War: Ash of War: Piercing Throw - Ruined Forge of Starfall Past
+Ashes of War: Ash of War: Poison Moth Flight
+Ashes of War: Ash of War: Poisonous Mist
+Ashes of War: Ash of War: Prayerful Strike
+Ashes of War: Ash of War: Prelate's Charge
+Ashes of War: Ash of War: Raging Beast
+Ashes of War: Ash of War: Rain of Arrows
+Ashes of War: Ash of War: Repeating Thrust
+Ashes of War: Ash of War: Rolling Sparks
+Ashes of War: Ash of War: Sacred Blade
+Ashes of War: Ash of War: Sacred Ring of Light
+Ashes of War: Ash of War: Scattershot Throw - Taylew's Ruined Forge
+Ashes of War: Ash of War: Seppuku
+Ashes of War: Ash of War: Shared Order
+Ashes of War: Ash of War: Shield Bash
+Ashes of War: Ash of War: Storm Assault
+Ashes of War: Ash of War: Storm Wall
+Ashes of War: Ash of War: Stormcaller
+Ashes of War: Ash of War: Sword Dance
+Ashes of War: Ash of War: Unsheathe
+Ashes of War: Ash of War: Vacuum Slice
+Ashes of War: Ash of War: Vow of the Indomitable
+Ashes of War: Ash of War: Wild Strikes
+Bosses: Base Serpent Messmer
+Bosses: Beast Clergyman / Maliketh, The Black Blade
+Bosses: Cleanrot Knight Duo (Abandoned Cave)
+Bosses: Crucible Knight & Crucible Knight Ordovis
+Bosses: Crucible Knight / Misbegotten Warrior
+Bosses: Crucible Knight Siluria
+Bosses: Demi-Human Queen Marigga
+Bosses: Flying Dragon Greyll
+Bosses: Ghost Troll
+Bosses: Knight of the Solitary Gaol
+Bosses: Lichdragon Fortissax
+Bosses: Radahn, Consort of Miquella - Enir-Ilim
+Bosses: Ralva the Great Red Bear
+Flask Upgrades: Cerulean Hidden Tear
+Flask Upgrades: Crimsonburst Crystal Tear
+Flask Upgrades: Glovewort Crystal Tear
+Flask Upgrades: Golden Seed (A) - Crumbling Farum Azula
+Flask Upgrades: Golden Seed (A) - Stormveil Castle
+Flask Upgrades: Golden Seed (B) - Crumbling Farum Azula
+Flask Upgrades: Golden Seed (B) - Stormveil Castle
+Flask Upgrades: Leaden Hardtear
+Flask Upgrades: Opaline Bubbletear
+Flask Upgrades: Opaline Hardtear
+Flask Upgrades: Stonebarb Cracked Tear
+Flask Upgrades: Strength-Knot Crystal Tear
+Flask Upgrades: Thorny Cracked Tear
+Flask Upgrades: Viridian Hidden Tear
+Key Items: "The Sacred Tower" Painting
+Key Items: Ancestral Infant's Head
+Key Items: Bernahl's Bell Bearing
+Key Items: Calm Down Gesture
+Key Items: Champion's Song Painting
+Key Items: Chelona's Rise Turtle Marker 1
+Key Items: Chelona's Rise Turtle Marker 2
+Key Items: Chelona's Rise Turtle Marker 3
+Key Items: Crossed Legs Gesture
+Key Items: Dancer's Castanets
+Key Items: Domain of Dragons Painting Solution
+Key Items: Dozing Cross-Legged Gesture
+Key Items: Dragon Cult Prayerbook
+Key Items: Duelist's Furled Finger
+Key Items: Fevor's Cookbook [1]
+Key Items: Fire Knight's Cookbook [1]
+Key Items: Fire Knight's Cookbook [2]
+Key Items: Fire Monks' Prayerbook
+Key Items: Fire Spur Me (Gesture)
+Key Items: Furlcalling Finger Remedy D
+Key Items: Furlcalling Finger Remedy E
+Key Items: Furlcalling Finger Remedy F
+Key Items: Furlcalling Finger Remedy H
+Key Items: Furlcalling Finger Remedy I
+Key Items: Glinting Nail x2
+Key Items: Godskin Prayerbook
+Key Items: Golden Vow x3
+Key Items: Gostoc's Bell Bearing
+Key Items: Greasemonger's Bell Bearing
+Key Items: Greater Potentate's Cookbook [13] - Ruined Forge Lava Intake
+Key Items: Heart of Bayle
+Key Items: Herbalist's Bell Bearing
+Key Items: Homing Instinct Painting
+Key Items: Horned Bairn
+Key Items: Igon's Cookbook [1]
+Key Items: Igon's Cookbook [2]
+Key Items: Incursion Painting Solution
+Key Items: Inner Order
+Key Items: Larval Tear B
+Key Items: Letter to Bernahl
+Key Items: Letter to Patches
+Key Items: Mending Rune of the Death-Prince
+Key Items: Message from Leda
+Key Items: Mimic's Veil
+Key Items: Moldmonger's Bell Bearing
+Key Items: Mushroom-Seller's Bell Bearing (1)
+Key Items: Mushroom-Seller's Bell Bearing [2]
+Key Items: Note: The Lord of Frenzied Flame
+Key Items: Pidia's Bell Bearing
+Key Items: Prattling Pate "Lamentation" - Lamenter's Gaol
+Key Items: Remembrance of the Lichdragon
+Key Items: Resurrection Painting
+Key Items: Rusty Key
+Key Items: Sanctified Whetblade
+Key Items: Small Red Effigy
+Key Items: Surging Frenzied Flame x3
+Key Items: The Sacred Tower Painting Solution
+Key Items: Triumphant Delight (Gesture)
+Key Items: Two Fingers' Prayerbook
+Miquella's Cross: Miquella's Cross: Belurat Tower Settlement
+Miquella's Cross: Miquella's Cross: Three-Path Cross
+NPC Invaders: Anastasia Tarnished-Eater (Consecrated Snowfield)
+NPC Invaders: Anastasia, Tarnished-Eater A
+NPC Invaders: Anastasia, Tarnished-Eater B
+NPC Invaders: Bloody Finger Ravenmount Assassin
+NPC Invaders: Great Horned Tragoth
+NPC Invaders: Juno Hoslow, Knight of Blood
+NPC Invaders: Moongrum, Carian Knight
+NPC Invaders: Moore (Enemy) - Enir-Ilim
+NPC Invaders: Nameless White Mask
+NPC Invaders: Nameless White Mask
+NPC Invaders: Nameless White Mask
+NPC Invaders: Old Knight Istvan
+NPC Invaders: Preceptor Miriam
+NPC Invaders: Recusant Henricus
+NPC Invaders: Rileigh the Idle
+NPC Invaders: Vargram the Raging Wolf
+NPCs: D's Twin Brother (Second Location)
+NPCs: D, Hunter of the Dead Summonwater Village
+NPCs: Frustrated Spirit
+NPCs: Gurranq Beast Clergyman
+NPCs: Hermit Merchant Mountaintops East
+NPCs: Isolated Merchant Dragonbarrow
+NPCs: Nomadic Merchant Caelid South
+NPCs: Nomadic Merchant Castle Morne Rampart
+NPCs: Nomadic Merchant East Limgrave
+NPCs: Nomadic Merchant Liurnia of the Lakes
+NPCs: Nomadic Merchant Mt. Gelmir
+NPCs: Nomadic Merchant North Limgrave
+NPCs: Nomadic Merchant West Altus Plateau
+NPCs: Pidia, Carian Servant
+NPCs: The Great-Jar
+NPCs: Thiollier (2nd Location) - Stone Coffin Fissure
+NPCs: Wandering Merchant Caelid Highway North
+NPCs: Wandering Merchant Siofra River
+NPCs: White Mask Varre Invasion Sign
+NPCs: White-Mask Varre (Second Location)
+NPCs: Witch-Hunter Jerren (Third Location)
+Remembrances: Remembrance of the Grafted
+Remembrances: Remembrance of the Starscourge
+Shields: Beast Crest Heater Shield
+Shields: Beastman's Jar-Shield
+Shields: Eclipse Crest Greatshield
+Shields: Eclipse Crest Heater Shield
+Shields: Great Turtle Shell
+Shields: Hawk Crest Wooden Shield
+Shields: Jellyfish Shield
+Shields: Manor Towershield
+Shields: Marred Leather Shield
+Shields: Marred Wooden Shield
+Shields: Serpent Crest Shield
+Shields: Spiked Palisade Shield
+Shields: Spiralhorn Shield
+Shields: Verdigris Greatshield - Enir-Ilim
+Shields: Wooden Greatshield
+Spells: Ancient Death Rancor
+Spells: Aspects of the Crucible: Horns
+Spells: Barrier of Gold
+Spells: Bestial Constitution
+Spells: Bloodflame Talons
+Spells: Briars of Sin
+Spells: Cherishing Fingers
+Spells: Divine Fortification
+Spells: Elden Stars
+Spells: Fia's Mist
+Spells: Frenzied Burst
+Spells: Frozen Armament
+Spells: Gelmir's Fury
+Spells: Giant Golden Arc
+Spells: Gravitational Missile
+Spells: Gravity Well
+Spells: Heal from Afar
+Spells: Lannseax's Glaive
+Spells: Lucidity
+Spells: Magic Downpour
+Spells: Poison Armament
+Spells: Poison Mist
+Spells: Protection of the Erdtree
+Spells: Rancorcall
+Spells: Roar of Rugalea
+Spells: Swarm of Flies
+Spells: Theodorix's Magma
+Spells: Thop's Barrier
+Spells: Triple Rings of Light
+Spells: Whirl, O Flame!
+Spirit Ashes: Albinauric Ashes
+Spirit Ashes: Cleanrot Knight Finlay Ashes
+Spirit Ashes: Gravebird Ashes
+Spirit Ashes: Haligtree Soldier Ashes
+Spirit Ashes: Horned Warrior Ashes - Enir-Ilim
+Spirit Ashes: Inquisitor Ashes - Enir-Ilim
+Spirit Ashes: Land Squirt Ashes
+Spirit Ashes: Marionette Soldier Ashes
+Spirit Ashes: Mausoleum Soldier Ashes
+Spirit Ashes: Omenkiller Rollo
+Spirit Ashes: Revered Spirit Ash x2 - Enir-Ilim
+Spirit Ashes: Revered Spirit Ash: Abandoned Ailing Village
+Spirit Ashes: Skeletal Militiaman Ashes
+Talismans: Aged One's Exultation
+Talismans: Arrow's Sting Talisman
+Talismans: Blue-Feathered Branchsword
+Talismans: Clarifying Horn Charm +1
+Talismans: Crepus's Vial
+Talismans: Curved Sword Talisman
+Talismans: Dragoncrest Greatshield Talisman
+Talismans: Erdtree's Favor +1
+Talismans: Great-Jar's Arsenal
+Talismans: Haligdrake Talisman +2
+Talismans: Hammer Talisman
+Talismans: Immunizing Horn Charm +1
+Talismans: Lance Talisman
+Talismans: Marika's Soreseal
+Talismans: Millicent's Prosthesis
+Talismans: Mottled Necklace +1
+Talismans: Pearl Shield Talisman
+Talismans: Prince of Death's Cyst
+Talismans: Prince of Death's Pustule
+Talismans: Red-Feathered Branchsword
+Talismans: Ritual Shield Talisman
+Talismans: Ritual Shield Talisman
+Talismans: Rotten Winged Sword Insignia
+Talismans: Sacrificial Twig 1x - Castle Morne
+Talismans: St. Trina's Smile - Stone Coffin Fissure
+Weapons: Arbalest
+Weapons: Banished Knight's Halberd +8
+Weapons: Battle Hammer
+Weapons: Black Steel Twinblade
+Weapons: Bloodfiend's Sacred Spear
+Weapons: Bloodstained Dagger
+Weapons: Cane Sword
+Weapons: Coded Sword
+Weapons: Commander's Standard
+Weapons: Deadly Poison Perfume Bottle
+Weapons: Death's Poker
+Weapons: Digger's Staff
+Weapons: Dragonscale Blade
+Weapons: Dryleaf Seal
+Weapons: Firespark Perfume Bottle
+Weapons: Frenzied Flame Seal
+Weapons: Gargoyle's Great Axe
+Weapons: Gargoyle's Greatsword
+Weapons: Gargoyle's Halberd
+Weapons: Gargoyle's Twinblade
+Weapons: Giant-Crusher
+Weapons: Godslayer's Seal
+Weapons: Golem's Halberd
+Weapons: Great Epee
+Weapons: Great Mace
+Weapons: Greathorn Hammer
+Weapons: Harp Bow
+Weapons: Helphen's Steeple
+Weapons: Highland Axe
+Weapons: Hookclaws
+Weapons: Horned Warrior's Greatsword - Enir-Ilim
+Weapons: Inseparable Sword
+Weapons: Large Club
+Weapons: Leda's Sword - Enir-Ilim
+Weapons: Lightning Perfume Bottle
+Weapons: Lordsworn's Straight Sword (B)
+Weapons: Lucerne
+Weapons: Magma Whip Candlestick
+Weapons: Miquellan Knight's Sword
+Weapons: Misbegotten Shortbow
+Weapons: Morning Star
+Weapons: Nagakiba
+Weapons: Nightrider Flail
+Weapons: Omen Cleaver
+Weapons: Prince of Death's Staff
+Weapons: Red Branch Shortbow
+Weapons: Repeating Crossbow
+Weapons: Rotten Battle Hammer
+Weapons: Rotten Crystal Sword
+Weapons: Rotten Staff
+Weapons: Royal Greatsword
+Weapons: Sacrificial Axe
+Weapons: Scavenger's Curved Sword
+Weapons: Siluria's Tree
+Weapons: Spiraltree Seal
+Weapons: Spirit Sword
+Weapons: Staff of the Avatar
+Weapons: Staff of the Avatar
+Weapons: Star Fist
+Weapons: Star-Lined Sword
+Weapons: Stone-Sheathed Sword (Altar) - Fog Rift Catacombs
+Weapons: Stone-Sheathed Sword Altar
+Weapons: Sword of Milos
+Weapons: Sword of Milos
+Weapons: Treespear
+Weapons: Troll's Golden Sword
+Weapons: Varre's Bouquet
+Weapons: Velvet Sword of St Trina - Stone Coffin Fissure
+Weapons: Warpick

@@ -124,3 +124,9 @@ Open, in the owner's words or mine:
 - fetch-places.mjs now also reads legacy-dungeon pages ('Full X Walkthrough' h2 followed by one h3 per part). The dungeon page's text is shown only where a part is not already its own step.
 - Check result now: A/B/C pass; 3 paragraphs twice, 8 out of order, 153 objectives listed in a step other than the one whose text names them, 473 not named in the route text under their map name.
 
+
+## UPDATE 9, 2026-11-28
+- build-route.mjs: sections stay on the walkthrough's current map; a section naming only materials is folded into the previous step; a section takes one marker per name and picks the nearest variant ('Grafted Scion' vs 'Grafted Scion (Tutorial)'); an area's own item/boss lists place their items inside that area's steps; leftover markers go to the nearest step measured from its pin and what it named within 0.03 of the pin. Set TRACE='<marker title>' to see which rule placed a marker.
+- Found and fixed with this: Stormveil Castle items had been landing in 'The Chapel of Anticipation' and 'Where is Boc?'. Similar faults may remain elsewhere; sample with the scratch script logic (objectives not named in their step's text, with their wiki description) before trusting a region.
+- Check now: 356 steps; A/B/C pass; 1395 objectives named in their own step's text, 138 more in their place's item list, 112 named only in another step's text, 380 not named in route text under their map name.
+

@@ -1,12 +1,11 @@
 A. Walkthrough text: 1271 paragraphs on the wiki pages (speed runs and item lists excluded); 1271 are in the route, 0 are missing, 3 appear twice, 8 are out of the wiki's order.
 B. Place pages with their own walkthrough: 245; 245 are in the route (245 with every paragraph), 0 are not used.
 C. Map markers: 5111; 5111 are in exactly one step, 0 in none, 0 in more than one.
-D. Objectives (2025): 1399 are named in the text of their own step; 153 are listed in one step but only named in another step's text; 473 are not named in the route's text under their map name (map-only, item lists, or a different spelling).
-   - 196. The Volcano Manor: 18 objectives that only another step's text talks about
-   - 104. Village of the Albinaurics: 8 objectives that only another step's text talks about
-   - 77. Raya Lucaria Academy: 5 objectives that only another step's text talks about
-   - 122. Explore Siofra River (Underground): 4 objectives that only another step's text talks about
-   - 255. Subterranean Shunning-Grounds: 4 objectives that only another step's text talks about
-E. Items a place's own page lists that sit at that place on the map: 741; 519 are objectives of that place's step, 222 are in a neighbouring step.
+D. Objectives (2025): 1395 are named in the text of their own step; 138 more are in the item list of their own place's page; 112 are listed in one step but only named in another step's text; 380 are not named in the route's text under their map name (map-only, item lists, or a different spelling).
+   - 149. Nokron, Eternal City and Ranni's Quest: 7 objectives that only another step's text talks about
+   - 250. Siofra Aqueduct: 7 objectives that only another step's text talks about
+   - 56. Mini-Boss: Lion Guardian: 5 objectives that only another step's text talks about
+   - 243. Crumbling Farum Azula: 5 objectives that only another step's text talks about
+E. Items a place's own page lists that sit at that place on the map: 773; 541 are objectives of that place's step, 232 are in a neighbouring step.
 
 RESULT: A, B and C pass (all text present once, all place pages used, every marker in exactly one step). D and E show how well lists and text agree.
