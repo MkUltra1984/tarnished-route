@@ -273,3 +273,7 @@ button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:poin
   .tab span{font-size:11px;line-height:15px;max-width:100%}
   .tab img{padding:4px 12px}
 }
+
+/* The app is pinned to the part of the screen the browser really shows. (Sized by 100dvh and drawn "edge to edge",
+   Android Chrome let the tab bar slide under the system's gesture bar, which hid the labels.) */
+#app{position:fixed;inset:0;height:auto}
