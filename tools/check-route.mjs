@@ -112,10 +112,10 @@ say(`E. Items a place's own page lists that sit at that place on the map: ${list
     const generic = sakes.get(nm).length >= 3 && !/[\[(]\d+[\])]\s*$/.test(MK.list[i][4]);
     const here = says(lower[si], i), listed = listedBy[si] && (listedBy[si].has(nm) || listedBy[si].has(clean(MK.list[i][4]).replace(/[‘’]/g, "'").toLowerCase()));
     // F1: a step is named after it, but it sits elsewhere
-    if (!after(si, i)) { const t = R.findIndex((x, xi) => xi !== si && after(xi, i) && pinD(xi, i) < 0.1 && meant(xi, i)); if (t >= 0) f1.push(MK.list[i][4] + ' is in "' + s.title + '" but "' + R[t].title + '" is named after it'); }
+    if (!after(si, i)) { const t = R.findIndex((x, xi) => xi !== si && !x.side && after(xi, i) && pinD(xi, i) < 0.1 && meant(xi, i)); if (t >= 0) f1.push(MK.list[i][4] + ' is in "' + s.title + '" but "' + R[t].title + '" is named after it'); }
     // F2: its own step says nothing about it, while a step that happens closer to it does
     // (the Haligdrake Talisman lies inside the starting cave but is only reached from outside, by the cliff at the Seaside Ruins: its page says so)
-    if (!here && !listed && MK.list[i][4] !== 'Haligdrake Talisman') { const d0 = pinD(si, i); const t = R.findIndex((x, xi) => xi !== si && says(lower[xi], i) && pinD(xi, i) < Math.min(d0, generic ? 0.03 : 0.08) && (!generic || meant(xi, i))); if (t >= 0) f2.push(MK.list[i][4] + ' is in "' + s.title + '" (' + d0.toFixed(3) + ') but the text of "' + R[t].title + '" (' + pinD(t, i).toFixed(3) + ') names it'); }
+    if (!here && !listed && !s.side && MK.list[i][4] !== 'Haligdrake Talisman') { const d0 = pinD(si, i); const t = R.findIndex((x, xi) => xi !== si && !x.side && says(lower[xi], i) && pinD(xi, i) < Math.min(d0, generic ? 0.03 : 0.08) && (!generic || meant(xi, i))); if (t >= 0) f2.push(MK.list[i][4] + ' is in "' + s.title + '" (' + d0.toFixed(3) + ') but the text of "' + R[t].title + '" (' + pinD(t, i).toFixed(3) + ') names it'); }
     // F3: nothing in the app would tell you what to do about it
     const note = clean(MK.list[i][5]);
     if (after(si, i)) why.title++; else if (here) why.text++; else if (listed) why.list++; else if (note.length > 15) why.note++; else f3.push(MK.list[i][3] + ': ' + MK.list[i][4] + ' in "' + s.title + '"');
@@ -126,13 +126,14 @@ say(`E. Items a place's own page lists that sit at that place on the map: ${list
   if (f1.length || f2.length || f3.length) hardFail++;
 
   // G. order: a place is never visited before the walkthrough has opened its region
+  const RG = R.filter(s => !s.side);   // the small steps for single people and fights are not places of the walkthrough; G looks at the route without them
   const regOf = new Map(Object.values(PLACES).filter(p => p.region).map(p => [p.title.toLowerCase(), canonRegion(p.region)]));
-  const entry = z => { const e = ENTRY.find(x => x[0] === z); return e ? R.findIndex((s, i) => src[i] === 'walk' && e[1].test(s.region + ' | ' + s.title)) : -1; };
+  const entry = z => { const e = ENTRY.find(x => x[0] === z); return e ? RG.findIndex((s, i) => src[i] === 'walk' && e[1].test(s.region + ' | ' + s.title)) : -1; };
   const g = []; let checked = 0;
-  R.forEach((s, i) => { if (src[i] === 'walk') return; const z = regOf.get(s.title.toLowerCase()); if (!z) return; const e = entry(z); if (e < 0) return; checked++; if (i <= e) g.push((i + 1) + '. ' + s.title + ' (' + z + ') comes before ' + (e + 1) + '. ' + R[e].title); });
+  RG.forEach((s, i) => { if (src[i] === 'walk') return; const z = regOf.get(s.title.toLowerCase()); if (!z) return; const e = entry(z); if (e < 0) return; checked++; if (i <= e) g.push((i + 1) + '. ' + s.title + ' (' + z + ') comes before ' + (e + 1) + '. ' + RG[e].title); });
   say('G. Order: ' + checked + ' inserted places have a region with a known entry point in the walkthrough; ' + g.length + ' come before it.');
-  for (const [title, re, how] of SPECIAL) { const i = R.findIndex(s => s.title === title), w = R.findIndex((s, k) => src[k] === 'walk' && re.test(s.title)); if (i < 0 || w < 0) { g.push(title + ': not found'); continue; } if (how === 'after' ? !(i > w && i <= w + SPECIAL.length + 2) : i !== w - 1) g.push((i + 1) + '. ' + title + ' should come ' + how + ' ' + (w + 1) + '. ' + R[w].title); }
-  const mixed = R.findIndex((s, i) => i && s.game === 'base' && R[i - 1].game === 'dlc'); if (mixed >= 0) g.push((mixed + 1) + '. ' + R[mixed].title + ' is a base-game step after the expansion has started');
+  for (const [title, re, how] of SPECIAL) { const i = RG.findIndex(s => s.title === title), w = RG.findIndex((s, k) => src[k] === 'walk' && re.test(s.title)); if (i < 0 || w < 0) { g.push(title + ': not found'); continue; } if (how === 'after' ? !(i > w && i <= w + SPECIAL.length + 2) : i !== w - 1) g.push((i + 1) + '. ' + title + ' should come ' + how + ' ' + (w + 1) + '. ' + RG[w].title); }
+  const mixed = RG.findIndex((s, i) => i && s.game === 'base' && RG[i - 1].game === 'dlc'); if (mixed >= 0) g.push((mixed + 1) + '. ' + RG[mixed].title + ' is a base-game step after the expansion has started');
   g.forEach(x => say('   - ' + x)); if (g.length) hardFail++;
 }
 say(''); say(hardFail ? `RESULT: ${hardFail} hard check(s) failed.` : 'RESULT: all hard checks pass (A text, B place pages, C markers, F objectives, G order). D and E are statistics.');
