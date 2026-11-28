@@ -120,6 +120,8 @@ function parse(html, boss) {
     else if (mode === 'where') push(out.where, t, 6);
     else if (mode === 'effect') push(out.intro, t, 4);
   });
+  // an armour piece says which set it is part of
+  { const all = clean(root.text()).slice(0, 40000), m = all.match(/part of the ([A-Z][A-Za-z' -]{2,40}? Set)\b/) || all.match(/([A-Z][A-Za-z' -]{2,40}? Set) Armor Pieces/); if (m && !boss) out.set = m[1]; }
   // a page written differently from the rest: its first real paragraph is still better than no card
   if (!out.src && !out.intro.length && !out.where.length && !out.facts.length && !out.strat.length) root.find('p').each((_, el) => { const t = clean($(el).text()); if (t.length > 60 && !$(el).parents('table').length) push(out.intro, t, 2, 600); });
   return out;

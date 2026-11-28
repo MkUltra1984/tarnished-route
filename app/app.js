@@ -181,8 +181,8 @@
   }
   function checkHTML(m, sub) {
     // the symbol already says what kind of thing it is; the second line is only for what the name cannot say
-    const note = [typeof sub === 'string' ? sub : '', DROPS[m.i] ? 'Drops ' + DROPS[m.i].map(i => baseName(M[i].title)).join(', ') : ''].filter(Boolean).join(' · ');
-    return `<button class="chk${S.got[m.i] ? ' got' : ''}${S.skip[m.i] && !S.got[m.i] ? ' gone' : ''}" data-i="${m.i}"><img class="ci" data-pan="${m.i}" src="icons/${m.f}.png" alt=""><span class="cn">${note ? `<span class="nm">${esc(m.title)}</span><small>${esc(note)}</small>` : esc(m.title)}</span><span class="box" data-tick="1" aria-hidden="true"></span></button>${openInfo === m.i ? `<div class="info">${esc(m.desc || "The wiki map has no extra note for this one.")}${DROPS[m.i] ? `<br><br>Drops, ticked together with the boss: ${esc(DROPS[m.i].map(i => M[i].title).join(', '))}.` : ''}${cardOf(m) ? `<button class="link more" data-card="${m.i}">Picture and details &rsaquo;</button>` : ''}${S.got[m.i] ? '' : `<button class="link more" data-skip="${m.i}">${S.skip[m.i] ? 'Bring it back' : 'Not for me: forget this one'}</button>`}</div>` : ""}`;
+    const note = [typeof sub === 'string' ? sub : '', DROPS[m.i] ? (m.cat === 'Bosses' ? 'Drops ' : 'Includes ') + DROPS[m.i].map(i => baseName(M[i].title)).join(', ') : ''].filter(Boolean).join(' · ');
+    return `<button class="chk${S.got[m.i] ? ' got' : ''}${S.skip[m.i] && !S.got[m.i] ? ' gone' : ''}" data-i="${m.i}"><img class="ci" data-pan="${m.i}" src="icons/${m.f}.png" alt=""><span class="cn">${note ? `<span class="nm">${esc(m.title)}</span><small>${esc(note)}</small>` : esc(m.title)}</span><span class="box" data-tick="1" aria-hidden="true"></span></button>${openInfo === m.i ? `<div class="info">${esc(m.desc || "The wiki map has no extra note for this one.")}${DROPS[m.i] ? `<br><br>${m.cat === 'Bosses' ? 'Drops, ticked together with the boss' : 'Ticked together with it'}: ${esc(DROPS[m.i].map(i => M[i].title).join(', '))}.` : ''}${cardOf(m) ? `<button class="link more" data-card="${m.i}">Picture and details &rsaquo;</button>` : ''}${S.got[m.i] ? '' : `<button class="link more" data-skip="${m.i}">${S.skip[m.i] ? 'Bring it back' : 'Not for me: forget this one'}</button>`}</div>` : ""}`;
   }
   const shot = (f, cls) => f ? `<img class="shot ${cls || ''}" loading="lazy" src="walk/${esc(f)}" alt="">` : '';
   function zoomPicture(src) { const sh = $('#sheet'); sh.hidden = false; sh.innerHTML = `<img class="bigshot" src="${src}" alt="">`; sh.onclick = () => { sh.hidden = true; sh.innerHTML = ''; }; }
@@ -215,6 +215,7 @@
         ${here.map(checkHTML).join('') || '<div class="none">Nothing to pick up here.</div>'}
         ${onway.length ? `<div class="sechead"><span class="over">Nearby, on the way &middot; ${got(onway)} of ${due(onway)}</span></div>${onway.map(checkHTML).join('')}` : ''}
         ${(s.sell || []).length ? `<details class="guide sold"${S.soldOpen ? ' open' : ''}><summary>Sold here &middot; ${s.sell.filter(i => S.got[i]).length} of ${s.sell.length} bought</summary><p class="soldnote">Buy these when you can afford them. They do not hold the step open.</p>${s.sell.map(i => checkHTML(M[i], M[i].desc.replace(/^Sold by .*? for /, '').replace(/.$/, ''))).join('')}</details>` : ''}
+${(s.farm || []).length ? `<details class="guide farm"${S.farmOpen ? ' open' : ''}><summary>Found or farmed around here &middot; ${s.farm.filter(i => S.got[i]).length} of ${s.farm.length}</summary><p class="soldnote">Mostly drops from ordinary enemies and class starting gear. They do not hold the step open.</p>${s.farm.map(i => checkHTML(M[i], M[i].desc.length > 70 ? M[i].desc.slice(0, 68).replace(/\s+\S*$/, '') + ' ...' : M[i].desc)).join('')}</details>` : ''}
         ${back.length ? `<div class="sechead"><span class="over warn">Left open nearby &middot; ${back.length}</span></div>${back.map(m => checkHTML(m, 'from ' + ROUTE[stepOf.get(m.i)].title)).join('')}` : ''}
         ${extra.length ? `<button class="link wide" id="xt">${S.extras ? 'Hide' : 'Show'} ${extra.length} nearby materials</button>${S.extras ? extra.map(checkHTML).join('') : ''}` : ''}
       </div>
@@ -232,6 +233,7 @@
     });
     pane.querySelectorAll('[data-card]').forEach(b => b.onclick = () => openCard(M[+b.dataset.card]));
     const sd = $('.sold', pane); if (sd) sd.ontoggle = () => { S.soldOpen = sd.open ? 1 : 0; };
+    const fd = $('.farm', pane); if (fd) fd.ontoggle = () => { S.farmOpen = fd.open ? 1 : 0; };
     pane.querySelectorAll('[data-skip]').forEach(b => b.onclick = () => { const i = +b.dataset.skip; if (S.skip[i]) delete S.skip[i]; else S.skip[i] = 1; openInfo = null; settle(i); save(); renderRoute(); });
     const allb = $('#allb', pane); if (allb) allb.onclick = () => { grab.forEach(m => { if (S.skip[m.i]) return; if (open) S.got[m.i] = 1; else delete S.got[m.i]; }); grab.forEach(m => settle(m.i)); save(); renderRoute(); drawStep(s, false); };
     const xt = $('#xt', pane); if (xt) xt.onclick = () => { S.extras = !S.extras; save(); renderRoute(); drawStep(s, false); };

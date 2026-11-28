@@ -17,7 +17,8 @@ import fs from 'node:fs';
 import * as cheerio from 'cheerio';
 
 const MK = JSON.parse(fs.readFileSync('app/data/markers.json', 'utf8'));
-MK.list = MK.list.filter(a => a[6] !== 'rm');   // without the objectives an earlier run of this tool added (see "sheet-only" below)
+MK.list = MK.list.filter(a => a[6] !== 'rm');
+if (MK.drops) for (const b of Object.keys(MK.drops)) { MK.drops[b] = MK.drops[b].filter(i => i < MK.list.length); if (+b >= MK.list.length || !MK.drops[b].length) delete MK.drops[b]; }   // and without the set parts an earlier run hung on them   // without the objectives an earlier run of this tool added (see "sheet-only" below)
 const L = MK.list;
 // Things the sheet has you obtain that the wiki's map has no marker for (gestures, rewards people hand over, a few
 // weapons and sets): tools/sheet-only.mjs has looked up what each is. They become objectives of the step that obtains them.
@@ -221,6 +222,27 @@ if (fs.existsSync('raw/redmaw/merchants.html')) { const $ = cheerio.load(fs.read
       const price = plain(li.text()).split(':').slice(1).join(':').trim(), cond = plain($(box).closest('ul,ol').parent('li').clone().children('ul,ol').remove().end().text());
       L[i][5] = 'Sold by ' + name + (hold ? ' in the Roundtable Hold' : place && !/remembrances|equipment/i.test(place) ? ' (' + place + ')' : '') + (price ? ' for ' + price : '') + '.' + (cond && cond.length < 200 ? ' ' + cond.replace(/:$/, '.') : '');
       used.add(i); if (st) { k++; L[i][0] = L[at][0]; L[i][1] = +(L[at][1] + 0.0006 * (k % 9)).toFixed(5); L[i][2] = +(L[at][2] + 0.0006 * Math.floor(k / 9) + 0.0006).toFixed(5); L[i][7] = 'sold'; (st.sell = st.sell || []).push(i); sold++; } else soldNoStep++; }); }); }
+// The rest of the complete lists: armour pieces and weapons that ordinary enemies drop, starting gear. Neither the
+// walkthrough nor the merchants sheet places them; the wiki's page of each thing does (app/data/cards.json):
+//  a. an armour piece whose set is in a step is part of that set: ticked with it, like a boss's drops;
+//  b. otherwise the first place the wiki's "where to find" text names puts it into the step that holds that place,
+//     as "found or farmed around here" (it does not hold the step open: a 2% drop is not an errand);
+//  c. what names no place stays in the Collection with the wiki's sentence.
+let asPart = 0, farmed = 0, noPlace = 0;
+if (fs.existsSync('app/data/cards.json')) { const CARDS = JSON.parse(fs.readFileSync('app/data/cards.json', 'utf8')), pageOf = i => CARDS.pages[CARDS.by[L[i][4]]] || null;
+  const setAt = new Map(); L.forEach((m, i) => { if (m[0] >= 0 && m[3] === 'Armor' && / Set\b/.test(m[4])) { const k = norm(plain(m[4]).replace(/\s*\(.*$/, '').replace(/\s+-\s+.*$/, '')); if (!setAt.has(k)) setAt.set(k, i); } });
+  const spots = []; L.forEach((m, i) => { if (m[0] >= 0 && ['Locations', 'Sites of Grace'].includes(m[3])) { const k = plain(m[4]).replace(/\s*\(.*$/, '').toLowerCase(); if (k.replace(/[^a-z]/g, '').length >= 8) spots.push([k, i]); } });
+  const holderOf = i => steps.find(x => x.m.includes(i) || x.n.includes(i)); const perStep = new Map();
+  L.forEach((m, i) => { if (m[0] >= 0 || used.has(i)) return; const page = pageOf(i), where = page ? page.where.filter(t => !/can be found at( the following location)?s?:?\s*$/i.test(t) && !/^where to find/i.test(t)) : [];
+    const sentence = where.slice(0, 2).join(' ').slice(0, 300);
+    const si = page && page.set ? setAt.get(norm(page.set)) : null, sh = si != null ? holderOf(si) : null;
+    if (sh) { (DROPS[si] = DROPS[si] || []).push(i); dropOf.set(i, si); m[0] = L[si][0]; m[1] = L[si][1]; m[2] = +(L[si][2] + 0.0003 * DROPS[si].length).toFixed(5); m[5] = 'Part of the ' + page.set + '.' + (sentence ? ' ' + sentence : ''); m[7] = 'part'; (sh.m.includes(si) ? sh.m : sh.n).push(i); used.add(i); asPart++; return; }
+    const low = where.join(' ').toLowerCase(); let best = null, at = 1e9; for (const [k, p] of spots) { const q = low.indexOf(k); if (q >= 0 && (q < at || (q === at && k.length > best[0].length))) { at = q; best = [k, p]; } }
+    const st = best ? holderOf(best[1]) : null;
+    if (st) { const n = (perStep.get(st) || 0) + 1; perStep.set(st, n); m[0] = L[best[1]][0]; m[1] = +(L[best[1]][1] + 0.0006 * (n % 8)).toFixed(5); m[2] = +(L[best[1]][2] - 0.0006 - 0.0006 * Math.floor(n / 8)).toFixed(5); m[5] = sentence; m[7] = 'farm'; (st.farm = st.farm || []).push(i); used.add(i); farmed++; return; }
+    if (sentence && !m[5]) m[5] = sentence; noPlace++; }); }
+console.log('rest of the lists: part of a set in a step', asPart, '| found or farmed at a place of a step', farmed, '| no place named', noPlace);
+
 // ---------- making the steps fit together ----------
 const holder = i => steps.find(x => x.m.includes(i) || x.n.includes(i)), takeOut = (st, i) => { st.m = st.m.filter(k => k !== i); st.n = st.n.filter(k => k !== i); };
 // a. A boss and its drops are one thing. A step that holds a drop pulls in the boss when the boss was only "nearby"
@@ -318,7 +340,7 @@ console.log('things from the complete lists:', listOnly, '| given a step by a li
 console.log('objectives added from the sheet (no marker on the wiki map):', added, '| sites of grace named by a step:', steps.reduce((n, st) => n + st.m.filter(i => L[i][3] === 'Sites of Grace').length, 0), 'of', L.filter(m => m[3] === 'Sites of Grace').length);
 
 // report
-const inSteps = new Map(); steps.forEach(s => [...s.m, ...s.n, ...(s.sell || [])].forEach(i => inSteps.set(i, (inSteps.get(i) || 0) + 1)));
+const inSteps = new Map(); steps.forEach(s => [...s.m, ...s.n, ...(s.sell || []), ...(s.farm || [])].forEach(i => inSteps.set(i, (inSteps.get(i) || 0) + 1)));
 const gAll = L.map((_, i) => i).filter(i => kind(i) === 'g'), gOwn = gAll.filter(i => steps.some(s => s.m.includes(i))).length;
 const sizes = steps.map(s => s.m.filter(i => kind(i) === 'g' && !dropOf.has(i)).length), nearby = steps.map(s => s.n.filter(i => kind(i) === 'g' && !dropOf.has(i)).length);
 const R = [
