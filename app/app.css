@@ -7,7 +7,7 @@ button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:poin
 #app{display:grid;height:100dvh;grid-template-columns:1fr clamp(400px,37vw,520px);grid-template-rows:1fr 64px;grid-template-areas:"map pane" "tabs tabs"}
 #map{grid-area:map;background:var(--bg);min-height:0;z-index:0}
 #pane{grid-area:pane;background:var(--surface);border-left:1px solid var(--divider);display:flex;flex-direction:column;min-height:0;min-width:0}
-#tabs{grid-area:tabs;background:var(--bg);border-top:1px solid var(--divider);display:grid;grid-template-columns:repeat(4,1fr);padding-bottom:env(safe-area-inset-bottom)}
+#tabs{grid-area:tabs;background:var(--bg);border-top:1px solid var(--divider);display:grid;grid-template-columns:repeat(6,1fr);padding-bottom:env(safe-area-inset-bottom)}
 
 /* tabs */
 .tab{display:flex;align-items:center;justify-content:center;height:63px}
@@ -230,3 +230,6 @@ button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:poin
 .cn small{font-size:13px;line-height:18px;font-weight:600;color:var(--text-3)}
 .chk.got .cn .nm{text-decoration:line-through}
 .chk:has(.cn small){min-height:58px}
+
+.set .btn{width:100%}.set .danger{border-color:var(--danger);color:var(--danger);margin-top:8px}
+.group .meta{white-space:nowrap;flex:none;margin-left:12px}.group>span:first-child{min-width:0;text-align:left}

@@ -7,7 +7,7 @@
 
   const [ROUTE, MK, TILES, ART] = await Promise.all([json('data/route.json'), json('data/markers.json'), json('tiles/meta.json', {}), json('data/art.json', {})]);
   const MAPNAME = { overland: 'The Lands Between', underground: 'Underground', ashen: 'Leyndell, Ashen Capital', shadow: 'Realm of Shadow' };
-  const TABS = [['route', 'Route'], ['bosses', 'Bosses'], ['collection', 'Collection'], ['quests', 'Quests']];
+  const TABS = [['route', 'Route'], ['bosses', 'Bosses'], ['collection', 'Collection'], ['quests', 'Quests'], ['materials', 'Materials'], ['settings', 'Settings']];
   const M = MK.list.map((a, i) => ({ i, map: MK.maps[a[0]], x: a[1], y: a[2], cat: a[3], title: a[4], desc: a[5], f: MK.cats[a[3]].f, label: MK.cats[a[3]].label, kind: MK.cats[a[3]].kind }));
   const BOSSES = M.filter(m => m.cat === 'Bosses');
   // a boss's own drops are not objectives of their own: they are ticked together with the boss
@@ -154,7 +154,7 @@
     const back = nearbyLeft(s), openAll = leftOpen().length;
     pane.innerHTML = `
       <div class="head">
-        <div class="steprow"><span class="over gold">Step ${pos} of ${total}</span><span style="display:flex;align-items:center">${openAll ? `<button class="chip" id="openb">${openAll} open</button>` : ''}<span class="meta">${Math.round(dn / total * 100)}%</span><button class="gear" aria-label="Settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1 7 17M17 7l2.1-2.1"/></svg></button></span></div>
+        <div class="steprow"><span class="over gold">Step ${pos} of ${total}</span><span style="display:flex;align-items:center">${openAll ? `<button class="chip" id="openb">${openAll} open</button>` : ''}<span class="meta">${Math.round(dn / total * 100)}%</span></span></div>
         <div class="bar"><i style="width:${dn / total * 100}%"></i></div>
         <h1 class="title">${esc(s.title)}</h1>
         ${s.region ? `<div class="reg">${esc(s.region)}</div>` : ''}
@@ -183,7 +183,6 @@
     });
     const allb = $('#allb', pane); if (allb) allb.onclick = () => { grab.forEach(m => { if (open) S.got[m.i] = 1; else delete S.got[m.i]; }); settle(grab[0].i); save(); renderRoute(); drawStep(s, false); };
     const xt = $('#xt', pane); if (xt) xt.onclick = () => { S.extras = !S.extras; save(); renderRoute(); drawStep(s, false); };
-    $('.gear', pane).onclick = openSettings;
     const ob = $('#openb', pane); if (ob) ob.onclick = () => { showOpen = true; renderRoute(); };
     const jump = $('#jump', pane); if (jump) jump.onclick = () => $('#todo', pane).scrollIntoView({ behavior: 'smooth', block: 'start' });
     pane.querySelectorAll('.shot').forEach(im => im.onclick = () => zoomPicture(im.src));
@@ -230,27 +229,47 @@
     refreshCounts = () => { if (S.tab === 'quests') { const y = $('.list').scrollTop; renderQuests(); $('.list').scrollTop = y; } };
   }
 
-  // ---------- settings ----------
-  function openSettings() {
-    const sh = $('#sheet'); sh.hidden = false;
-    const seg = (id, opts, cur) => `<div class="seg" id="${id}">${opts.map(o => `<button class="btn${o[0] === cur ? ' on' : ''}" data-v="${o[0]}">${o[1]}</button>`).join('')}</div>`;
-    sh.innerHTML = `<div class="panel"><h2>Settings</h2>
-      <div class="opt">Markers on the map</div>${seg('al', [[0, 'This step only'], [1, 'Everything']], S.all ? 1 : 0)}
-      <button class="btn danger" id="reset">Reset all progress</button>
-      <button class="btn close" id="close">Close</button>
-      <p class="credit">Map images, marker positions and walkthrough text come from the <a href="https://eldenring.wiki.fextralife.com/" target="_blank" rel="noopener">Fextralife Elden Ring Wiki</a>. Elden Ring is a trademark of its owners; this is a personal fan tool.</p></div>`;
-    const redraw = () => { const s = currentStep(); if (s && S.tab === 'route') drawStep(s, false); else drawAll(); openSettings(); };
-    sh.querySelectorAll('#al .btn').forEach(b => b.onclick = () => { S.all = !!+b.dataset.v; save(); redraw(); });
-    $('#close').onclick = () => sh.hidden = true; sh.onclick = e => { if (e.target === sh) sh.hidden = true; };
-    let armed = false; $('#reset').onclick = e => { if (!armed) { armed = true; e.target.textContent = 'Tap again to erase everything'; return; } S.st = {}; S.got = {}; S.hist = []; save(); sh.hidden = true; peek = null; render(); };
+  // ---------- Materials tab: where each material can be found ----------
+  const MATS = M.filter(m => m.kind === 'x'), matName = m => { let t = m.title, p; do { p = t; t = baseName(t).replace(/\s+[A-Z]$/, '').trim(); } while (t !== p); return t; }, matQty = m => +((m.title.match(/(\d+)x\b/) || [])[1] || 1);
+  let matCat = null, matOpen = null;
+  function renderMaterials() {
+    const cats = Object.keys(MK.cats).filter(c => MK.cats[c].kind === 'x');
+    if (matOpen) {
+      const l = MATS.filter(m => m.cat === matCat && matName(m) === matOpen).sort(routeOrder);
+      listPage(matOpen, `${l.length} ${l.length === 1 ? 'place' : 'places'} &middot; ${l.reduce((a, m) => a + matQty(m), 0)} pieces`, `<button class="back">&lsaquo; ${esc(matCat)}</button><p class="lead">In the order the route passes them. Tap a row to see the spot on the map, tap the picture once you have it.</p>` +
+        l.map(m => { const st = stepOf.has(m.i) ? ROUTE[stepOf.get(m.i)] : null; return rowHTML(m, m.desc || MAPNAME[m.map], (matQty(m) > 1 ? matQty(m) + 'x \u00b7 ' : '') + (st ? st.title : MAPNAME[m.map])); }).join(''));
+      $('.back').onclick = () => { matOpen = null; renderMaterials(); }; return;
+    }
+    if (matCat) {
+      const g = new Map(); for (const m of MATS) if (m.cat === matCat) { const k = matName(m); if (!g.has(k)) g.set(k, []); g.get(k).push(m); }
+      const names = [...g.keys()].sort((a, b) => a.localeCompare(b, undefined, { numeric: true }));
+      listPage(matCat, `${names.length} different materials`, `<button class="back">&lsaquo; All materials</button>` + names.map(k => `<button class="group" data-k="${esc(k)}"><span><img src="icons/${MK.cats[matCat].f}.png" alt="">${esc(k)}</span><span class="meta">${g.get(k).length} ${g.get(k).length === 1 ? 'place' : 'places'}</span></button>`).join(''));
+      $('.back').onclick = () => { matCat = null; renderMaterials(); };
+      document.querySelectorAll('.group').forEach(b => b.onclick = () => { matOpen = b.dataset.k; renderMaterials(); }); return;
+    }
+    listPage('Materials', `${MATS.length} places on the map`, `<p class="lead">Every place the wiki's map marks for a material, grouped by material.</p>` + cats.map(c => `<button class="group" data-c="${esc(c)}"><span><img src="icons/${MK.cats[c].f}.png" alt="">${esc(c)}</span><span class="meta">${new Set(MATS.filter(m => m.cat === c).map(matName)).size}</span></button>`).join(''));
+    document.querySelectorAll('.group').forEach(b => b.onclick = () => { matCat = b.dataset.c; renderMaterials(); });
   }
+
+  // ---------- Settings tab ----------
+  function renderSettings() {
+    const seg = (id, opts, cur) => `<div class="seg" id="${id}">${opts.map(o => `<button class="btn${o[0] === cur ? ' on' : ''}" data-v="${o[0]}">${o[1]}</button>`).join('')}</div>`;
+    $('#pane').innerHTML = `<div class="listhead"><h1>Settings</h1></div><div class="list set">
+      <button class="btn danger" id="reset">Start new playthrough</button>
+      <p class="credit" style="margin-top:8px">Clears every tick and puts the route back to step 1.</p>
+      <div class="opt">Markers on the map</div>${seg('al', [[0, 'This step only'], [1, 'Everything']], S.all ? 1 : 0)}
+      <p class="credit">Map images, marker positions and walkthrough text come from the <a href="https://eldenring.wiki.fextralife.com/" target="_blank" rel="noopener">Fextralife Elden Ring Wiki</a>. Elden Ring is a trademark of its owners; this is a personal fan tool.</p></div>`;
+    document.querySelectorAll('#al .btn').forEach(b => b.onclick = () => { S.all = !!+b.dataset.v; save(); drawAll(); renderSettings(); });
+    let armed = false; $('#reset').onclick = e => { if (!armed) { armed = true; e.target.textContent = 'Tap again to erase all progress'; return; } S.st = {}; S.got = {}; S.hist = []; S.tab = 'route'; save(); peek = null; openInfo = null; showOpen = false; render(); };
+  }
+
 
   // ---------- shell ----------
   function render() {
     $('#tabs').innerHTML = TABS.map(t => `<button class="tab${S.tab === t[0] ? ' on' : ''}" data-t="${t[0]}"><span><img src="icons/tab-${t[0]}.png" alt="">${t[1]}</span></button>`).join('');
     document.querySelectorAll('.tab').forEach(b => b.onclick = () => { S.tab = b.dataset.t; save(); render(); });
     refreshCounts = () => {};
-    ({ route: renderRoute, bosses: renderBosses, collection: renderCollection, quests: renderQuests }[S.tab] || renderRoute)();
+    ({ route: renderRoute, bosses: renderBosses, collection: renderCollection, quests: renderQuests, materials: renderMaterials, settings: renderSettings }[S.tab] || renderRoute)();
     placeMapButton();
     const s = currentStep(); if (s && (S.tab === 'route' || !mapName)) drawStep(s, true);
   }

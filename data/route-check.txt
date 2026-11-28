@@ -1,11 +1,12 @@
 A. Walkthrough text: 1269 paragraphs on the wiki pages (speed runs and item lists excluded); 1269 are in the route, 0 are missing, 0 are shown more often than the wiki has them, 0 are out of the wiki's order.
 B. Place pages with their own walkthrough: 245; 245 are in the route (245 with every paragraph), 0 are not used.
 C. Map markers: 5111; 5111 are in exactly one step, 0 in none, 0 in more than one.
-D. Objectives (2025): 1301 are named in the text of their own step; 195 more are in the item list of their own place's page; 152 are listed in one step but only named in another step's text; 377 are not named in the route's text under their map name (map-only, item lists, or a different spelling).
-   - 25. Deathtouched Catacombs: 4 objectives that only another step's text talks about
+D. Objectives (2025): 1303 are named in the text of their own step; 196 more are in the item list of their own place's page; 150 are listed in one step but only named in another step's text; 376 are not named in the route's text under their map name (map-only, item lists, or a different spelling).
+   - 24. Warmaster's Shack: 4 objectives that only another step's text talks about
    - 86. Jarburg: 4 objectives that only another step's text talks about
+   - 178. Stormcaller Church: 4 objectives that only another step's text talks about
 E. Items a place's own page lists that sit at that place on the map: 763; 598 are objectives of that place's step, 165 are in a neighbouring step.
-F. Why each objective is where it is: 22 are what their step is named after, 1279 are named in their step's text, 195 are in their place's own item list, 529 are passed on the way (nearest step) and explained by the map's own note; 0 have no explanation at all.
+F. Why each objective is where it is: 22 are what their step is named after, 1281 are named in their step's text, 196 are in their place's own item list, 526 are passed on the way (nearest step) and explained by the map's own note; 0 have no explanation at all.
    Named after a step but placed elsewhere: 0. Named only by a closer step: 0.
 G. Order: 129 inserted places have a region with a known entry point in the walkthrough; 0 come before it.
 

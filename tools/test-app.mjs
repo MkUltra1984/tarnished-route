@@ -58,7 +58,7 @@ for (const [name, w, h] of [['tablet', 1280, 800], ['phone', 412, 915]]) {
   const nearby = await page.locator('.over.warn').count(); ok(true, `${name}: next step lists ${nearby ? await page.locator('.over.warn').innerText() : 'no leftovers nearby'}`);
   await page.screenshot({ path: `shots/app-${name}-nearby.png` });
   // tabs
-  for (const t of ['bosses', 'collection', 'quests']) {
+  for (const t of ['bosses', 'collection', 'quests', 'materials']) {
     await page.locator(`.tab[data-t="${t}"]`).click(); await page.waitForTimeout(400);
     ok(await page.locator('.listhead h1').count() === 1, `${name}: ${t} tab opens (${await page.locator('#cnt').innerText()})`);
     if (t === 'collection') { await page.locator('.group').first().click(); await page.waitForTimeout(300); await page.screenshot({ path: `shots/app-${name}-collection-open.png` }); await page.locator('.row [data-tick]').first().click(); ok(await page.locator('.row.got').count() >= 1, `${name}: ticking an item works`); await page.locator('.back').click(); await page.waitForTimeout(200); }
@@ -66,8 +66,8 @@ for (const [name, w, h] of [['tablet', 1280, 800], ['phone', 412, 915]]) {
     await page.screenshot({ path: `shots/app-${name}-${t}.png` });
   }
   await page.locator('.tab[data-t="route"]').click(); await page.waitForTimeout(300);
-  await page.locator('.gear').click(); await page.waitForTimeout(200); await page.screenshot({ path: `shots/app-${name}-settings.png` });
-  await page.locator('#al .btn').nth(1).click(); await page.waitForTimeout(600); await page.locator('#close').click(); await page.waitForTimeout(300);
+  await page.locator('.tab[data-t="settings"]').click(); await page.waitForTimeout(200); await page.screenshot({ path: `shots/app-${name}-settings.png` });
+  await page.locator('#al .btn').nth(1).click(); await page.waitForTimeout(600); await page.locator('.tab[data-t="route"]').click(); await page.waitForTimeout(600);
   ok(await page.locator('.sym.far').count() > 0, `${name}: "Everything" shows the other markers (${await page.locator('.sym.far').count()})`);
   await page.screenshot({ path: `shots/app-${name}-all.png` });
   ok(errors.length === 0, `${name}: no page errors${errors.length ? ': ' + [...new Set(errors)].slice(0, 5).join(' | ') : ''}`);

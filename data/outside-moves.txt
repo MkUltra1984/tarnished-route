@@ -1,0 +1,114 @@
+Ainsel River Well -> Travel to the Church of Vows: Briars of Sin
+Ainsel River Well -> Travel to the Church of Vows: Fire Spur Me (Gesture)
+Altus Tunnel -> Other Points of Interest in Altus Plateau: Finger Reader (Altus Plateau)
+Altus Tunnel -> Other Points of Interest in Altus Plateau: Harp Bow
+Altus Tunnel -> Other Points of Interest in Altus Plateau: Lannseax's Glaive
+Altus Tunnel -> Other Points of Interest in Altus Plateau: Nomadic Merchant West Altus Plateau
+Auriza Hero's Grave -> Auriza Side Tomb: Bloodflame Talons
+Auriza Hero's Grave -> Auriza Side Tomb: Furlcalling Finger Remedy - Leyndell, Royal Capital
+Auriza Hero's Grave -> Auriza Side Tomb: Hyetta (Final Location)
+Bonny Gaol -> Ruined Forge of Starfall Past: Repeating Crossbow
+Caelid Catacombs -> Cathedral of Dragon Communion: Golden Seed - South Caelid
+Caelid Catacombs -> Cathedral of Dragon Communion: Map (Caelid)
+Caelid Catacombs -> Cathedral of Dragon Communion: Nomadic Merchant Caelid South
+Cave of the Forlorn -> Albinauric Rise: Theodorix's Magma
+Charo's Hidden Grave -> Cerulean Coast/Southern Shore: Greater Potentate's Cookbook [14]
+Charo's Hidden Grave -> Cerulean Coast/Southern Shore: Spirit Sword
+Charo's Hidden Grave -> Grand Altar of Dragon Communion: Viridian Hidden Tear
+Clear out the Coastal Cave -> Limgrave - Church of Elleh: Boc the Seamster (Second Location)
+Clearing Belurat Gaol -> Miquella's Followers at the Three-Path Cross: Incursion Painting Solution
+Clearing Belurat Gaol -> Miquella's Followers at the Three-Path Cross: Serpent Crest Shield
+Consecrated Snowfield Catacombs -> Continuing through the Mountaintop of Giants: Lost Ashes of War - 1x Mountaintops of the Giants
+Consecrated Snowfield Catacombs -> Hidden Path to the Haligtree: Golden Seed (Consecrated Snowfield)
+Crumbling Beast Grave -> Dragon Temple: Beastman's Jar-Shield
+Crumbling Beast Grave -> Dragonlord Placidusax: Wormface - Crumbling Farum Azula
+DESCENDING THE GAOL -> Belurat Tower Settlement: Remembrance of the Dancing Lion - Belurat Tower Settlement
+Deathtouched Catacombs -> Summonwater Village: Triumphant Delight (Gesture)
+Deathtouched Catacombs -> Warmaster's Shack: Ash of War: Golden Vow
+Deathtouched Catacombs -> Warmaster's Shack: Beast Crest Heater Shield
+Deathtouched Catacombs -> Warmaster's Shack: Duelist's Furled Finger
+Deathtouched Catacombs -> Warmaster's Shack: Frustrated Spirit
+Deathtouched Catacombs -> Warmaster's Shack: Furlcalling Finger Remedy
+Deathtouched Catacombs -> Warmaster's Shack: Furlcalling Finger Remedy A
+Deathtouched Catacombs -> Warmaster's Shack: Hammer Talisman
+Deathtouched Catacombs -> Warmaster's Shack: Iron Fist Alexander (First Location)
+Deathtouched Catacombs -> Warmaster's Shack: Old Knight Istvan
+Deathtouched Catacombs -> Warmaster's Shack: Recusant Henricus
+Deathtouched Catacombs -> Warmaster's Shack: Scaled Set
+Deathtouched Catacombs -> Warmaster's Shack: Small Red Effigy
+Deep Siofra Well -> Divine Tower of Caelid: Map (Dragonbarrow)
+Dragonbarrow Cave -> Fort Faroth: Ash of War: Rain of Arrows
+Dragonbarrow Cave -> Fort Faroth: Opaline Hardtear
+Dragonbarrow Cave -> Fort Faroth: Putrid Avatar (Dragonbarrow)
+Dragonbarrow Cave -> Fort Faroth: Stonebarb Cracked Tear
+Dragonbarrow Cave -> Lenne's Rise: Bestial Constitution
+Eastern Nameless Mausoleum -> Finger Ruins of Miyr under the Cathedral: Ash of War: Raging Beast
+Eastern Nameless Mausoleum -> Finger Ruins of Miyr under the Cathedral: Scadutree Fragment - Recluses' River Downstream
+Eastern Nameless Mausoleum -> Finger Ruins of Miyr under the Cathedral: Scadutree Fragment - Recluses' River Downstream
+Exploring Stone Coffin Fissure -> Exploring Cerulean Coast: St. Trina Disciple's Cookbook [2] - Stone Coffin Fissure
+Fissure Cross - Site of Grace -> Exploring Cerulean Coast: Velvet Sword of St Trina - Stone Coffin Fissure
+Fissure Cross - Site of Grace -> Fight the Spirit Form of Misbegotten Crusader: St. Trina's Blossom - Stone Coffin Fissure
+Gael Tunnel -> Shack of the Rotting: Ash of War: Flame of the Redmanes
+Gaol Cave -> Street of Sages Ruins: Ash of War: Lifesteal Fist
+Giants' Mountaintop Catacombs -> Guardians' Garrison: Map (Mountaintops of The Giants, East)
+Heading to Dragon's Pit -> Suppressing Pillar: Larval Tear - Near Suppressing Pillar
+Highroad Cave -> Summonwater Village: Lance Talisman
+Lakeside Crystal Cave -> Slumbering Wolfs Shack: Fire Monks' Prayerbook
+Minor Erdtree & Road's End Catacombs -> Seek the Converted Tower: Ash of War: Sword Dance
+Minor Erdtree Catacombs -> Caelem Ruins: Greatsword
+Minor Erdtree Catacombs -> Minor Erdtree - Caelid: Whirl, O Flame!
+Mohgwyn Dynasty Mausoleum -> Unveiling Shadow of the Erdtree: Golden Seed - Mohgwyn Palace
+Mohgwyn Dynasty Mausoleum -> Unveiling Shadow of the Erdtree: Greathorn Hammer
+Mohgwyn Dynasty Mausoleum -> Unveiling Shadow of the Erdtree: Haligdrake Talisman +2
+Mohgwyn Dynasty Mausoleum -> Unveiling Shadow of the Erdtree: Map (Mohgwyn Palace)
+Mohgwyn Dynasty Mausoleum -> Unveiling Shadow of the Erdtree: Nameless White Mask
+Mohgwyn Dynasty Mausoleum -> Unveiling Shadow of the Erdtree: Nameless White Mask
+Mohgwyn Dynasty Mausoleum -> Unveiling Shadow of the Erdtree: Nameless White Mask
+Mohgwyn Dynasty Mausoleum -> Unveiling Shadow of the Erdtree: Nomadic Warrior's Cookbook (24)
+Mohgwyn Dynasty Mausoleum -> Unveiling Shadow of the Erdtree: Swarm of Flies
+Mohgwyn Dynasty Mausoleum -> Unveiling Shadow of the Erdtree: Varre's Bouquet
+Mohgwyn Dynasty Mausoleum -> Unveiling Shadow of the Erdtree: White Mask Varre Invasion Sign
+Morne Tunnel -> Callu Baptismal Church: Lightning Strike
+Morne Tunnel -> Demi-Human Forest Ruins: Bloodstained Dagger
+Murkwater Catacombs -> Summonwater Village: Homing Instinct Painting
+Murkwater Cave -> A Familiar Feeling: Armorer's Cookbook [1]
+Murkwater Cave -> A Familiar Feeling: Ash of War: Determination
+Murkwater Cave -> A Familiar Feeling: Ash of War: Repeating Thrust
+Murkwater Cave -> A Familiar Feeling: Boc the Seamster (First Location)
+Murkwater Cave -> A Familiar Feeling: Leather Set (No Helmet)
+Murkwater Cave -> A Familiar Feeling: Night's Cavalry (Limgrave)
+Northern Nameless Mausoleum -> Church of the Crusade: Crimson Amber Medallion +3 - Fog Rift Catacombs
+Northern Nameless Mausoleum -> Church of the Crusade: Death Knight's Twin Axes - Fog Rift Catacombs
+Path to Scorpion River Catacombs -> Temple Town Ruins: Greater Potentate's Cookbook [8]
+Path to Scorpion River Catacombs -> Temple Town Ruins: Larval Tear - West of Ravine North Site of Grace
+Perfumer's Grotto -> Other Points of Interest in Altus Plateau: Gargoyle's Great Axe
+Perfumer's Grotto -> Other Points of Interest in Altus Plateau: Golden Seed - 2x Capital Outskirts West
+Perfumer's Grotto -> Other Points of Interest in Altus Plateau: Map (Leyndell, Royal Capital)
+Perfumer's Grotto -> Stormcaller Church: Fallingstar Beast
+Raya Lucaria Crystal Tunnel -> Frenzied Flame Village: Spiralhorn Shield
+Raya Lucaria Crystal Tunnel -> Frenzied Flame Village: Stalwart Horn Charm
+Raya Lucaria Crystal Tunnel -> Travel to the Church of Vows: Eclipse Crest Greatshield
+Rivermouth Cave Exploration -> Rauh Base: Mushroom-Seller's Bell Bearing (1)
+Rivermouth Cave Exploration -> Rauh Base: Spiraltree Seal
+Rivermouth Cave Exploration -> Rauh Base: The Sacred Tower Painting Solution
+Royal Grave Evergaol -> Exploring Altus Plateau: Juvenile Scholar Cap
+Royal Grave Evergaol -> Exploring Altus Plateau: Juvenile Scholar Robe
+Royal Grave Evergaol -> Exploring Altus Plateau: Larval Tear (B)
+Royal Grave Evergaol -> Perfumer's Ruins: Albinauric Ashes
+Sainted Hero's Grave -> Other Points of Interest in Altus Plateau: Ancient Dragon Apostle's Cookbook [2]
+Sealed Tunnel -> Minor Erdtree Church: Giant-Crusher
+Sealed Tunnel -> Minor Erdtree Church: Golden Seed - Capital Outskirts (Ulcerated Tree Spirit Drop)
+Sealed Tunnel -> West Capital Rampart: Ash of War: Prayerful Strike
+Seethwater Cave -> Fort Laiedd: Leaden Hardtear
+Seethwater Cave -> How to get to Volcano Manor: Cerulean Hidden Tear
+Seethwater Cave -> How to get to Volcano Manor: Ulcerated Tree Spirit (Mt. Gelmir)
+Sellia Hideaway -> Travel to Sellia, Town of Sorcery: Lusat's Set
+Southern Nameless Mausoleum -> Cerulean Coast/Southern Shore: Grave Keeper's Cookbook [1]
+Southern Nameless Mausoleum -> Cerulean Coast/Southern Shore: Lost Ashes of War
+Spiritcaller Cave -> Heretical Rise: Ash of War: Seppuku
+Spiritcaller Cave -> Heretical Rise: White Reed Set
+Tombsward Catacombs -> Ailing Village: Erdtree Avatar
+Tombsward Catacombs -> Demi-Human Forest Ruins: Crimsonburst Crystal Tear
+Tombsward Catacombs -> Demi-Human Forest Ruins: Eclipse Crest Heater Shield
+Tombsward Catacombs -> Demi-Human Forest Ruins: Opaline Bubbletear
+Tombsward Cave -> Fourth Church of Marika: Lordsworn's Straight Sword (B)

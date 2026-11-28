@@ -25,4 +25,29 @@ L.forEach((m, i) => { if (MK.cats[m[3]].kind !== 'g' || ['Bosses', 'NPCs', 'NPC 
   if (best < 0) return; (drops[best] = drops[best] || []).push(i); rows.push(`${how}\t${m[4]} <= ${L[best][4]} | ${(m[5] || '').slice(0, 90)}`); });
 MK.drops = drops; fs.writeFileSync(file, JSON.stringify(MK));
 console.log(rows.length, 'boss drops on', Object.keys(drops).length, 'bosses');
+
+// A dungeon step holds only what is inside the dungeon. Things that merely lie near its entrance on the map go to the
+// overland step that passes them: the nearest step of the same map that is not a dungeon, looked for among the steps
+// around it in the route first (so it stays on the way), anywhere on that map otherwise.
+// Inside = the dungeon's name is in the marker's name or note, or the step's text / the place's own page names the thing.
+// Also: filler sentences that point at a wiki page the app cannot open ("check the page here") are removed.
+{ const rf = 'app/data/route.json', R = JSON.parse(fs.readFileSync(rf, 'utf8')), P = JSON.parse(fs.readFileSync('data/places.json', 'utf8'));
+  const DUN = /\b(cave|catacombs|grave|tunnels?|hideaway|grotto|gaol|precipice|crypt|well|depths|mausoleum|pit|fissure)\b/i;
+  const nm = s => base(s).replace(/\s*\[\d+\]$/, '').trim(), isDun = s => DUN.test(s.title);
+  const near = (s, m) => Math.min(...[[s.x, s.y], ...s.m.map(j => [L[j][1], L[j][2]])].map(p => Math.hypot(p[0] - m[1], p[1] - m[2])));
+  let moved = 0, from = 0; const lines = [];
+  R.forEach((s, si) => { if (!isDun(s)) return; const t = norm(s.title), txt = norm([...s.text, ...(s.place ? [...s.place.walk, ...s.place.notes] : [])].join(' '));
+    const pl = Object.values(P).find(p => norm(p.title) === t), links = new Set((pl ? pl.links : []).map(norm)), out = new Set();
+    for (const i of s.n) { const m = L[i];
+      const inside = norm(m[4]).includes(t) || norm(m[5] || '').includes(t) || (MK.cats[m[3]].kind === 'g' && (txt.includes(nm(m[4])) || links.has(nm(m[4])))) || (m[3] === 'Bosses' && Math.hypot(m[1] - s.x, m[2] - s.y) < 0.004);
+      if (!inside) out.add(i); }
+    if (!out.size) return; from++;
+    for (const i of out) { const m = L[i]; let best = -1, bd = 9;
+      for (const win of [12, 1e9]) { R.forEach((x, xi) => { if (xi === si || isDun(x) || x.map !== MK.maps[m[0]] || Math.abs(xi - si) > win) return; const d = near(x, m) + (xi < 2 ? 1 : 0); if (d < bd) { bd = d; best = xi; } }); if (best >= 0 && bd < 0.06) break; }
+      if (best < 0) continue; s.n = s.n.filter(k => k !== i); R[best].n.push(i); moved++; if (MK.cats[m[3]].kind === 'g') lines.push(`${s.title} -> ${R[best].title}: ${m[4]}`); } });
+  const FILLER = /[^.!?]*\b(check|see|visit)\b[^.!?]{0,80}\bpage here\b[^.!?]*[.!?]?\s*/gi; let cut = 0;
+  const tidy = a => a.map(p => { if (!/page here/i.test(p)) return p; const q = p.replace(FILLER, '').replace(/([a-z])\.([A-Z][a-z])/g, '$1. $2').replace(/\s{2,}/g, ' ').trim(); if (q !== p) cut++; return q; }).filter(p => p.length > 2);
+  for (const s of R) { s.text = tidy(s.text); if (s.place) { s.place.walk = tidy(s.place.walk); s.place.notes = tidy(s.place.notes); } }
+  fs.writeFileSync(rf, JSON.stringify(R)); fs.writeFileSync('data/outside-moves.txt', lines.sort().join('\n'));
+  console.log(moved, 'markers that are not inside a dungeon moved out of', from, 'dungeon steps;', cut, 'paragraphs lost a "page here" sentence'); }
 if (process.argv.includes('--list')) console.log(rows.sort().join('\n'));
