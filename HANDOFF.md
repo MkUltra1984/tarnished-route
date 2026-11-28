@@ -175,3 +175,33 @@ Rules added this round (all in `tools/build-route.mjs`, each commented where it 
 - wiki's own repeated paragraphs are kept in both steps; expansion steps stay on the expansion map
 The full order (367 steps) was read through once by hand after these rules; the 10 jumps over 1500 px that remain are the
 walkthrough's own area changes and waygates.
+
+## UPDATE 12 (2026-11-28): the gauntlet mod (not yet played)
+
+Lives outside this repo, in `Desktop\Projects\Elden ring\`:
+- `boss-arena-src\` : the unpacked Boss Arena mod (Sandbox 3.10.1, Nexus 5645), untouched reference.
+- `tarnished-gauntlet\` : our build. `mod\` is the mod with our changes, `Launch Tarnished Gauntlet.me3` starts it with its own
+  save copy (`TarnishedGauntlet.sl2`), `tools\` holds the scripts that made the changes, `data\gauntlet-order.txt` the order.
+- `gauntlet-tools\` : DarkScript3 3.6.3 (event scripts), esdtool 0.5.1 (menu scripts), WitchyBND 3.0.1.0 (game data, text).
+
+What our build changes against the mod:
+- Order (`tools\build-order.mjs`): 134 bosses, each once, from the mod's own progression tiers, written into the mod's custom
+  boss rush slot 1. Repeats and weaker twins dropped (DROP list), Gideon / Godfrey-Hoarah Loux / Radagon-Elden Beast left out
+  (SKIP), shardbearers last (LAST). `tools\check-order.mjs` checks every boss has a warp and a defeat handler.
+- Roundtable Hold grace (`tools\patch-grace.mjs`): "Prepare the gauntlet" (first time), then "Start the gauntlet" /
+  "Resume the gauntlet". Texts in `tools\patch-text.mjs`, applied to all 15 languages.
+- Mod menus off and the mod's extra characters removed from the room (`tools\patch-npcs.mjs`, `tools\patch-events.mjs`).
+  Hewg, Roderika, Gideon and the Twin Maiden Husks stay; Gideon no longer talks (his lines were the mod's boss menu).
+- Game data (`tools\patch-regulation.mjs`): base is the mod's "Restore Scadutree Blessing mechanics" file; level-ups cost
+  runes again; all area scaling tiers below Tier 18 raised to Tier 18, so early bosses are endgame strength.
+
+How to rebuild: run the patch scripts from `tarnished-gauntlet\`, then
+- events: `DOTNET_ROLL_FORWARD=LatestMajor DarkScript3.exe //cmd -compile -game er -indir <dir with the two .js> -outdir <out> -force`
+  (in Git Bash the switch must be written `//cmd`; DarkScript3 wants .NET 6, the variable lets it run on the installed 9/10).
+  Compiling the mod's untouched sources reproduces its files byte for byte.
+- menus: `esdtool.exe -er -basedir <mod> -i <mod bnd> -i <.py files> -writebnd <out>`.
+- data and text: WitchyBND unpack, edit the XML, WitchyBND on the XML, then on the folder. For regulation.bin WitchyBND refused
+  ("regulation version exceeds latest known"); `Assets\Paramdex\ER\Upgrader\version.txt` was raised from 1_16_1 to 1_17_1
+  (original kept as version.txt.orig). Check after repack: only CalcCorrectGraph and SpEffectParam differ from the base.
+
+Not done: nobody has started the game with it yet. The Gauntlet tab in the app still lists 160 bosses in route order, not these 134.
