@@ -221,3 +221,8 @@ Not done: nobody has started the game with it yet. The Gauntlet tab in the app s
   Test: `node tools/test-drops.mjs`.
 - The Grafted Scion (Tutorial), its drops and the chapel's Stormhawk items moved from step 1 to The Four Belfries
   (build-route.mjs, just before "write").
+- Start of the route (owner report): Fringefolk Hero's Grave was step 3, placed by distance although the wiki says
+  "return later" and never says when. It is now right before Stormveil Castle (step 53), with a line about the two
+  Stonesword Keys. Beach / Seaside Ruins items that hung on steps 2-3 as "nearby" moved to Coastal Cave and
+  Dragon-Burnt Ruins (build-route.mjs, block before "write"). Known general weakness: "nearby" is as the crow flies,
+  so cliffs are ignored; other steps may have the same kind of stray item.

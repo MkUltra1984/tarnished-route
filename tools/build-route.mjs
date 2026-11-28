@@ -469,6 +469,23 @@ steps.forEach((st, i) => { if (st.src !== 'walk' && i && steps[i - 1].game === s
     from.text = [...from.text, 'The Grafted Scion here is meant to kill you. You come back for it, its drops and the items of the chapel much later, through the waygate at The Four Belfries.'];
     log.push('moved to "The Four Belfries": ' + mv.map(k => all.get(k).title).join(', ')); } }
 
+// The start of the game. The wiki's walkthrough says of Fringefolk Hero's Grave "return to this section later on when
+// you are well-equipped" and never names the moment, so placing it by distance put it at step 3: before the player has
+// two Stonesword Keys or the strength for it. It now comes at the end of Limgrave, right before Stormveil Castle.
+// Things that only lie close to the starting cave as the crow flies (the beach below the cliff, the Seaside Ruins) go to
+// the steps that actually walk there.
+{ const S = t => steps.find(s => s.title === t), nameOf = k => all.get(k).title.replace(/<[^>]+>/g, '').trim();
+  const move = (from, to, names, dest) => { if (!from || !to) return; for (const l of ['m', 'n']) { const mv = (from[l] || []).filter(k => names.includes(nameOf(k))); if (!mv.length) continue;
+      from[l] = from[l].filter(k => !mv.includes(k)); to[dest] = [...(to[dest] || []), ...mv.filter(k => !(to.m || []).includes(k) && !(to.n || []).includes(k))]; log.push(`moved from "${from.title}" to "${to.title}": ` + mv.map(nameOf).join(', ')); } };
+  const start = S('Tutorial - Stranded Graveyard'), grave = S("Fringefolk Hero's Grave"), elleh = S('Limgrave - Church of Elleh'), coast = S('Clear out the Coastal Cave'), burnt = S('Dragon-Burnt Ruins'), castle = S('Stormveil Castle');
+  move(grave, start, ['Stranded Graveyard'], 'm'); move(grave, start, ['Cave of Knowledge', 'Small Golden Effigy'], 'n');
+  move(grave, elleh, ['Church of Elleh'], 'm'); move(grave, elleh, ['Golden Rune [2]'], 'n');
+  move(grave, coast, ['Gold-Pickled Fowl Foot', 'Golden Rune [1] H', "Spiritspring: Behind Fringefolk Hero's Grave"], 'n');
+  move(start, burnt, ['Haligdrake Talisman'], 'm'); move(start, burnt, ['Incantation Scarab', 'Seaside Ruins', 'Ash of War: Gravitas', 'Lump of Flesh', 'Spiritspring: Seaside Ruins'], 'n');
+  if (grave && castle) { steps.splice(steps.indexOf(grave), 1); steps.splice(steps.indexOf(castle), 0, grave); grave.region = 'Limgrave';
+    grave.text = ['Now is the time to come back to the fog door in the Stranded Graveyard, where the game began: travel to the Stranded Graveyard site of grace. The door needs two Stonesword Keys.', ...grave.text];
+    log.push('moved before "Stormveil Castle" (the walkthrough says to return later): Fringefolk Hero’s Grave'); } }
+
 // ---- write ----
 const order = [...all.values()], idx = new Map(order.map((m, i) => [m.key, i])), ids = new Set();
 const outSteps = steps.map(st => {

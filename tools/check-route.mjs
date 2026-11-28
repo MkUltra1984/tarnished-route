@@ -114,7 +114,8 @@ say(`E. Items a place's own page lists that sit at that place on the map: ${list
     // F1: a step is named after it, but it sits elsewhere
     if (!after(si, i)) { const t = R.findIndex((x, xi) => xi !== si && after(xi, i) && pinD(xi, i) < 0.1 && meant(xi, i)); if (t >= 0) f1.push(MK.list[i][4] + ' is in "' + s.title + '" but "' + R[t].title + '" is named after it'); }
     // F2: its own step says nothing about it, while a step that happens closer to it does
-    if (!here && !listed) { const d0 = pinD(si, i); const t = R.findIndex((x, xi) => xi !== si && says(lower[xi], i) && pinD(xi, i) < Math.min(d0, generic ? 0.03 : 0.08) && (!generic || meant(xi, i))); if (t >= 0) f2.push(MK.list[i][4] + ' is in "' + s.title + '" (' + d0.toFixed(3) + ') but the text of "' + R[t].title + '" (' + pinD(t, i).toFixed(3) + ') names it'); }
+    // (the Haligdrake Talisman lies inside the starting cave but is only reached from outside, by the cliff at the Seaside Ruins: its page says so)
+    if (!here && !listed && MK.list[i][4] !== 'Haligdrake Talisman') { const d0 = pinD(si, i); const t = R.findIndex((x, xi) => xi !== si && says(lower[xi], i) && pinD(xi, i) < Math.min(d0, generic ? 0.03 : 0.08) && (!generic || meant(xi, i))); if (t >= 0) f2.push(MK.list[i][4] + ' is in "' + s.title + '" (' + d0.toFixed(3) + ') but the text of "' + R[t].title + '" (' + pinD(t, i).toFixed(3) + ') names it'); }
     // F3: nothing in the app would tell you what to do about it
     const note = clean(MK.list[i][5]);
     if (after(si, i)) why.title++; else if (here) why.text++; else if (listed) why.list++; else if (note.length > 15) why.note++; else f3.push(MK.list[i][3] + ': ' + MK.list[i][4] + ' in "' + s.title + '"');
