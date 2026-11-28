@@ -51,6 +51,7 @@ for (const [name, w, h] of [['tablet', 1280, 800], ['phone', 412, 915]]) {
   await page.screenshot({ path: `shots/app-${name}-route.png` });
   // rerouting: what was left open shows in the header counter and its list
   await page.evaluate(() => { localStorage.clear(); }); await page.reload({ waitUntil: 'networkidle' });
+  if (await page.locator('.chk').count() === 0) { await page.locator('.done').click(); await page.waitForTimeout(300); }   // past character creation
   await page.locator('.done').click(); await page.waitForTimeout(300);
   ok(await page.locator('#openb').count() === 1, `${name}: skipped objectives are counted (${await page.locator('#openb').innerText()})`);
   await page.locator('#openb').click(); await page.waitForTimeout(300);

@@ -108,7 +108,7 @@ for (const [file, game, maps] of [['walkthrough', 'base', ['overland', 'undergro
       const body = li.clone(); body.find('.badge').remove(); const trophy = li.find('.badge').filter((_, b) => /\u{1F3C6}/u.test($(b).text())).length > 0;
       const creation = /\b(origin|keepsakes?)\b/i.test(plain(body.text())) && steps.length === 0;
       const text = /keepsakes?/i.test(plain(body.text())) && steps.length === 0
-        ? 'Keepsake: do not take the Fanged Imp Ashes. They can be bought later from the Isolated Merchant near the Main Academy Gate for 2,000 runes, so choosing them wastes the keepsake. The Golden Seed helps most at the start (one more flask charge). Avoid the Stonesword Keys: the route never needs bought ones.'
+        ? 'Keepsake: take the Lands Between Rune. It is unique: the keepsake is the only way to get it, so for 100% it is the one to pick. Do not take the Fanged Imp Ashes; they can be bought later from the Isolated Merchant near the Main Academy Gate for 2,000 runes. The Golden Seed and the Stonesword Keys are found in the world anyway, and the route never needs bought keys.'
         : (optional ? 'Optional: ' : '') + plain(body.text()) + (trophy ? ' (This earns an achievement.)' : ''), low = text.toLowerCase();
       const linksOut = li.find('a').map((_, a) => { const h = $(a).attr('href') || ''; return /youtu\.?be/.test(h) ? { t: 'Video: ' + plain($(a).text()), href: h } : /^\/images\//.test(h) ? { t: 'Picture: ' + plain($(a).text()), href: 'https://eldenring.redmaw.dev' + h } : null; }).get().filter(Boolean);
       const marks = [], fresh = [], note = creation || /^\s*(note|tip|warning)\b/i.test(text);
