@@ -311,3 +311,4 @@ Not done: nobody has started the game with it yet. The Gauntlet tab in the app s
   trades): added to the Collection with map -1 (a[7] === 'list'), tickable, no place on the map, in no step.
   `node tools/completion-audit.mjs` compares the sheets with the markers (16 left, mostly plural boss names).
 - Ticks are saved by map + position + kind + name (gotV 3); gotV 2 and number-keyed saves are still read.
+- Cards for the 693 Collection-only things fetched (all have a card, 690 a picture); app/cards is 30 MB, cards.json v 4.
