@@ -12,7 +12,7 @@ ok(await p.locator(`.chk.gone[data-i="${i}"]`).count() === 1, 'forgetting it gre
 ok((await p.locator('.done').innerText()).trim() === 'DONE' || /^done$/i.test((await p.locator('.done').innerText()).trim()), 'the step then counts as done ("Done", nothing left open)');
 await p.locator('.done').click(); await p.waitForTimeout(300); const st = await state();
 ok(st.st[first.id] === 'd' && await p.locator('#openb').count() === 0, 'moving on marks the step done and no "open" reminder appears');
-ok(Object.keys(st.skip).length === 1 && !Object.keys(st.got).length, 'it is saved as forgotten, not as collected');
+ok(Object.keys(st.skip).length === 1 && !Object.keys(st.skip).some(k => st.got[k]), 'it is saved as forgotten, not as collected');
 await p.reload(); await p.waitForSelector('.title'); ok(await p.locator('#openb').count() === 0, 'still no reminder after a reload');
 await p.goto(base + '?step=' + k0); await p.waitForSelector('.chk'); await p.locator(`.chk[data-i="${i}"] .cn`).click(); ok((await p.locator('[data-skip]').innerText()).includes('Bring it back'), 'it can be brought back');
 await p.locator('[data-skip]').click(); await p.waitForTimeout(200); ok(await p.locator(`.chk.gone[data-i="${i}"]`).count() === 0 && (await state()).st[first.id] === 'l', 'brought back: the step is open again');

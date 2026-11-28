@@ -20,12 +20,14 @@
   // Ticks are saved under a name that does not move when the marker list is rebuilt: map, position, kind and name.
   // (gotV 3. gotV 2 had map and position only, which two things at one spot shared; without gotV: by number.)
   const tickKey = a => a[0] + '_' + a[1] + '_' + a[2] + '_' + a[3] + '_' + a[4], spotKey = a => a[0] + '_' + a[1] + '_' + a[2];
+  const giveStart = () => { M.forEach(m => { if (m.src === 'start') S.got[m.i] = 1; }); S.startGiven = 1; };
   S.skip = S.skip || {}; S.chk = S.chk || {};   // chk: ticks of the checklists that are not on the map (questlines, achievements, New Game Plus), by the sheet's own line id
   if (S.gotV === 3) { const at = new Map(MK.list.map((a, i) => [tickKey(a), i])); for (const f of ['got', 'skip']) { const g = {}; for (const k in S[f]) { const i = at.get(k); if (i != null) g[i] = 1; } S[f] = g; } }
   else if (S.gotV === 2) { const at = new Map(); MK.list.forEach((a, i) => { const k = spotKey(a); if (!at.has(k)) at.set(k, []); at.get(k).push(i); }); const g = {}; for (const k in S.got) for (const i of at.get(k) || []) g[i] = 1; S.got = g; }
   const stored = () => { const g = {}, k = {}; for (const i in S.got) if (S.got[i] && MK.list[i]) g[tickKey(MK.list[i])] = 1; for (const i in S.skip) if (S.skip[i] && MK.list[i]) k[tickKey(MK.list[i])] = 1; return { ...S, got: g, skip: k, gotV: 3, tab: keptTab == null ? S.tab : keptTab }; };
   let keptTab = null;   // the tab to remember while a tab from the address (?tab=) is only being looked at
   const save = () => { syncDrops(); localStorage.setItem(KEY, JSON.stringify(stored())); };
+  if (!S.startGiven) giveStart();
   syncDrops();
   const q = new URLSearchParams(location.search);
   let peek = q.has('step') ? +q.get('step') : null;          // look at a step without changing progress
@@ -334,7 +336,7 @@ ${(s.farm || []).length ? `<details class="guide farm"${S.farmOpen ? ' open' : '
       <div class="opt">Markers on the map</div>${seg('al', [[0, 'This step only'], [1, 'Everything']], S.all ? 1 : 0)}
       <p class="credit">The order of the route follows <a href="https://eldenring.redmaw.dev/" target="_blank" rel="noopener">Redmaw's Elden Ring Completion Sheets</a>, and where the wiki has no note the step shows Redmaw's own line. Map images, marker positions and descriptions come from the <a href="https://eldenring.wiki.fextralife.com/" target="_blank" rel="noopener">Fextralife Elden Ring Wiki</a>. Elden Ring is a trademark of its owners; this is a personal fan tool.</p></div>`;
     document.querySelectorAll('#al .btn').forEach(b => b.onclick = () => { S.all = !!+b.dataset.v; save(); drawAll(); renderSettings(); });
-    let armed = false; $('#reset').onclick = e => { if (!armed) { armed = true; e.target.textContent = 'Tap again to erase all progress'; return; } S.st = {}; S.got = {}; S.skip = {}; S.chk = {}; S.hist = []; S.again = 0; S.tab = 'route'; keptTab = null; save(); peek = null; openInfo = null; showOpen = false; render(); };
+    let armed = false; $('#reset').onclick = e => { if (!armed) { armed = true; e.target.textContent = 'Tap again to erase all progress'; return; } S.st = {}; S.got = {}; S.skip = {}; S.chk = {}; S.hist = []; S.again = 0; giveStart(); S.tab = 'route'; keptTab = null; save(); peek = null; openInfo = null; showOpen = false; render(); };
   }
 
 

@@ -217,38 +217,80 @@ for (const [after, st] of extras) steps.splice(steps.indexOf(after) + 1, 0, st);
 let sold = 0, soldNoStep = 0;
 if (fs.existsSync('raw/redmaw/merchants.html')) { const $ = cheerio.load(fs.readFileSync('raw/redmaw/merchants.html', 'utf8'));
   $('h3').each((_, h3) => { const h = $(h3).clone(); h.find('button').remove(); const place = plain(h.find('.secondary').text()).replace(/^\(|\)$/g, ''); h.find('.secondary').remove(); const name = plain(h.text()); if (!name) return;
-    const ALIAS = { 'Knight Bernahl': 'Bernahl', 'Nomadic Merchant|Weeping Peninsula': 'Nomadic Merchant Castle Morne Rampart', 'Nomadic Merchant|South Liurnia': 'Nomadic Merchant Liurnia of the Lakes', 'Nomadic Merchant|North Liurnia': 'Nomadic Merchant North Liurnia of the Lakes',
+    const ALIAS = { 'Knight Bernahl': 'Bernahl (First Location)', 'Nomadic Merchant|Weeping Peninsula': 'Nomadic Merchant Castle Morne Rampart', 'Nomadic Merchant|South Liurnia': 'Nomadic Merchant Liurnia of the Lakes', 'Nomadic Merchant|North Liurnia': 'Nomadic Merchant North Liurnia of the Lakes',
       'Nomadic Merchant|North Caelid': 'Wandering Merchant Caelid Highway North', 'Nomadic Merchant|South Caelid': 'Nomadic Merchant Caelid South', 'Nomadic Merchant|Altus Plateau': 'Nomadic Merchant West Altus Plateau', 'Hermit Merchant|Capital Outskirts': 'Hermit Merchant',
       'Hermit Merchant|Mountaintops of the Giants': 'Hermit Merchant Mountaintops East', 'Abandoned Merchant': 'Wandering Merchant Siofra River', 'Count Ymir, High Priest': 'Count Ymir', 'Isolated Merchant|Weeping Peninsula': 'Isolated Merchant' };
     const al = ALIAS[name + '|' + place] || ALIAS[name], exact = al ? L.map((m, i) => i).filter(i => L[i][3] === 'NPCs' && plain(L[i][4]) === al) : null;
     const who = exact && exact.length ? exact : lookup(name + ' ' + place) || lookup(name) || lookupPerson(name), npc = who ? who.filter(i => L[i][3] === 'NPCs' && L[i][0] >= 0) : [];
     const hold = /^(Twin Maiden Husks|Finger Reader Enia|Brother Corhyn)$/.test(name) ? steps.find(x => (x.lines || []).some(l => /roundtable hold/i.test(l.text)) && x.m.length) : null;
-    const st = hold || (npc.length ? steps.find(x => x.m.some(i => npc.includes(i))) || steps.find(x => x.n.some(i => npc.includes(i))) : null), at = st ? (npc.find(i => st.m.includes(i) || st.n.includes(i)) ?? st.m[0]) : null;
+    const st0 = hold || (npc.length ? steps.find(x => x.m.some(i => npc.includes(i))) || steps.find(x => x.n.some(i => npc.includes(i))) : null), at0 = st0 ? (npc.find(i => st0.m.includes(i) || st0.n.includes(i)) ?? st0.m[0]) : null;
     let k = 0; $(h3).nextAll('ul, ol').first().find('input[type=checkbox]').each((_, box) => { const li = $(box).closest('li').clone(); li.find('ul,ol').remove(); const a = li.find('a[href*="wiki.gg"]').first(); if (!a.length) return;
       const c = lookup(a.text()); const i = c && c.find(j => L[j][0] < 0 && !used.has(j)); if (i == null) return;
-      const price = plain(li.text()).split(':').slice(1).join(':').trim(), cond = plain($(box).closest('ul,ol').parent('li').clone().children('ul,ol').remove().end().text());
+      const price = plain(li.text()).replace(plain(a.text()), '').replace(/^[^:]*:/, '').trim(), cond = plain($(box).closest('ul,ol').parent('li').clone().children('ul,ol').remove().end().text());
       L[i][5] = 'Sold by ' + name + (hold ? ' in the Roundtable Hold' : place && !/remembrances|equipment/i.test(place) ? ' (' + place + ')' : '') + (price ? ' for ' + price : '') + '.' + (cond && cond.length < 200 ? ' ' + cond.replace(/:$/, '.') : '');
-      used.add(i); if (st) { k++; L[i][0] = L[at][0]; L[i][1] = +(L[at][1] + 0.0006 * (k % 9)).toFixed(5); L[i][2] = +(L[at][2] + 0.0006 * Math.floor(k / 9) + 0.0006).toFixed(5); L[i][7] = 'sold'; (st.sell = st.sell || []).push(i); sold++; } else soldNoStep++; }); }); }
+      used.add(i); let st = st0, at = at0; if (/volcano manor/i.test(cond)) { const later = L.findIndex(m => m[3] === 'NPCs' && m[0] >= 0 && plain(m[4]).startsWith(name.replace(/^Knight /, '') + ' (Second Location)')), ls = later >= 0 ? steps.find(x => x.m.includes(later) || x.n.includes(later)) : null; if (ls) { st = ls; at = later; } }
+      if (st) { k++; L[i][0] = L[at][0]; L[i][1] = +(L[at][1] + 0.0006 * (k % 9)).toFixed(5); L[i][2] = +(L[at][2] + 0.0006 * Math.floor(k / 9) + 0.0006).toFixed(5); L[i][7] = 'sold'; (st.sell = st.sell || []).push(i); sold++; } else soldNoStep++; }); }); }
 // The rest of the complete lists: armour pieces and weapons that ordinary enemies drop, starting gear. Neither the
 // walkthrough nor the merchants sheet places them; the wiki's page of each thing does (app/data/cards.json):
 //  a. an armour piece whose set is in a step is part of that set: ticked with it, like a boss's drops;
 //  b. otherwise the first place the wiki's "where to find" text names puts it into the step that holds that place,
 //     as "found or farmed around here" (it does not hold the step open: a 2% drop is not an errand);
 //  c. what names no place stays in the Collection with the wiki's sentence.
-let asPart = 0, farmed = 0, noPlace = 0;
+let asPart = 0, farmed = 0, noPlace = 0, byHand = 0, started = 0;
 if (fs.existsSync('app/data/cards.json')) { const CARDS = JSON.parse(fs.readFileSync('app/data/cards.json', 'utf8')), pageOf = i => CARDS.pages[CARDS.by[L[i][4]]] || null;
   const setAt = new Map(); L.forEach((m, i) => { if (m[0] >= 0 && m[3] === 'Armor' && / Set\b/.test(m[4])) { const k = norm(plain(m[4]).replace(/\s*\(.*$/, '').replace(/\s+-\s+.*$/, '')); if (!setAt.has(k)) setAt.set(k, i); } });
   const spots = []; L.forEach((m, i) => { if (m[0] >= 0 && ['Locations', 'Sites of Grace'].includes(m[3])) { const k = plain(m[4]).replace(/\s*\(.*$/, '').toLowerCase(); if (k.replace(/[^a-z]/g, '').length >= 8) spots.push([k, i]); } });
   const holderOf = i => steps.find(x => x.m.includes(i) || x.n.includes(i)); const perStep = new Map();
+  const anyHolder = i => steps.find(x => x.m.includes(i) || x.n.includes(i) || (x.sell || []).includes(i) || (x.farm || []).includes(i));
+  const mark = (cat, re) => () => L.findIndex(m => m[0] >= 0 && m[3] === cat && re.test(plain(m[4])));
+  const said = re => () => { const st = steps.find(x => (x.lines || []).some(l => re.test(l.text))); return st && st.m.length ? [st, st.m[0]] : -1; };
+  // [name, how, where, note]. how: 'part' = ticked together with the thing it comes with, 'obj' = an objective of that step,
+  // 'farm' = "found or farmed around here" in the step that holds the anchor.
+  const BYHAND = [
+    [/^Spellblade's (Pointed Hat|Traveling Attire|Gloves|Trousers)$/, 'part', mark('Armor', /^Spellblade's Set/), "Part of the Spellblade's Set, looted from Rogier's body in the Roundtable Hold."],
+    [/^Azur's Manchettes$/, 'part', mark('Armor', /^Azur's Glintstone Set/), "Part of Azur's Glintstone Set, on the ground where Azur sat after Sellen's quest."],
+    [/^Gold (Bracelets|Waistwrap)$/, 'part', mark('Armor', /^Goldmask's Set/), "Part of Goldmask's Set, on Goldmask's body: loot the rune, reload the area, then loot the body again."],
+    [/^Ash of War: Spinning Gravity Thrust$/, 'part', mark('Weapons', /^Sword Lance$/), 'The skill of the Sword Lance. It cannot be taken off the weapon: you have it once you have the Sword Lance.'],
+    [/^Royal Remains (Helm|Armor|Gauntlets|Greaves)$/, 'obj', said(/Royal Remains Set/), "Part of the Royal Remains Set, lying outside Gideon's study in the Roundtable Hold once Ensha is dead."],
+    [/^Fia's Robe$/, 'obj', mark('Bosses', /^Lichdragon Fortissax/), "After Lichdragon Fortissax is dead, Fia's Robe lies where Fia lay, at the Prince of Death's Throne."],
+    [/^Patches' Crouch/, 'obj', said(/Patches' Crouch gesture/), "Open Patches' chest in Murkwater Cave again at the end of his quest. He surrenders and teaches the gesture."],
+    [/^Kaiden (Helm|Armor|Gauntlets|Trousers)$/, 'farm', said(/camp with Kaiden Sellswords/), 'Random drop from the Kaiden Sellswords at the camp northeast of Agheel Lake North.'],
+    [/^Foot Soldier (Cap|Gauntlets|Greaves)$/, 'farm', mark('Locations', /^Gatefront Ruins$/), 'Random drop from the Godrick Foot Soldiers at the Gatefront Ruins.'],
+    [/^Heavy Crossbow$/, 'farm', mark('Locations', /^Gatefront Ruins$/), 'Random drop from soldiers who carry a crossbow, for example the Godrick Soldiers at the Gatefront Ruins.'],
+    [/^Foot Soldier (Helmet|Tabard)$/, 'farm', mark('Locations', /^Academy Gate Town$/), 'Random drop from the Raya Lucaria Foot Soldiers in Liurnia, for example around the Academy Gate Town.'],
+    [/^Exile (Hood|Armor|Gauntlets|Greaves)$/, 'farm', mark('Sites of Grace', /^Rampart Tower$/), 'Random drop from the Exile Soldiers in Stormveil Castle.'],
+    [/^Scarlet Tabard$/, 'farm', mark('Armor', /^Radahn Soldier Helm$/), 'Random drop from the Radahn Foot Soldiers across Caelid.'],
+    [/^Redmane Knight Gauntlets$/, 'farm', mark('Armor', /^Redmane Knight Helm$/), 'Random drop from the Redmane Knights.'],
+    [/^Leyndell Knight Greaves$/, 'farm', mark('Armor', /^Leyndell Knight Helm$/), 'Random drop from the Leyndell Knights.'],
+    [/^Nox (Bracelets|Greaves)$/, 'farm', mark('Armor', /^Nox Monk Armor$/), 'Random drop from Nox Monks, Nox Swordstresses and Night Maidens in Nokron and Nokstella.'],
+    [/^Forked Hatchet$/, 'farm', mark('Weapons', /^Forked Greatsword$/), 'Random drop from the Imps that carry it, in most catacombs.'],
+    [/^Messmer Soldier('s Axe| Helm| Armor| Gauntlets| Greaves)$/, 'farm', mark('Spirit Ashes', /^Messmer Soldier Ashes/), 'Random drop from the Messmer Soldiers (the axe only from those who carry it).'],
+    [/^(Curseblade Mask|Ascetic's (Loincloth|Wrist Guards|Ankle Guards))$/, 'farm', mark('Locations', /^Bonny Village$/), 'Random drop (3%) from the Curseblades, for example in Bonny Village.'],
+    [/^Horned Warrior Helm$/, 'farm', mark('Weapons', /^Horned Warrior's Sword/), 'Random drop (3%) from the Horned Warriors.'],
+    [/^Divine Bird (Helm|Warrior (Armor|Gauntlets|Greaves))$/, 'farm', mark('Spirit Ashes', /^Horned Warrior Ashes/), 'Random drop from the Divine Bird Warriors in Enir-Ilim.'],
+    [/^Divine Beast (Helm|Warrior Armor)$/, 'farm', mark('Spirit Ashes', /^Horned Warrior Ashes/), 'Random drop from the Divine Beast Warriors in Enir-Ilim.'],
+  ];
   L.forEach((m, i) => { if (m[0] >= 0 || used.has(i)) return; const page = pageOf(i), where = page ? page.where.filter(t => !/can be found at( the following location)?s?:?\s*$/i.test(t) && !/^where to find/i.test(t)) : [];
     const sentence = where.slice(0, 2).join(' ').slice(0, 300);
+    // d. By hand, before the other rules: quest rewards whose set name the wiki writes differently, drops of enemies the
+    //    wiki names without a place, and what every character owns from the start.
+    { const t = plain(m[4]);
+      if (/^Memory of Grace$/.test(t) || (/\(Gesture\)$/.test(t) && !/^Patches/.test(t))) { m[5] = 'Every character has this from the start of the game.'; m[7] = 'start'; used.add(i); started++; return; }
+      const hand = BYHAND.find(h => h[0].test(t));
+      if (hand) { const a = hand[2](); let st = null, ai = null; if (Array.isArray(a)) [st, ai] = a; else if (a >= 0) { ai = a; st = anyHolder(a); }
+        if (st && ai != null) { const note = hand[3] || sentence, n = (perStep.get(st) || 0) + 1; perStep.set(st, n);
+          if (hand[1] === 'part') { (DROPS[ai] = DROPS[ai] || []).push(i); dropOf.set(i, ai); m[0] = L[ai][0]; m[1] = L[ai][1]; m[2] = +(L[ai][2] + 0.0003 * DROPS[ai].length).toFixed(5); m[5] = note; m[7] = 'part'; [st.m, st.n, st.sell || [], st.farm || []].find(x => x.includes(ai)).push(i); }
+          else { m[0] = L[ai][0]; m[1] = +(L[ai][1] + 0.0006 * (n % 8)).toFixed(5); m[2] = +(L[ai][2] - 0.0006 - 0.0006 * Math.floor(n / 8)).toFixed(5); m[5] = note;
+            if (hand[1] === 'obj') { m[7] = 'sheet'; st.m.push(i); } else { m[7] = 'farm'; (st.farm = st.farm || []).push(i); } }
+          used.add(i); byHand++; return; }
+        console.log('  by hand: no anchor found for', t); } }
     const si = page && page.set ? setAt.get(norm(page.set)) : null, sh = si != null ? holderOf(si) : null;
     if (sh) { (DROPS[si] = DROPS[si] || []).push(i); dropOf.set(i, si); m[0] = L[si][0]; m[1] = L[si][1]; m[2] = +(L[si][2] + 0.0003 * DROPS[si].length).toFixed(5); m[5] = 'Part of the ' + page.set + '.' + (sentence ? ' ' + sentence : ''); m[7] = 'part'; (sh.m.includes(si) ? sh.m : sh.n).push(i); used.add(i); asPart++; return; }
     const low = where.join(' ').toLowerCase(); let best = null, at = 1e9; for (const [k, p] of spots) { const q = low.indexOf(k); if (q >= 0 && (q < at || (q === at && k.length > best[0].length))) { at = q; best = [k, p]; } }
     const st = best ? holderOf(best[1]) : null;
     if (st) { const n = (perStep.get(st) || 0) + 1; perStep.set(st, n); m[0] = L[best[1]][0]; m[1] = +(L[best[1]][1] + 0.0006 * (n % 8)).toFixed(5); m[2] = +(L[best[1]][2] - 0.0006 - 0.0006 * Math.floor(n / 8)).toFixed(5); m[5] = sentence; m[7] = 'farm'; (st.farm = st.farm || []).push(i); used.add(i); farmed++; return; }
     if (sentence && !m[5]) m[5] = sentence; noPlace++; }); }
-console.log('rest of the lists: part of a set in a step', asPart, '| found or farmed at a place of a step', farmed, '| no place named', noPlace);
+console.log('rest of the lists: part of a set in a step', asPart, '| found or farmed at a place of a step', farmed, '| placed by hand', byHand, '| owned from the start', started, '| no place named', noPlace);
 
 // ---------- making the steps fit together ----------
 const holder = i => steps.find(x => x.m.includes(i) || x.n.includes(i)), takeOut = (st, i) => { st.m = st.m.filter(k => k !== i); st.n = st.n.filter(k => k !== i); };
