@@ -62,7 +62,7 @@ for (const [name, w, h] of [['tablet', 1280, 800], ['phone', 412, 915]]) {
     await page.locator(`.tab[data-t="${t}"]`).click(); await page.waitForTimeout(400);
     ok(await page.locator('.listhead h1').count() === 1, `${name}: ${t} tab opens (${await page.locator('#cnt').innerText()})`);
     if (t === 'collection') { await page.locator('.group').first().click(); await page.waitForTimeout(300); await page.screenshot({ path: `shots/app-${name}-collection-open.png` }); await page.locator('.row [data-tick]').first().click(); ok(await page.locator('.row.got').count() >= 1, `${name}: ticking an item works`); await page.locator('.back').click(); await page.waitForTimeout(200); }
-    if (t === 'bosses') { await page.locator('.row .txt').nth(3).click(); await page.waitForTimeout(900); }
+    if (t === 'bosses') { await page.locator('.row .txt').nth(3).click(); await page.waitForTimeout(900); ok(await page.locator('.card h2').count() === 1, `${name}: tapping a boss opens its card (${await page.locator('.card li').count()} lines, picture: ${await page.locator('.cpic img').count() === 1})`); await page.screenshot({ path: `shots/app-${name}-card.png` }); await page.locator('.cx').click(); await page.waitForTimeout(300); ok(await page.locator('#sheet').isHidden(), `${name}: the card closes`); }
     await page.screenshot({ path: `shots/app-${name}-${t}.png` });
   }
   await page.locator('.tab[data-t="route"]').click(); await page.waitForTimeout(300);
