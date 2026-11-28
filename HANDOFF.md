@@ -295,3 +295,6 @@ Not done: nobody has started the game with it yet. The Gauntlet tab in the app s
   the next ones beside the first; a name the line links is not matched a second time from its text; the last free
   marker of a shared name is no longer taken blindly. App: "Next step" while looking through ?step= saves nothing;
   "Tick all" settles every step; Undo list is cleaned when left-open steps come back.
+- Rest of the review: ticks are saved by map and position (gotV 2; old saves by number are still read); card pictures
+  are asked for as cards/<file>?v=<cards.json v> (count v up when pictures are fetched again); the step header says
+  "left open earlier" once the route has come round. `node tools/test-offline.mjs` checks offline start on the live app.

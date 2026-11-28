@@ -12,11 +12,12 @@ for (const d of drops) ok(await page.locator(`.chk[data-i="${d}"]`).count() === 
 ok((await page.locator(`.chk[data-i="${scion}"] .cn small`).innerText()).includes('Golden Beast Crest Shield'), 'the boss row names its drops');
 await page.locator(`.chk[data-i="${scion}"]`).scrollIntoViewIfNeeded(); await page.locator(`.chk[data-i="${scion}"] .box`).click(); await page.waitForTimeout(200);
 let got = await page.evaluate(() => JSON.parse(localStorage.getItem('tarnished-route-v2')).got);
-ok(got[scion] && drops.every(d => got[d]), 'ticking the boss ticks its drops');
+const K = i => MK.list[i][0] + '_' + MK.list[i][1] + '_' + MK.list[i][2];   // ticks are saved by map and position
+ok(got[K(scion)] && drops.every(d => got[K(d)]), 'ticking the boss ticks its drops');
 await page.screenshot({ path: 'shots/drops-belfries.png' });
 await page.goto(base + '?tab=collection'); await page.waitForSelector('.group'); await page.locator('.group[data-c="Shields"]').click(); await page.waitForTimeout(300);
 ok(await page.locator(`.row.got[data-i="${drops[0]}"]`).count() === 1, 'the drop shows as collected in the Collection tab');
 await page.locator(`.row[data-i="${drops[0]}"] [data-tick]`).click(); await page.waitForTimeout(200);
 got = await page.evaluate(() => JSON.parse(localStorage.getItem('tarnished-route-v2')).got);
-ok(!got[scion] && drops.every(d => !got[d]), 'unticking the drop unticks the boss and its other drops');
+ok(!got[K(scion)] && drops.every(d => !got[K(d)]), 'unticking the drop unticks the boss and its other drops');
 await browser.close(); console.log(fails ? fails + ' FAILED' : 'ALL PASSED'); process.exit(fails ? 1 : 0);

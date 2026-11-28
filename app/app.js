@@ -17,8 +17,11 @@
   // ---------- saved progress ----------
   const KEY = 'tarnished-route-v2';   // v2: steps are saved by their stable id, so rebuilding the route keeps your progress
   const S = Object.assign({ st: {}, got: {}, hist: [], size: 18, extras: false, all: false, tab: 'route' }, JSON.parse(localStorage.getItem(KEY) || '{}'));
+  const tickKey = a => a[0] + '_' + a[1] + '_' + a[2], keyIndex = new Map(MK.list.map((a, i) => [tickKey(a), i]));
+  if (S.gotV === 2) { const g = {}; for (const k in S.got) { const i = keyIndex.get(k); if (i != null) g[i] = 1; } S.got = g; }   // (without gotV: an older save, ticks by number, read as they are)
+  const stored = () => { const g = {}; for (const i in S.got) if (S.got[i] && MK.list[i]) g[tickKey(MK.list[i])] = 1; return { ...S, got: g, gotV: 2, tab: keptTab == null ? S.tab : keptTab }; };
   let keptTab = null;   // the tab to remember while a tab from the address (?tab=) is only being looked at
-  const save = () => { syncDrops(); localStorage.setItem(KEY, JSON.stringify(keptTab == null ? S : { ...S, tab: keptTab })); };
+  const save = () => { syncDrops(); localStorage.setItem(KEY, JSON.stringify(stored())); };
   syncDrops();
   const q = new URLSearchParams(location.search);
   let peek = q.has('step') ? +q.get('step') : null;          // look at a step without changing progress
@@ -29,7 +32,7 @@
     if (peek != null && ROUTE[peek]) return ROUTE[peek];
     let s = ROUTE.find(x => !S.st[x.id]);
     if (!s) { // end of the list: bring back "Later" steps first, then skipped ones
-      for (const kind of ['l', 's']) { const ids = Object.keys(S.st).filter(k => S.st[k] === kind); if (ids.length) { ids.forEach(k => delete S.st[k]); S.hist = S.hist.filter(id => S.st[id]); save(); return currentStep(); } }
+      for (const kind of ['l', 's']) { const ids = Object.keys(S.st).filter(k => S.st[k] === kind); if (ids.length) { ids.forEach(k => delete S.st[k]); S.hist = S.hist.filter(id => S.st[id]); S.again = 1; save(); return currentStep(); } }
     }
     return s || null;
   }
@@ -113,7 +116,7 @@
   const artOf = m => { const c = CARDS.pages[CARDS.by[m.title]]; return c && c.img; };
   function rowHTML(m, sub, name) {
     const art = artOf(m);
-    return `<button class="row${S.got[m.i] ? ' got' : ''}" data-i="${m.i}"><span class="tile" data-tick="${m.i}"><img ${art ? `class="art${/jpg$/.test(art) ? ' ph' : ''}" src="cards/${esc(art)}" loading="lazy"` : `src="icons/${m.f}.png"`} alt=""><span class="tick">&#10003;</span></span><span class="txt"><span class="name">${esc(name || m.title)}</span><span class="cat">${esc(sub || m.label)}</span></span></button>`;
+    return `<button class="row${S.got[m.i] ? ' got' : ''}" data-i="${m.i}"><span class="tile" data-tick="${m.i}"><img ${art ? `class="art${/jpg$/.test(art) ? ' ph' : ''}" src="cards/${esc(art)}?v=${CARDS.v || 1}" loading="lazy"` : `src="icons/${m.f}.png"`} alt=""><span class="tick">&#10003;</span></span><span class="txt"><span class="name">${esc(name || m.title)}</span><span class="cat">${esc(sub || m.label)}</span></span></button>`;
   }
   function wireRows(root) {
     root.querySelectorAll('.row').forEach(r => r.onclick = e => {
@@ -133,7 +136,7 @@
     const drops = DROPS[m.i] ? `<h3>Drops</h3><ul>${DROPS[m.i].map(i => `<li>${esc(M[i].title)}</li>`).join('')}</ul>` : '';
     sh.hidden = false;
     sh.innerHTML = `<div class="panel card"><button class="cx" aria-label="Close">&times;</button>
-      ${c.img ? `<div class="cpic${c.boss ? ' boss' : ''}"><img src="cards/${esc(c.img)}" alt=""></div>` : ''}
+      ${c.img ? `<div class="cpic${c.boss ? ' boss' : ''}"><img src="cards/${esc(c.img)}?v=${CARDS.v || 1}" alt=""></div>` : ''}
       <h2>${esc(m.title)}</h2><div class="over">${esc(m.label)} &middot; ${esc(MAPNAME[m.map])}</div>
       ${m.desc ? `<p class="cnote">${esc(m.desc)}</p>` : ''}
       ${c.intro.length ? c.intro.map(p => `<p>${esc(p)}</p>`).join('') : ''}
@@ -190,7 +193,7 @@
     const back = nearbyLeft(s), openAll = leftOpen().length;
     pane.innerHTML = `
       <div class="head">
-        <div class="steprow"><span class="over gold">Step ${pos} of ${total}</span><span style="display:flex;align-items:center">${openAll ? `<button class="chip" id="openb">${openAll} open</button>` : ''}<span class="meta">${Math.round(dn / total * 100)}%</span></span></div>
+        <div class="steprow"><span class="over gold">Step ${pos} of ${total}${S.again ? ' &middot; left open earlier' : ''}</span><span style="display:flex;align-items:center">${openAll ? `<button class="chip" id="openb">${openAll} open</button>` : ''}<span class="meta">${Math.round(dn / total * 100)}%</span></span></div>
         <div class="bar"><i style="width:${dn / total * 100}%"></i></div>
         <h1 class="title">${esc(s.title)}</h1>
         ${s.region ? `<div class="reg">${esc(s.region)}</div>` : ''}
@@ -198,7 +201,7 @@
       </div>
       <div class="body">
         <div class="sechead"><span class="over">Walkthrough</span>${grab.length ? `<button class="link" id="jump">To do &middot; ${grab.length - open} of ${grab.length} &darr;</button>` : ''}</div>
-        <div class="dir">${shot(s.imgs[0], 'lead')}${s.card != null && cardOf(M[s.card]) && cardOf(M[s.card]).img ? `<img class="shot lead cardlead${cardOf(M[s.card]).boss ? '' : ' item'}" data-card="${s.card}" loading="lazy" src="cards/${esc(cardOf(M[s.card]).img)}" alt="">` : ''}${para.map(p => p.startsWith('## ') ? `<h3>${esc(p.slice(3))}</h3>` : `<p>${esc(p)}</p>`).join('')}${s.imgs.length > 1 ? `<div class="strip">${s.imgs.slice(1).map(f => shot(f, 'thumb')).join('')}</div>` : ''}</div>
+        <div class="dir">${shot(s.imgs[0], 'lead')}${s.card != null && cardOf(M[s.card]) && cardOf(M[s.card]).img ? `<img class="shot lead cardlead${cardOf(M[s.card]).boss ? '' : ' item'}" data-card="${s.card}" loading="lazy" src="cards/${esc(cardOf(M[s.card]).img)}?v=${CARDS.v || 1}" alt="">` : ''}${para.map(p => p.startsWith('## ') ? `<h3>${esc(p.slice(3))}</h3>` : `<p>${esc(p)}</p>`).join('')}${s.imgs.length > 1 ? `<div class="strip">${s.imgs.slice(1).map(f => shot(f, 'thumb')).join('')}</div>` : ''}</div>
         ${s.place && (s.place.walk.length || s.place.notes.length || s.place.img) ? `<div class="over sechead">${esc(s.place.title)} in detail</div><div class="dir">${shot(s.place.img, 'lead')}${s.place.walk.map(p => p.startsWith('## ') ? `<h3>${esc(p.slice(3))}</h3>` : `<p>${esc(p)}</p>`).join('')}${s.place.notes.length ? `<h3>Notes</h3><ul>${s.place.notes.map(p => `<li>${esc(p)}</li>`).join('')}</ul>` : ''}</div>` : ''}
         ${(s.guide || []).map(g => `<details class="guide"><summary>Wiki walkthrough: ${esc(g.title)}</summary><div class="dir">${g.text.map(p => `<p>${esc(p)}</p>`).join('')}</div></details>`).join('')}
         ${s.miss ? `<div class="miss"><b>Missable:</b> ${esc(s.miss)}</div>` : ''}
@@ -302,7 +305,7 @@
       <div class="opt">Markers on the map</div>${seg('al', [[0, 'This step only'], [1, 'Everything']], S.all ? 1 : 0)}
       <p class="credit">The order of the route follows <a href="https://eldenring.redmaw.dev/" target="_blank" rel="noopener">Redmaw's Elden Ring Completion Sheets</a>, and where the wiki has no note the step shows Redmaw's own line. Map images, marker positions and descriptions come from the <a href="https://eldenring.wiki.fextralife.com/" target="_blank" rel="noopener">Fextralife Elden Ring Wiki</a>. Elden Ring is a trademark of its owners; this is a personal fan tool.</p></div>`;
     document.querySelectorAll('#al .btn').forEach(b => b.onclick = () => { S.all = !!+b.dataset.v; save(); drawAll(); renderSettings(); });
-    let armed = false; $('#reset').onclick = e => { if (!armed) { armed = true; e.target.textContent = 'Tap again to erase all progress'; return; } S.st = {}; S.got = {}; S.hist = []; S.tab = 'route'; save(); peek = null; openInfo = null; showOpen = false; render(); };
+    let armed = false; $('#reset').onclick = e => { if (!armed) { armed = true; e.target.textContent = 'Tap again to erase all progress'; return; } S.st = {}; S.got = {}; S.hist = []; S.again = 0; S.tab = 'route'; keptTab = null; save(); peek = null; openInfo = null; showOpen = false; render(); };
   }
 
 

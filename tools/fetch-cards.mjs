@@ -146,5 +146,8 @@ for (const m of uniq) {
   if (!by[m[4]]) none++;
   if (k % 100 === 0) console.log(k, '/', uniq.length, '| fetched', fetched, 'pictures', pics, 'no page', none);
 }
-fs.writeFileSync('app/data/cards.json', JSON.stringify({ by, pages }));
+// v: the pictures' version. The app asks for cards/<file>?v=<v>; count it up after fetching pictures again, so that
+// installed copies (which keep pictures for good) take the new ones.
+const prevV = fs.existsSync('app/data/cards.json') ? (JSON.parse(fs.readFileSync('app/data/cards.json', 'utf8')).v || 1) : 1;
+fs.writeFileSync('app/data/cards.json', JSON.stringify({ v: pics ? prevV + 1 : prevV, by, pages }));
 console.log(`done: ${Object.keys(pages).length} pages for ${Object.keys(by).length} names (${none} names without a page); fetched ${fetched}, new pictures ${pics}; cards.json ${Math.round(fs.statSync('app/data/cards.json').size / 1024)} KB`);
