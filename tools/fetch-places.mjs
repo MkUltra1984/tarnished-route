@@ -83,8 +83,13 @@ for (const [slug, [href, text]] of hrefs) {
       await sleep(250);
     } catch (e) { console.log('no picture for', href, e.message); }
   }
+  // the wiki's own breadcrumb says which region the place is in: Home > World Information > Locations > Altus Plateau > Lux Ruins
+  const crumbs = $('[class*=bread], [id*=bread]').first().text().replace(/\s+/g, ' ').split('>').map(t => t.trim()), ci = crumbs.indexOf('Locations');
+  // ... and the page's info box says it more precisely: "Located In Stormhill"
+  const box = ($('body').text().replace(/\s+/g, ' ').match(/Located In\s+(.{3,40}?)\s+DLC\b/) || [])[1] || null;
+  const region = box || (ci >= 0 && crumbs.length > ci + 2 ? crumbs[ci + 1] : null);
   if (walk.length) withWalk++; if (img) pics++;
-  out[slug] = { title: (clean($('h1').first().text()) || text).replace(/\s*\|.*$/, '').trim() || text, href, walk: walk.slice(0, 400), notes: notes.slice(0, 20), img, links };
+  out[slug] = { title: (clean($('h1').first().text()) || text).replace(/\s*\|.*$/, '').trim() || text, href, walk: walk.slice(0, 400), notes: notes.slice(0, 20), img, links, region };
 }
 fs.writeFileSync('data/places.json', JSON.stringify(out));
 console.log(`fetched ${fetched}, cached ${cached}, no such page ${missing}; ${withWalk} pages have a walkthrough, ${pics} have a picture`);

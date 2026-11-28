@@ -151,3 +151,27 @@ Check now (369 steps): A/B/C pass. D: 1324 objectives named in their own step's 
 text never names (they sit in the nearest step; the app shows the map's own note for them).
 Still open: read-through of the order for playability; "Malenia, Blade of Miquella" merged into the Elphael place step;
 the 144/376 have not been checked one by one.
+
+## UPDATE 11 — route closed out: every objective has a reason, order checked against region gates
+
+`node tools/check-route.mjs` now has hard checks that all pass (exit 0):
+- A: all 1269 walkthrough paragraphs are in the route, none more often than the wiki has them, none out of wiki order.
+- B: all 245 place walkthroughs in full. C: all 5111 markers in exactly one step.
+- F: each of the 2025 objectives is where it is for a stated reason: its step is named after it (22), its step's text
+  names it (1280), its place's own item list has it (195), or it is passed on the way and explained by the map's own
+  note (528). None is named after another step, none is named only by a step that happens closer to it.
+- G: no inserted place comes before the walkthrough opens its region (`tools/regions.mjs`: ENTRY per region, read from
+  each place page's "Located In" box; SPECIAL for five places the walkthrough text itself puts at a point: Divine Tower
+  of Limgrave after "After Godrick", Renna's Rise and Divine Tower of Liurnia after the Nokron step, Mohgwyn after
+  "Cave of the Forlorn", Forge of the Giants right before Crumbling Farum Azula). Base-game steps never follow DLC steps.
+D and E in the output are statistics only.
+
+Rules added this round (all in `tools/build-route.mjs`, each commented where it lives):
+- place regions from the wiki (`fetch-places.mjs` stores `region`); places and loose objectives never before their region opens
+- a place the walkthrough describes later follows that section; waygate-only places follow the step that mentions them
+- last look: an objective far from its step and right next to another one stays only if its step's text links it or
+  writes it as a proper name ("Bolt of Gransax" yes, "iron ball trap" no); place names do not count ("Black Knife Catacombs")
+- "After Godrick" restored (it is not part of the speed run); "Avenue Balcony to West Capital Rampart" is (dropped)
+- wiki's own repeated paragraphs are kept in both steps; expansion steps stay on the expansion map
+The full order (367 steps) was read through once by hand after these rules; the 10 jumps over 1500 px that remain are the
+walkthrough's own area changes and waygates.

@@ -21,6 +21,7 @@ Armor: Gravebird Anklets
 Armor: Gravebird Bracelets - Ruined Forge Lava Intake
 Armor: Gravebird's Blackquill Armor
 Armor: Greathood
+Armor: Haligtree Knight Helm
 Armor: Highland Attire
 Armor: Hoslow's Set
 Armor: Igon's Set
@@ -92,6 +93,7 @@ Ashes of War: Ash of War: Shared Order
 Ashes of War: Ash of War: Shield Bash
 Ashes of War: Ash of War: Storm Assault
 Ashes of War: Ash of War: Storm Wall
+Ashes of War: Ash of War: Stormcaller
 Ashes of War: Ash of War: Sword Dance
 Ashes of War: Ash of War: Unsheathe
 Ashes of War: Ash of War: Vacuum Slice
@@ -103,6 +105,7 @@ Bosses: Cleanrot Knight Duo (Abandoned Cave)
 Bosses: Crucible Knight & Crucible Knight Ordovis
 Bosses: Crucible Knight / Misbegotten Warrior
 Bosses: Crucible Knight Siluria
+Bosses: Crystalians (Trio - Sellia Hideaway)
 Bosses: Demi-Human Queen Marigga
 Bosses: Flying Dragon Greyll
 Bosses: Ghost Troll
@@ -112,10 +115,6 @@ Bosses: Ralva the Great Red Bear
 Flask Upgrades: Cerulean Hidden Tear
 Flask Upgrades: Crimsonburst Crystal Tear
 Flask Upgrades: Glovewort Crystal Tear
-Flask Upgrades: Golden Seed (A) - Crumbling Farum Azula
-Flask Upgrades: Golden Seed (A) - Stormveil Castle
-Flask Upgrades: Golden Seed (B) - Crumbling Farum Azula
-Flask Upgrades: Golden Seed (B) - Stormveil Castle
 Flask Upgrades: Leaden Hardtear
 Flask Upgrades: Opaline Bubbletear
 Flask Upgrades: Opaline Hardtear
@@ -130,7 +129,6 @@ Key Items: Antiquity Scholar's Cookbook [1]
 Key Items: Armorer's Cookbook [1]
 Key Items: Battlefield Priest's Cookbook [3]
 Key Items: Bernahl's Bell Bearing
-Key Items: Black Whetblade
 Key Items: Calm Down Gesture
 Key Items: Champion's Song Painting
 Key Items: Chelona's Rise Turtle Marker 1
@@ -163,7 +161,6 @@ Key Items: Gostoc's Bell Bearing
 Key Items: Grave Keeper's Cookbook [1]
 Key Items: Greasemonger's Bell Bearing
 Key Items: Greater Potentate's Cookbook [12]
-Key Items: Greater Potentate's Cookbook [13] - Ruined Forge Lava Intake
 Key Items: Greater Potentate's Cookbook [14]
 Key Items: Greater Potentate's Cookbook [6]
 Key Items: Greater Potentate's Cookbook [7]
@@ -211,7 +208,6 @@ NPC Invaders: Bloody Finger Ravenmount Assassin
 NPC Invaders: Great Horned Tragoth
 NPC Invaders: Juno Hoslow, Knight of Blood
 NPC Invaders: Moongrum, Carian Knight
-NPC Invaders: Moore (Enemy) - Enir-Ilim
 NPC Invaders: Nameless White Mask
 NPC Invaders: Nameless White Mask
 NPC Invaders: Nameless White Mask
@@ -220,6 +216,8 @@ NPC Invaders: Preceptor Miriam
 NPC Invaders: Recusant Henricus
 NPC Invaders: Rileigh the Idle
 NPC Invaders: Vargram the Raging Wolf
+NPCs: Blaidd (Ranni's Quest - First Location)
+NPCs: Blaidd (Ranni's Quest - Second Location)
 NPCs: D's Twin Brother (Second Location)
 NPCs: D, Hunter of the Dead Summonwater Village
 NPCs: Frustrated Spirit
@@ -235,14 +233,13 @@ NPCs: Nomadic Merchant North Limgrave
 NPCs: Nomadic Merchant West Altus Plateau
 NPCs: Pidia, Carian Servant
 NPCs: The Great-Jar
-NPCs: Thiollier (2nd Location) - Stone Coffin Fissure
 NPCs: Wandering Merchant Caelid Highway North
 NPCs: Wandering Merchant Siofra River
 NPCs: White Mask Varre Invasion Sign
 NPCs: White-Mask Varre (Second Location)
 NPCs: Witch-Hunter Jerren (Third Location)
 Remembrances: Remembrance of the Dancing Lion - Belurat Tower Settlement
-Remembrances: Remembrance of the Grafted
+Remembrances: Remembrance of the Starscourge
 Shields: Beast Crest Heater Shield
 Shields: Beastman's Jar-Shield
 Shields: Eclipse Crest Greatshield
@@ -283,8 +280,10 @@ Spells: Theodorix's Magma
 Spells: Thop's Barrier
 Spells: Whirl, O Flame!
 Spirit Ashes: Albinauric Ashes
+Spirit Ashes: Cleanrot Knight Finlay Ashes
 Spirit Ashes: Divine Bird Warrior Ornis
 Spirit Ashes: Gravebird Ashes
+Spirit Ashes: Haligtree Soldier Ashes
 Spirit Ashes: Land Squirt Ashes
 Spirit Ashes: Marionette Soldier Ashes
 Spirit Ashes: Mausoleum Soldier Ashes
@@ -298,6 +297,7 @@ Talismans: Arrow's Sting Talisman
 Talismans: Blue-Feathered Branchsword
 Talismans: Clarifying Horn Charm +1
 Talismans: Crepus's Vial
+Talismans: Crimson Amber Medallion +3 - Fog Rift Catacombs
 Talismans: Erdtree's Favor +1
 Talismans: Great-Jar's Arsenal
 Talismans: Haligdrake Talisman +2
@@ -323,6 +323,7 @@ Weapons: Cane Sword
 Weapons: Coded Sword
 Weapons: Commander's Standard
 Weapons: Deadly Poison Perfume Bottle
+Weapons: Death Knight's Twin Axes - Fog Rift Catacombs
 Weapons: Death's Poker
 Weapons: Digger's Staff
 Weapons: Dragonscale Blade
@@ -355,6 +356,7 @@ Weapons: Prince of Death's Staff
 Weapons: Red Branch Shortbow
 Weapons: Repeating Crossbow
 Weapons: Rotten Battle Hammer
+Weapons: Rotten Crystal Sword
 Weapons: Royal Greatsword
 Weapons: Sacrificial Axe
 Weapons: Scavenger's Curved Sword
@@ -365,7 +367,6 @@ Weapons: Staff of the Avatar
 Weapons: Staff of the Avatar
 Weapons: Star Fist
 Weapons: Star-Lined Sword
-Weapons: Stone-Sheathed Sword (Altar) - Fog Rift Catacombs
 Weapons: Stone-Sheathed Sword Altar
 Weapons: Sword of Milos
 Weapons: Sword of Milos
