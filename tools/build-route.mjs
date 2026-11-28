@@ -461,6 +461,14 @@ for (const st of [...steps]) {
 // an inserted place carries the area name of the step it follows
 steps.forEach((st, i) => { if (st.src !== 'walk' && i && steps[i - 1].game === st.game) st.region = steps[i - 1].region; });
 
+// The opening fight in the Chapel of Anticipation is meant to be lost. The Grafted Scion, its two drops and the
+// chapel's other pickups are the ones you return for through the waygate at The Four Belfries, so they belong to that step.
+{ const from = steps.find(s => s.title === 'The Chapel of Anticipation'), to = steps.find(s => s.title === 'The Four Belfries');
+  const back = new Set(['Grafted Scion (Tutorial)', 'Golden Beast Crest Shield', 'Ornamental Straight Sword', 'Stormhawk Deenh', 'The Stormhawk King']);
+  if (from && to) { const mv = from.m.filter(k => back.has(all.get(k).title)); from.m = from.m.filter(k => !mv.includes(k)); to.m.push(...mv);
+    from.text = [...from.text, 'The Grafted Scion here is meant to kill you. You come back for it, its drops and the items of the chapel much later, through the waygate at The Four Belfries.'];
+    log.push('moved to "The Four Belfries": ' + mv.map(k => all.get(k).title).join(', ')); } }
+
 // ---- write ----
 const order = [...all.values()], idx = new Map(order.map((m, i) => [m.key, i])), ids = new Set();
 const outSteps = steps.map(st => {
@@ -492,4 +500,5 @@ const head = R.length;
 R.push('', '--- order ---', ...steps.map((s, i) => `${i + 1}. [${s.src}] ${s.region} / ${s.title} (${s.map}, ${grabCount(s)} objectives)`), '', '--- sections not turned into steps ---', ...log);
 fs.writeFileSync('data/route-report.txt', R.join('\n'));
 console.log(R.slice(0, head).join('\n'));
+await import('./boss-drops.mjs');   // adds each boss's own drops to markers.json
 console.log('route.json', kb('app/data/route.json'), 'markers.json', kb('app/data/markers.json'));

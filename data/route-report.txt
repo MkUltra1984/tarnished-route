@@ -19,7 +19,7 @@ jumps over 1500 px between consecutive steps: 10
   1503 px: Jagged Peak -> Shadow Keep Depths (Main Gate to Recluse River)
 
 --- order ---
-1. [walk] Limgrave / The Chapel of Anticipation (overland, 6 objectives)
+1. [walk] Limgrave / The Chapel of Anticipation (overland, 1 objectives)
 2. [walk] Limgrave / Tutorial - Stranded Graveyard (overland, 5 objectives)
 3. [place] Limgrave / Fringefolk Hero's Grave (overland, 8 objectives)
 4. [walk] Entering Limgrave / Limgrave - Church of Elleh (overland, 1 objectives)
@@ -122,7 +122,7 @@ jumps over 1500 px between consecutive steps: 10
 101. [walk] Liurnia of the Lakes: West / Minor Erdtree & Road's End Catacombs (overland, 8 objectives)
 102. [walk] Liurnia of the Lakes: West / Revenger's Shack - Edgar, the Revenger (overland, 4 objectives)
 103. [walk] Liurnia of the Lakes: West / Cuckoo's Evergaol (overland, 2 objectives)
-104. [walk] Liurnia of the Lakes: West / The Four Belfries (overland, 3 objectives)
+104. [walk] Liurnia of the Lakes: West / The Four Belfries (overland, 8 objectives)
 105. [walk] Liurnia of the Lakes: West / Kingsrealm Ruins (overland, 4 objectives)
 106. [map] Liurnia of the Lakes: West / Testu's Rise (overland, 2 objectives)
 107. [walk] Liurnia of the Lakes: West / Meet Smithing Master Iji (overland, 2 objectives)
@@ -547,3 +547,4 @@ moved after "Nokron, Eternal City and Ranni's Quest" (the walkthrough says so): 
 moved after "Cave of the Forlorn" (the walkthrough says so): Mohgwyn Dynasty Mausoleum
 moved before "Crumbling Farum Azula" (the walkthrough says so): Forge of the Giants
 moved behind "West Capital Rampart" (reached from there): Isolated Divine Tower
+moved to "The Four Belfries": Grafted Scion (Tutorial), Golden Beast Crest Shield, Ornamental Straight Sword, Stormhawk Deenh, The Stormhawk King

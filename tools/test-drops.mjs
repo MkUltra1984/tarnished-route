@@ -1,0 +1,24 @@
+// Checks that a boss's drops are not listed on their own and get ticked with the boss. Needs: node tools/serve.mjs
+import { chromium } from 'playwright';
+import fs from 'node:fs';
+const base = process.argv[2] || 'http://localhost:8123/', R = JSON.parse(fs.readFileSync('app/data/route.json', 'utf8')), MK = JSON.parse(fs.readFileSync('app/data/markers.json', 'utf8'));
+const browser = await chromium.launch(), ctx = await browser.newContext({ viewport: { width: 412, height: 915 }, deviceScaleFactor: 2, hasTouch: true }), page = await ctx.newPage();
+let fails = 0; const ok = (c, m) => { console.log((c ? 'PASS ' : 'FAIL ') + m); if (!c) fails++; };
+const at = R.findIndex(s => s.title === 'The Four Belfries'), scion = MK.list.findIndex(m => m[4] === 'Grafted Scion (Tutorial)'), drops = MK.drops[scion];
+ok(!R[0].m.includes(scion) && R[at].m.includes(scion), 'Grafted Scion belongs to The Four Belfries, not to step 1');
+await page.goto(base + '?step=0'); await page.waitForSelector('.title'); await page.screenshot({ path: 'shots/drops-step1.png' });
+ok(await page.locator(`.chk[data-i="${scion}"]`).count() === 0, 'step 1 does not list the Grafted Scion');
+await page.goto(base + '?step=' + at); await page.waitForSelector('.title');
+ok(await page.locator(`.chk[data-i="${scion}"]`).count() === 1, 'the boss is listed in The Four Belfries');
+for (const d of drops) ok(await page.locator(`.chk[data-i="${d}"]`).count() === 0, 'drop is not a row of its own: ' + MK.list[d][4]);
+ok((await page.locator(`.chk[data-i="${scion}"] .cn small`).innerText()).includes('Golden Beast Crest Shield'), 'the boss row names its drops');
+await page.locator(`.chk[data-i="${scion}"]`).scrollIntoViewIfNeeded(); await page.locator(`.chk[data-i="${scion}"] .box`).click(); await page.waitForTimeout(200);
+let got = await page.evaluate(() => JSON.parse(localStorage.getItem('tarnished-route-v2')).got);
+ok(got[scion] && drops.every(d => got[d]), 'ticking the boss ticks its drops');
+await page.screenshot({ path: 'shots/drops-belfries.png' });
+await page.goto(base + '?tab=collection'); await page.waitForSelector('.group'); await page.locator('.group[data-c="Shields"]').click(); await page.waitForTimeout(300);
+ok(await page.locator(`.row.got[data-i="${drops[0]}"]`).count() === 1, 'the drop shows as collected in the Collection tab');
+await page.locator(`.row[data-i="${drops[0]}"] [data-tick]`).click(); await page.waitForTimeout(200);
+got = await page.evaluate(() => JSON.parse(localStorage.getItem('tarnished-route-v2')).got);
+ok(!got[scion] && drops.every(d => !got[d]), 'unticking the drop unticks the boss and its other drops');
+await browser.close(); console.log(fails ? fails + ' FAILED' : 'ALL PASSED'); process.exit(fails ? 1 : 0);

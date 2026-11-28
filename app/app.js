@@ -10,11 +10,15 @@
   const TABS = [['route', 'Route'], ['bosses', 'Bosses'], ['collection', 'Collection'], ['quests', 'Quests']];
   const M = MK.list.map((a, i) => ({ i, map: MK.maps[a[0]], x: a[1], y: a[2], cat: a[3], title: a[4], desc: a[5], f: MK.cats[a[3]].f, label: MK.cats[a[3]].label, kind: MK.cats[a[3]].kind }));
   const BOSSES = M.filter(m => m.cat === 'Bosses');
+  // a boss's own drops are not objectives of their own: they are ticked together with the boss
+  const DROPS = MK.drops || {}, dropOf = new Map(); for (const b in DROPS) for (const i of DROPS[b]) dropOf.set(i, +b);
+  const syncDrops = () => { for (const b in DROPS) for (const i of DROPS[b]) { if (S.got[b]) S.got[i] = 1; else delete S.got[i]; } };
 
   // ---------- saved progress ----------
   const KEY = 'tarnished-route-v2';   // v2: steps are saved by their stable id, so rebuilding the route keeps your progress
   const S = Object.assign({ st: {}, got: {}, hist: [], size: 18, extras: false, all: false, tab: 'route' }, JSON.parse(localStorage.getItem(KEY) || '{}'));
-  const save = () => localStorage.setItem(KEY, JSON.stringify(S));
+  const save = () => { syncDrops(); localStorage.setItem(KEY, JSON.stringify(S)); };
+  syncDrops();
   const q = new URLSearchParams(location.search);
   let peek = q.has('step') ? +q.get('step') : null;          // look at a step without changing progress
   if (q.has('tab')) S.tab = q.get('tab');
@@ -30,7 +34,7 @@
   }
   const nextAfter = s => { const at = ROUTE.indexOf(s); return ROUTE.find((x, i) => i > at && !S.st[x.id]) || ROUTE.find(x => x !== s && !S.st[x.id]); };
   const doneCount = () => ROUTE.filter(x => S.st[x.id] === 'd').length;
-  const grabOf = s => [...new Set([...s.m, ...s.n])].map(i => M[i]).filter(m => m.kind === 'g');
+  const grabOf = s => [...new Set([...s.m, ...s.n])].map(i => M[i]).filter(m => m.kind === 'g' && !dropOf.has(m.i));
   const extraOf = s => s.n.map(i => M[i]).filter(m => m.kind === 'x');
 
   // ---------- map ----------
@@ -56,7 +60,7 @@
   const explain = mk => mk.bindTooltip(mk.options.title, { direction: 'top', offset: [0, -SIZE / 2], className: 'tt' }).bindPopup(tipHTML(mk.options.m), { className: 'tip', closeButton: false, offset: [0, -SIZE / 2 + 4], maxWidth: 280, autoPanPadding: [16, 16] });
   function drawStep(s, fit) {
     setMap(s.map); stepLayer.clearLayers(); markerOf.clear(); spot.clearLayers();
-    const show = [...new Set([...s.m, ...s.n])].map(i => M[i]).filter(m => s.m.includes(m.i) ? true : m.kind === 'g' || (m.kind === 'x' && S.extras));
+    const show = [...new Set([...s.m, ...s.n])].map(i => M[i]).filter(m => !dropOf.has(m.i) && (s.m.includes(m.i) ? true : m.kind === 'g' || (m.kind === 'x' && S.extras)));
     for (const m of show) { const mk = L.marker(ll(m.x, m.y), { icon: symIcon(m), zIndexOffset: m.kind === 'g' ? 200 : 0, title: m.title, m }).addTo(stepLayer); explain(mk); mk.on('click', () => focusRow(m.i)); markerOf.set(m.i, mk); }
     for (const m of nearbyLeft(s)) { if (markerOf.has(m.i)) continue; const mk = L.marker(ll(m.x, m.y), { icon: symIcon(m), zIndexOffset: 150, title: m.title, m }).addTo(stepLayer); explain(mk); mk.on('click', () => focusRow(m.i)); markerOf.set(m.i, mk); }
     L.marker(ll(s.x, s.y), { icon: pinIcon, zIndexOffset: 1000, interactive: false }).addTo(stepLayer);
@@ -103,7 +107,7 @@
   function wireRows(root) {
     root.querySelectorAll('.row').forEach(r => r.onclick = e => {
       const m = M[+r.dataset.i];
-      if (e.target.closest('[data-tick]')) { if (S.got[m.i]) delete S.got[m.i]; else S.got[m.i] = 1; save(); r.classList.toggle('got', !!S.got[m.i]); const mk = markerOf.get(m.i); if (mk) mk.setIcon(symIcon(m)); refreshCounts(); return; }
+      if (e.target.closest('[data-tick]')) { const t = dropOf.has(m.i) ? dropOf.get(m.i) : m.i; if (S.got[t]) delete S.got[t]; else S.got[t] = 1; save(); root.querySelectorAll('.row').forEach(x => x.classList.toggle('got', !!S.got[+x.dataset.i])); const mk = markerOf.get(m.i); if (mk) mk.setIcon(symIcon(m)); refreshCounts(); return; }
       showSpot(m, true);
     });
   }
@@ -117,7 +121,7 @@
   // header, and whatever is still open at the very end comes back as its own steps.
   let openInfo = null, showOpen = false;   // openInfo: the objective whose wiki note is unfolded
   const NEAR = 0.04;                        // about 330 px on the 8192 px map: "you are passing by"
-  const leftOpen = () => M.filter(m => m.kind === 'g' && !S.got[m.i] && stepOf.has(m.i) && S.st[ROUTE[stepOf.get(m.i)].id]);
+  const leftOpen = () => M.filter(m => m.kind === 'g' && !dropOf.has(m.i) && !S.got[m.i] && stepOf.has(m.i) && S.st[ROUTE[stepOf.get(m.i)].id]);
   function nearbyLeft(s) {
     const mine = new Set([...s.m, ...s.n]), pts = [[s.x, s.y], ...s.m.map(i => [M[i].x, M[i].y])];
     return leftOpen().filter(m => m.map === s.map && !mine.has(m.i) && pts.some(p => Math.hypot(p[0] - m.x, p[1] - m.y) < NEAR));
@@ -134,7 +138,7 @@
     refreshCounts = () => { all.forEach(m => settle(m.i)); save(); const y = $('.list').scrollTop; renderOpen(); $('.list').scrollTop = y; };
   }
   function checkHTML(m, sub) {
-    return `<button class="chk${S.got[m.i] ? ' got' : ''}" data-i="${m.i}"><img class="ci" data-pan="${m.i}" src="icons/${m.f}.png" alt=""><span class="cn">${esc(m.title)}</span><span class="cc">${esc(typeof sub === 'string' ? sub : m.label)}</span><span class="box" data-tick="1" aria-hidden="true"></span></button>${openInfo === m.i ? `<div class="info">${esc(m.desc || "The wiki map has no extra note for this one.")}</div>` : ""}`;
+    return `<button class="chk${S.got[m.i] ? ' got' : ''}" data-i="${m.i}"><img class="ci" data-pan="${m.i}" src="icons/${m.f}.png" alt=""><span class="cn">${DROPS[m.i] ? `<span class="nm">${esc(m.title)}</span><small>Drops ${esc(DROPS[m.i].map(i => baseName(M[i].title)).join(', '))}</small>` : esc(m.title)}</span><span class="cc">${esc(typeof sub === 'string' ? sub : m.label)}</span><span class="box" data-tick="1" aria-hidden="true"></span></button>${openInfo === m.i ? `<div class="info">${esc(m.desc || "The wiki map has no extra note for this one.")}${DROPS[m.i] ? `<br><br>Drops, ticked together with the boss: ${esc(DROPS[m.i].map(i => M[i].title).join(', '))}.` : ''}</div>` : ""}`;
   }
   const shot = (f, cls) => f ? `<img class="shot ${cls || ''}" loading="lazy" src="walk/${esc(f)}" alt="">` : '';
   function zoomPicture(src) { const sh = $('#sheet'); sh.hidden = false; sh.innerHTML = `<img class="bigshot" src="${src}" alt="">`; sh.onclick = () => { sh.hidden = true; sh.innerHTML = ''; }; }

@@ -215,3 +215,9 @@ Not done: nobody has started the game with it yet. The Gauntlet tab in the app s
   100000-102999 back into ShopLineupParam (vanilla regulation unpacked in `gauntlet-tools\work-vanilla`); regulation
   repacked from `gauntlet-tools\work-verify`, round-trip checked (194 tables identical to intent).
 - Still untested in the game.
+- Boss drops (owner request): `tools/boss-drops.mjs` (run by build-route) writes `drops` into markers.json: 245 items on
+  194 bosses, read from the wiki notes ("Dropped by X") and matched to the boss marker beside them. The app does not list
+  them as objectives; the boss row names them and ticking the boss ticks them (and the other way round in Collection).
+  Test: `node tools/test-drops.mjs`.
+- The Grafted Scion (Tutorial), its drops and the chapel's Stormhawk items moved from step 1 to The Four Belfries
+  (build-route.mjs, just before "write").

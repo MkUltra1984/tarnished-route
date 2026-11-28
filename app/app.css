@@ -224,3 +224,9 @@ button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:poin
 .title{-webkit-line-clamp:2}
 .reg{font-weight:600;font-size:13px;line-height:18px;letter-spacing:.06em;text-transform:uppercase;color:var(--text-3);margin-top:3px}
 .shot.lead{float:none;display:block;width:100%;max-width:none;height:150px;object-fit:cover;margin:2px 0 12px;border-radius:6px}
+
+.cn:has(small){white-space:normal;text-decoration:none!important}
+.cn .nm,.cn small{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cn small{font-size:13px;line-height:18px;font-weight:600;color:var(--text-3)}
+.chk.got .cn .nm{text-decoration:line-through}
+.chk:has(.cn small){min-height:58px}
