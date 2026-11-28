@@ -5,7 +5,7 @@
   const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
   const json = (u, fallback) => fetch(u).then(r => r.ok ? r.json() : Promise.reject()).catch(() => fallback);
 
-  const [ROUTE, MK, TILES, ART] = await Promise.all([json('data/route.json'), json('data/markers.json'), json('tiles/meta.json', {}), json('data/art.json', {})]);
+  const [ROUTE, MK, TILES, CARDS] = await Promise.all([json('data/route.json'), json('data/markers.json'), json('tiles/meta.json', {}), json('data/cards.json', { by: {}, pages: {} })]);
   const MAPNAME = { overland: 'The Lands Between', underground: 'Underground', ashen: 'Leyndell, Ashen Capital', shadow: 'Realm of Shadow' };
   const TABS = [['route', 'Route'], ['bosses', 'Bosses'], ['collection', 'Collection'], ['quests', 'Quests'], ['materials', 'Materials'], ['settings', 'Settings']];
   const M = MK.list.map((a, i) => ({ i, map: MK.maps[a[0]], x: a[1], y: a[2], cat: a[3], title: a[4], desc: a[5], f: MK.cats[a[3]].f, label: MK.cats[a[3]].label, kind: MK.cats[a[3]].kind }));
@@ -99,19 +99,41 @@
   addEventListener('resize', () => { placeMapButton(); map.invalidateSize(); });
 
   // ---------- rows ----------
-  const artOf = m => ART[m.title];
+  const artOf = m => { const c = CARDS.pages[CARDS.by[m.title]]; return c && c.img; };
   function rowHTML(m, sub, name) {
     const art = artOf(m);
-    return `<button class="row${S.got[m.i] ? ' got' : ''}" data-i="${m.i}"><span class="tile" data-tick="${m.i}"><img ${art ? `class="art" src="items/${esc(art)}"` : `src="icons/${m.f}.png"`} alt=""><span class="tick">&#10003;</span></span><span class="txt"><span class="name">${esc(name || m.title)}</span><span class="cat">${esc(sub || m.label)}</span></span></button>`;
+    return `<button class="row${S.got[m.i] ? ' got' : ''}" data-i="${m.i}"><span class="tile" data-tick="${m.i}"><img ${art ? `class="art${/jpg$/.test(art) ? ' ph' : ''}" src="cards/${esc(art)}" loading="lazy"` : `src="icons/${m.f}.png"`} alt=""><span class="tick">&#10003;</span></span><span class="txt"><span class="name">${esc(name || m.title)}</span><span class="cat">${esc(sub || m.label)}</span></span></button>`;
   }
   function wireRows(root) {
     root.querySelectorAll('.row').forEach(r => r.onclick = e => {
       const m = M[+r.dataset.i];
       if (e.target.closest('[data-tick]')) { const t = dropOf.has(m.i) ? dropOf.get(m.i) : m.i; if (S.got[t]) delete S.got[t]; else S.got[t] = 1; save(); root.querySelectorAll('.row').forEach(x => x.classList.toggle('got', !!S.got[+x.dataset.i])); const mk = markerOf.get(m.i); if (mk) mk.setIcon(symIcon(m)); refreshCounts(); return; }
-      showSpot(m, true);
+      showSpot(m, true); openCard(m);
     });
   }
   let refreshCounts = () => {};
+
+  // ---------- cards: the wiki's picture and notes for a boss or an item ----------
+  const cardOf = m => CARDS.pages[CARDS.by[m.title]] || null;
+  function openCard(m) {
+    const c = cardOf(m); if (!c) return false;
+    const sh = $('#sheet'), para = a => a.map(p => p.startsWith('## ') ? `<h4>${esc(p.slice(3))}</h4>` : `<li>${esc(p)}</li>`).join('');
+    const sec = (title, a) => a && a.length ? `<h3>${title}</h3><ul>${para(a)}</ul>` : '';
+    const drops = DROPS[m.i] ? `<h3>Drops</h3><ul>${DROPS[m.i].map(i => `<li>${esc(M[i].title)}</li>`).join('')}</ul>` : '';
+    sh.hidden = false;
+    sh.innerHTML = `<div class="panel card"><button class="cx" aria-label="Close">&times;</button>
+      ${c.img ? `<div class="cpic${c.boss ? ' boss' : ''}"><img src="cards/${esc(c.img)}" alt=""></div>` : ''}
+      <h2>${esc(m.title)}</h2><div class="over">${esc(m.label)} &middot; ${esc(MAPNAME[m.map])}</div>
+      ${m.desc ? `<p class="cnote">${esc(m.desc)}</p>` : ''}
+      ${c.intro.length ? c.intro.map(p => `<p>${esc(p)}</p>`).join('') : ''}
+      ${c.boss ? sec('Key facts', c.facts) + drops + sec('Strategy', c.strat) : sec('Where to find', c.where)}
+      <div class="seg cbtn"><button class="btn" id="cmap">Show on map</button><button class="btn${S.got[m.i] ? ' on' : ''}" id="ctick">${S.got[m.i] ? '&#10003; ' : ''}${c.boss ? 'Defeated' : 'Collected'}</button></div>
+      <p class="credit">Picture and text from the <a href="https://eldenring.wiki.fextralife.com/${encodeURIComponent(CARDS.by[m.title]).replace(/%20/g, '+')}" target="_blank" rel="noopener">Fextralife Elden Ring Wiki</a>.</p></div>`;
+    const close = () => { sh.hidden = true; sh.innerHTML = ''; sh.onclick = null; };
+    sh.onclick = e => { if (e.target === sh) close(); }; $('.cx', sh).onclick = close; $('#cmap').onclick = () => { close(); showSpot(m, true); };
+    $('#ctick').onclick = () => { const t = dropOf.has(m.i) ? dropOf.get(m.i) : m.i; if (S.got[t]) delete S.got[t]; else S.got[t] = 1; settle(t); save(); close(); render(); };
+    return true;
+  }
 
   // ---------- Route tab ----------
   // Every objective has its own tick. "Next step" moves on: a step with everything ticked is done; a step with open
@@ -140,7 +162,7 @@
   function checkHTML(m, sub) {
     // the symbol already says what kind of thing it is; the second line is only for what the name cannot say
     const note = [typeof sub === 'string' ? sub : '', DROPS[m.i] ? 'Drops ' + DROPS[m.i].map(i => baseName(M[i].title)).join(', ') : ''].filter(Boolean).join(' · ');
-    return `<button class="chk${S.got[m.i] ? ' got' : ''}" data-i="${m.i}"><img class="ci" data-pan="${m.i}" src="icons/${m.f}.png" alt=""><span class="cn">${note ? `<span class="nm">${esc(m.title)}</span><small>${esc(note)}</small>` : esc(m.title)}</span><span class="box" data-tick="1" aria-hidden="true"></span></button>${openInfo === m.i ? `<div class="info">${esc(m.desc || "The wiki map has no extra note for this one.")}${DROPS[m.i] ? `<br><br>Drops, ticked together with the boss: ${esc(DROPS[m.i].map(i => M[i].title).join(', '))}.` : ''}</div>` : ""}`;
+    return `<button class="chk${S.got[m.i] ? ' got' : ''}" data-i="${m.i}"><img class="ci" data-pan="${m.i}" src="icons/${m.f}.png" alt=""><span class="cn">${note ? `<span class="nm">${esc(m.title)}</span><small>${esc(note)}</small>` : esc(m.title)}</span><span class="box" data-tick="1" aria-hidden="true"></span></button>${openInfo === m.i ? `<div class="info">${esc(m.desc || "The wiki map has no extra note for this one.")}${DROPS[m.i] ? `<br><br>Drops, ticked together with the boss: ${esc(DROPS[m.i].map(i => M[i].title).join(', '))}.` : ''}${cardOf(m) ? `<button class="link more" data-card="${m.i}">Picture and details &rsaquo;</button>` : ''}</div>` : ""}`;
   }
   const shot = (f, cls) => f ? `<img class="shot ${cls || ''}" loading="lazy" src="walk/${esc(f)}" alt="">` : '';
   function zoomPicture(src) { const sh = $('#sheet'); sh.hidden = false; sh.innerHTML = `<img class="bigshot" src="${src}" alt="">`; sh.onclick = () => { sh.hidden = true; sh.innerHTML = ''; }; }
@@ -181,6 +203,7 @@
       const mk = markerOf.get(m.i); if (mk) mk.setIcon(symIcon(m));
       renderRoute();
     });
+    pane.querySelectorAll('[data-card]').forEach(b => b.onclick = () => openCard(M[+b.dataset.card]));
     const allb = $('#allb', pane); if (allb) allb.onclick = () => { grab.forEach(m => { if (open) S.got[m.i] = 1; else delete S.got[m.i]; }); settle(grab[0].i); save(); renderRoute(); drawStep(s, false); };
     const xt = $('#xt', pane); if (xt) xt.onclick = () => { S.extras = !S.extras; save(); renderRoute(); drawStep(s, false); };
     const ob = $('#openb', pane); if (ob) ob.onclick = () => { showOpen = true; renderRoute(); };

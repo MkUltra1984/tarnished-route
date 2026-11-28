@@ -233,3 +233,19 @@ button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:poin
 
 .set .btn{width:100%}.set .danger{border-color:var(--danger);color:var(--danger);margin-top:8px}
 .group .meta{white-space:nowrap;flex:none;margin-left:12px}.group>span:first-child{min-width:0;text-align:left}
+
+/* cards: wiki picture and notes for a boss or an item */
+.card{position:relative;padding-top:16px}
+.card .cx{position:absolute;right:8px;top:8px;width:40px;height:40px;border-radius:20px;background:rgba(14,13,10,.7);color:var(--text);font-size:26px;line-height:36px;z-index:2}
+.cpic{margin:-16px -24px 16px;background:#3a352b;display:grid;place-items:center;padding:20px;border-radius:8px 8px 0 0}
+.cpic img{max-width:60%;max-height:240px;object-fit:contain;filter:drop-shadow(0 4px 10px rgba(0,0,0,.5))}
+.cpic.boss{padding:0;background:#0e0d0a}.cpic.boss img{max-width:100%;max-height:320px;width:100%;object-fit:cover;object-position:50% 20%;border-radius:8px 8px 0 0;filter:none}
+.card h2{margin:0 40px 4px 0}
+.card h3{font-family:Marcellus,Georgia,serif;font-weight:400;font-size:20px;line-height:26px;margin:20px 0 8px;color:var(--gold)}
+.card h4{font-weight:700;font-size:14px;letter-spacing:.06em;text-transform:uppercase;color:var(--text-3);margin:12px 0 4px;list-style:none}
+.card p,.card li{font-size:16px;line-height:24px;color:var(--text-2)}
+.card p{margin:12px 0 0}.card ul{margin:0;padding:0 0 0 18px}.card li{margin:0 0 8px}
+.card .cnote{color:var(--text)}
+.card .cbtn{margin-top:20px}.card .credit{margin-top:16px}
+.link.more{display:block;padding:8px 0 0;min-height:34px}
+.tile img.art.ph{width:100%;height:100%;object-fit:cover;object-position:50% 20%;border-radius:4px}
