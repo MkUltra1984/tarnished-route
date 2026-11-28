@@ -12,7 +12,7 @@ import { ENTRY, SPECIAL, canonRegion } from './regions.mjs';
 const R = JSON.parse(fs.readFileSync('app/data/route.json', 'utf8')), MK = JSON.parse(fs.readFileSync('app/data/markers.json', 'utf8'));
 const PLACES = JSON.parse(fs.readFileSync('data/places.json', 'utf8')), report = fs.readFileSync('data/route-report.txt', 'utf8');
 const clean = s => (s || '').replace(/<[^>]+>/g, ' ').replace(/&amp;/g, '&').replace(/&nbsp;/g, ' ').replace(/\s+/g, ' ').trim();
-const tidy = t => t.replace(/^[^.]*Click on the image above to enlarge it\.\s*/i, '').replace(/(You can )?click HERE for the map'?s coordinates\.?\s*/gi, '').replace(/\[\s*(Elden Ring )?Map (Coordinates|Link)[^\]]*\]/gi, '').replace(/\[\s*Map\s*\]/gi, '').replace(/\(\s*\)/g, '').replace(/\s+([.,;:!?])/g, '$1').replace(/\s{2,}/g, ' ').trim();
+const tidy = t => t.replace(/^[^.]*Click on the image above to enlarge it\.\s*/i, '').replace(/(You can )?click HERE for the map'?s coordinates\.?\s*/gi, '').replace(/\[\s*(Elden Ring )?Map (Coordinates|Link)[^\]]*\]/gi, '').replace(/\[\s*Map\s*\]/gi, '').replace(/\(\s*(Elden Ring )?(Interactive )?Map (Coordinates|Link)[^)]*\)/gi, '').replace(/(Elden Ring )?(Interactive )?Map (Coordinates|Link)( Here| for [^.)]{0,40})?\.?/gi, '').replace(/,?\s*\(?\s*(you can |please )?click here\b\s*\)?/gi, '').replace(/\(\s*\)/g, '').replace(/\s+([.,;:!?])/g, '$1').replace(/\s{2,}/g, ' ').trim();
 const key = t => tidy(clean(t)).toLowerCase().replace(/[^a-z0-9]/g, '').slice(0, 60);
 const out = [], say = s => { out.push(s); };
 let hardFail = 0;

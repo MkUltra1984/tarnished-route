@@ -32,7 +32,7 @@ const HEADER = /walkthrough\s*-\s*(.+)$/i;
 const SPEEDRUN = new Set(['Entry to Cliffside', 'Cliffside to Rampart Tower', 'Rampart Towers to Liftside Chamber', 'Liftside Chamber to the Courtyard and Godrick', 'East Capital Rampart to Avenue Balcony', 'Avenue Balcony to West Capital Rampart', 'West Capital Rampart to Spectral Godfrey', 'Erdtree Sanctuary to Morgott']);
 const clean = s => (s || '').replace(/<[^>]+>/g, ' ').replace(/&amp;/g, '&').replace(/&nbsp;/g, ' ').replace(/\s+/g, ' ').trim();
 const tidy = t => t.replace(/^[^.]*Click on the image above to enlarge it\.\s*/i, '').replace(/(You can )?click HERE for the map'?s coordinates\.?\s*/gi, '')
-  .replace(/\[\s*(Elden Ring )?Map (Coordinates|Link)[^\]]*\]/gi, '').replace(/\[\s*Map\s*\]/gi, '').replace(/\(\s*\)/g, '').replace(/\s+([.,;:!?])/g, '$1').replace(/\s{2,}/g, ' ').trim();
+  .replace(/\[\s*(Elden Ring )?Map (Coordinates|Link)[^\]]*\]/gi, '').replace(/\[\s*Map\s*\]/gi, '').replace(/\(\s*(Elden Ring )?(Interactive )?Map (Coordinates|Link)[^)]*\)/gi, '').replace(/(Elden Ring )?(Interactive )?Map (Coordinates|Link)( Here| for [^.)]{0,40})?\.?/gi, '').replace(/,?\s*\(?\s*(you can |please )?click here\b\s*\)?/gi, '').replace(/\(\s*\)/g, '').replace(/\s+([.,;:!?])/g, '$1').replace(/\s{2,}/g, ' ').trim();
 const norm = s => clean(s).toLowerCase().replace(/[‘’`]/g, "'").trim();
 // a marker's plain name: without "(First Location)", "[2]", " - Crumbling Farum Azula" and the like, so it can be found in the text
 const bare = s => { let t = s.replace(/[‘’]/g, "'"), p; do { p = t; t = t.replace(/\s*\([^)]*\)\s*$/, '').replace(/\s*\[\d+\]\s*$/, '').replace(/\s+-\s+.*$/, '').trim(); } while (t !== p && t); return t || p; };
