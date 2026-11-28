@@ -225,3 +225,9 @@ button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:poin
 .chk{grid-template-columns:32px minmax(0,1fr) minmax(0,auto) 28px}
 .cc{max-width:34vw;overflow:hidden;text-overflow:ellipsis}
 @media (min-width:840px){.cc{max-width:150px}}
+
+/* readable header and text: the region gets its own line instead of being cut off, the title may wrap, and the
+   step picture sits above the text instead of squeezing it into a narrow column */
+.title{-webkit-line-clamp:2}
+.reg{font-weight:600;font-size:13px;line-height:18px;letter-spacing:.06em;text-transform:uppercase;color:var(--text-3);margin-top:3px}
+.shot.lead{float:none;display:block;width:100%;max-width:none;height:150px;object-fit:cover;margin:2px 0 12px;border-radius:6px}
