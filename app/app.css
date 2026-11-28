@@ -281,9 +281,9 @@ button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:poin
 /* phones: the system's gesture bar lies over the bottom 20 px or so of the page, so the tab labels stay above it */
 @media (pointer:coarse) and (max-width:559px){
   #app{grid-template-rows:clamp(200px,30dvh,300px) 1fr auto}
-  #tabs{padding-bottom:max(22px,env(safe-area-inset-bottom))}
+  #tabs{padding-bottom:max(4px,env(safe-area-inset-bottom))}
 }
 @media (pointer:coarse) and (max-height:479px) and (orientation:landscape){
   #app{grid-template-rows:1fr auto}
-  #tabs{padding-bottom:max(14px,env(safe-area-inset-bottom))}
+  #tabs{padding-bottom:max(2px,env(safe-area-inset-bottom))}
 }
