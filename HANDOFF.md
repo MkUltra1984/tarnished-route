@@ -267,3 +267,6 @@ Not done: nobody has started the game with it yet. The Gauntlet tab in the app s
   neighbours. Result: 1,402 steps, 1,921 of 2,025 objectives in the sheet's order, 208 not placed by the sheet
   (137 of them are not in the sheet at all). `node tools/redmaw-audit.mjs --all` lists them (data/redmaw-audit.txt).
 - App: when the route is rebuilt, saved ticks are carried over to step progress (carryOver in app.js).
+- raw/redmaw/ (the four sheet pages) and raw/index/, raw/cards/ (saved wiki pages) are NOT in the repository. Refetch the
+  sheets with: curl -sL https://raw.githubusercontent.com/rdmaw/elden-ring-completion-sheets/HEAD/sheets/<name>.html
+  for walkthrough, dlc-walkthrough, npc-walkthrough, questlines.
