@@ -138,7 +138,9 @@
     refreshCounts = () => { all.forEach(m => settle(m.i)); save(); const y = $('.list').scrollTop; renderOpen(); $('.list').scrollTop = y; };
   }
   function checkHTML(m, sub) {
-    return `<button class="chk${S.got[m.i] ? ' got' : ''}" data-i="${m.i}"><img class="ci" data-pan="${m.i}" src="icons/${m.f}.png" alt=""><span class="cn">${DROPS[m.i] ? `<span class="nm">${esc(m.title)}</span><small>Drops ${esc(DROPS[m.i].map(i => baseName(M[i].title)).join(', '))}</small>` : esc(m.title)}</span><span class="cc">${esc(typeof sub === 'string' ? sub : m.label)}</span><span class="box" data-tick="1" aria-hidden="true"></span></button>${openInfo === m.i ? `<div class="info">${esc(m.desc || "The wiki map has no extra note for this one.")}${DROPS[m.i] ? `<br><br>Drops, ticked together with the boss: ${esc(DROPS[m.i].map(i => M[i].title).join(', '))}.` : ''}</div>` : ""}`;
+    // the symbol already says what kind of thing it is; the second line is only for what the name cannot say
+    const note = [typeof sub === 'string' ? sub : '', DROPS[m.i] ? 'Drops ' + DROPS[m.i].map(i => baseName(M[i].title)).join(', ') : ''].filter(Boolean).join(' · ');
+    return `<button class="chk${S.got[m.i] ? ' got' : ''}" data-i="${m.i}"><img class="ci" data-pan="${m.i}" src="icons/${m.f}.png" alt=""><span class="cn">${note ? `<span class="nm">${esc(m.title)}</span><small>${esc(note)}</small>` : esc(m.title)}</span><span class="box" data-tick="1" aria-hidden="true"></span></button>${openInfo === m.i ? `<div class="info">${esc(m.desc || "The wiki map has no extra note for this one.")}${DROPS[m.i] ? `<br><br>Drops, ticked together with the boss: ${esc(DROPS[m.i].map(i => M[i].title).join(', '))}.` : ''}</div>` : ""}`;
   }
   const shot = (f, cls) => f ? `<img class="shot ${cls || ''}" loading="lazy" src="walk/${esc(f)}" alt="">` : '';
   function zoomPicture(src) { const sh = $('#sheet'); sh.hidden = false; sh.innerHTML = `<img class="bigshot" src="${src}" alt="">`; sh.onclick = () => { sh.hidden = true; sh.innerHTML = ''; }; }
