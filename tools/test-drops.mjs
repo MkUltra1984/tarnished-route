@@ -12,7 +12,7 @@ for (const d of drops) ok(await page.locator(`.chk[data-i="${d}"]`).count() === 
 ok((await page.locator(`.chk[data-i="${scion}"] .cn small`).innerText()).includes('Golden Beast Crest Shield'), 'the boss row names its drops');
 await page.locator(`.chk[data-i="${scion}"]`).scrollIntoViewIfNeeded(); await page.locator(`.chk[data-i="${scion}"] .box`).click(); await page.waitForTimeout(200);
 let got = await page.evaluate(() => JSON.parse(localStorage.getItem('tarnished-route-v2')).got);
-const K = i => MK.list[i][0] + '_' + MK.list[i][1] + '_' + MK.list[i][2];   // ticks are saved by map and position
+const K = i => MK.list[i].slice(0, 5).join('_');   // ticks are saved by map and position
 ok(got[K(scion)] && drops.every(d => got[K(d)]), 'ticking the boss ticks its drops');
 await page.screenshot({ path: 'shots/drops-belfries.png' });
 await page.goto(base + '?tab=collection'); await page.waitForSelector('.group'); await page.locator('.group[data-c="Shields"]').click(); await page.waitForTimeout(300);

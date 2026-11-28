@@ -1,0 +1,567 @@
+{
+ "The Ring": {
+  "cat": "Key Items",
+  "gesture": true,
+  "page": "Gestures"
+ },
+ "Strength!": {
+  "cat": "Key Items",
+  "gesture": true,
+  "page": "Gestures"
+ },
+ "Spectral Steed Whistle": {
+  "cat": "Key Items",
+  "gesture": false,
+  "page": null
+ },
+ "Sitting Sideways": {
+  "cat": "Key Items",
+  "gesture": true,
+  "page": "Gestures"
+ },
+ "Prayer": {
+  "cat": "Key Items",
+  "gesture": true,
+  "page": "Gestures"
+ },
+ "Baldachin's Blessing": {
+  "cat": "Key Items",
+  "gesture": false,
+  "page": null
+ },
+ "Ensha": {
+  "cat": null,
+  "gesture": false,
+  "page": "Ensha of the Royal Remains"
+ },
+ "What Do You Want?": {
+  "cat": "Key Items",
+  "gesture": true,
+  "page": "Gestures"
+ },
+ "Ruin Fragment": {
+  "cat": null,
+  "gesture": false,
+  "page": null
+ },
+ "Irina's Letter": {
+  "cat": "Key Items",
+  "gesture": false,
+  "page": null
+ },
+ "Idus Sword": {
+  "cat": "Weapons",
+  "gesture": false,
+  "page": null
+ },
+ "Gold Scarab": {
+  "cat": "Talismans",
+  "gesture": false,
+  "page": "Gold Scarab"
+ },
+ "Grovel for Mercy": {
+  "cat": "Key Items",
+  "gesture": true,
+  "page": "Gestures"
+ },
+ "Extreme Repentance": {
+  "cat": "Key Items",
+  "gesture": true,
+  "page": "Gestures"
+ },
+ "Calm Down!": {
+  "cat": "Key Items",
+  "gesture": true,
+  "page": "Gestures"
+ },
+ "Nod In Thought": {
+  "cat": "Key Items",
+  "gesture": true,
+  "page": "Gestures"
+ },
+ "Crossed Legs": {
+  "cat": "Key Items",
+  "gesture": true,
+  "page": "Gestures"
+ },
+ "Bestial Sling": {
+  "cat": "Weapons",
+  "gesture": false,
+  "page": null
+ },
+ "Clawmark Seal": {
+  "cat": "Weapons",
+  "gesture": false,
+  "page": null
+ },
+ "Bolt": {
+  "cat": null,
+  "gesture": false,
+  "page": null
+ },
+ "St. Trina's Arrow": {
+  "cat": null,
+  "gesture": false,
+  "page": null
+ },
+ "Dozing Cross-Legged": {
+  "cat": "Key Items",
+  "gesture": true,
+  "page": "Gestures"
+ },
+ "As You Wish": {
+  "cat": "Key Items",
+  "gesture": true,
+  "page": "Gestures"
+ },
+ "Rapture": {
+  "cat": "Key Items",
+  "gesture": true,
+  "page": "Gestures"
+ },
+ "Rogier's Rapier+8": {
+  "cat": "Weapons",
+  "gesture": false,
+  "page": null
+ },
+ "Ash of War: Glintblade Phalanx": {
+  "cat": "Ashes of War",
+  "gesture": false,
+  "page": null
+ },
+ "Reverential Bow": {
+  "cat": "Key Items",
+  "gesture": true,
+  "page": "Gestures"
+ },
+ "Taunter's Tongue": {
+  "cat": "Key Items",
+  "gesture": false,
+  "page": null
+ },
+ "Cipher Pata": {
+  "cat": "Weapons",
+  "gesture": false,
+  "page": null
+ },
+ "Knifeprint Clue": {
+  "cat": "Key Items",
+  "gesture": false,
+  "page": null
+ },
+ "Arsenal Charm": {
+  "cat": "Talismans",
+  "gesture": false,
+  "page": "Arsenal Charm"
+ },
+ "Bravo!": {
+  "cat": "Key Items",
+  "gesture": true,
+  "page": "Gestures"
+ },
+ "Clinging Bone": {
+  "cat": "Weapons",
+  "gesture": false,
+  "page": "Clinging Bone"
+ },
+ "Ash of War: Spinning Strikes": {
+  "cat": "Ashes of War",
+  "gesture": false,
+  "page": null
+ },
+ "Shattershard Arrow (Fletched)": {
+  "cat": null,
+  "gesture": false,
+  "page": null
+ },
+ "Volcano Manor Invitation": {
+  "cat": "Key Items",
+  "gesture": false,
+  "page": null
+ },
+ "Crystal Cave Moss": {
+  "cat": null,
+  "gesture": false,
+  "page": null
+ },
+ "Balled Up": {
+  "cat": "Key Items",
+  "gesture": true,
+  "page": "Gestures"
+ },
+ "Erudition": {
+  "cat": "Key Items",
+  "gesture": true,
+  "page": "Gestures"
+ },
+ "Burred Bolt": {
+  "cat": null,
+  "gesture": false,
+  "page": null
+ },
+ "Curtsy": {
+  "cat": "Key Items",
+  "gesture": true,
+  "page": "Gestures"
+ },
+ "Juvenile Scholar Set": {
+  "cat": "Armor",
+  "gesture": false,
+  "page": null
+ },
+ "Assassin's Prayerbook": {
+  "cat": "Key Items",
+  "gesture": false,
+  "page": null
+ },
+ "Spellblade's Set": {
+  "cat": "Armor",
+  "gesture": false,
+  "page": null
+ },
+ "Casual Greeting": {
+  "cat": "Key Items",
+  "gesture": true,
+  "page": "Gestures"
+ },
+ "Explosive Bolt": {
+  "cat": null,
+  "gesture": false,
+  "page": null
+ },
+ "Sellia's Secret": {
+  "cat": "Key Items",
+  "gesture": false,
+  "page": "Sellia's Secret"
+ },
+ "Drawstring Poison Grease": {
+  "cat": null,
+  "gesture": false,
+  "page": null
+ },
+ "Polite Bow": {
+  "cat": "Key Items",
+  "gesture": true,
+  "page": "Gestures"
+ },
+ "Heartening Cry": {
+  "cat": "Key Items",
+  "gesture": true,
+  "page": "Gestures"
+ },
+ "Radahn's Spear": {
+  "cat": "Weapons",
+  "gesture": false,
+  "page": null
+ },
+ "Leontiel's Greatsword": {
+  "cat": "Weapons",
+  "gesture": false,
+  "page": null
+ },
+ "Leontiel's Set": {
+  "cat": "Armor",
+  "gesture": false,
+  "page": null
+ },
+ "Weathered Dagger": {
+  "cat": "Weapons",
+  "gesture": false,
+  "page": null
+ },
+ "Magic Scorpion Charm": {
+  "cat": "Talismans",
+  "gesture": false,
+  "page": "Magic Scorpion Charm"
+ },
+ "Dolores the Sleeping Arrow Puppet": {
+  "cat": "Spirit Ashes",
+  "gesture": false,
+  "page": null
+ },
+ "Radiant Baldachin's Blessing": {
+  "cat": "Key Items",
+  "gesture": false,
+  "page": null
+ },
+ "Discarded Palace Key": {
+  "cat": "Key Items",
+  "gesture": false,
+  "page": null
+ },
+ "Explosive Stone Clump": {
+  "cat": null,
+  "gesture": false,
+  "page": null
+ },
+ "Desperate Prayer": {
+  "cat": "Key Items",
+  "gesture": true,
+  "page": "Gestures"
+ },
+ "Ash of War: Piercing Fang": {
+  "cat": "Ashes of War",
+  "gesture": false,
+  "page": null
+ },
+ "Mirage Riddle": {
+  "cat": "Key Items",
+  "gesture": false,
+  "page": null
+ },
+ "Lansseax's Glaive": {
+  "cat": "Weapons",
+  "gesture": false,
+  "page": null
+ },
+ "Sellian Sealbreaker": {
+  "cat": "Weapons",
+  "gesture": false,
+  "page": null
+ },
+ "Eccentric's Set": {
+  "cat": "Armor",
+  "gesture": false,
+  "page": null
+ },
+ "Azur's Set": {
+  "cat": "Armor",
+  "gesture": false,
+  "page": null
+ },
+ "Tonic of Forgetfulness": {
+  "cat": "Key Items",
+  "gesture": false,
+  "page": null
+ },
+ "Daedicar's Woe": {
+  "cat": "Talismans",
+  "gesture": false,
+  "page": "Daedicar's Woe"
+ },
+ "Zorayas's Letter": {
+  "cat": "Key Items",
+  "gesture": false,
+  "page": null
+ },
+ "Cave Moss": {
+  "cat": null,
+  "gesture": false,
+  "page": null
+ },
+ "Ash of War: Thunderbolt": {
+  "cat": "Ashes of War",
+  "gesture": false,
+  "page": null
+ },
+ "By My Sword": {
+  "cat": "Key Items",
+  "gesture": true,
+  "page": "Gestures"
+ },
+ "Broken Mask's Set": {
+  "cat": "Armor",
+  "gesture": false,
+  "page": null
+ },
+ "Immutable Shield": {
+  "cat": "Shields",
+  "gesture": false,
+  "page": null
+ },
+ "Fire's Deadly Sin": {
+  "cat": "Spells",
+  "gesture": false,
+  "page": "Fire's Deadly Sin"
+ },
+ "Bloodsoaked Set": {
+  "cat": "Armor",
+  "gesture": false,
+  "page": null
+ },
+ "Mohg's Shackle": {
+  "cat": "Key Items",
+  "gesture": false,
+  "page": null
+ },
+ "Rainbow Stone Arrow (Fletched)": {
+  "cat": null,
+  "gesture": false,
+  "page": null
+ },
+ "Poisoned Stone": {
+  "cat": null,
+  "gesture": false,
+  "page": "Poisoned Stone"
+ },
+ "Ash of War: Braggart's Roar": {
+  "cat": "Ashes of War",
+  "gesture": false,
+  "page": null
+ },
+ "Hoslow's Oath": {
+  "cat": "Key Items",
+  "gesture": true,
+  "page": "Gestures"
+ },
+ "My Thanks": {
+  "cat": "Key Items",
+  "gesture": true,
+  "page": "Gestures"
+ },
+ "Patches' Crouch": {
+  "cat": "Key Items",
+  "gesture": true,
+  "page": "Gestures"
+ },
+ "Fancy Spin": {
+  "cat": "Key Items",
+  "gesture": true,
+  "page": "Gestures"
+ },
+ "Blackflame Monk Amon": {
+  "cat": null,
+  "gesture": false,
+  "page": null
+ },
+ "Ritual Thrusting Shield": {
+  "cat": "Shields",
+  "gesture": false,
+  "page": null
+ },
+ "Rimed Rowa": {
+  "cat": null,
+  "gesture": false,
+  "page": "Rimed Rowa"
+ },
+ "Hero's Rune [3]": {
+  "cat": null,
+  "gesture": false,
+  "page": null
+ },
+ "Fevor's Cookbook [3]": {
+  "cat": "Key Items",
+  "gesture": false,
+  "page": null
+ },
+ "Law of Causality": {
+  "cat": "Spells",
+  "gesture": false,
+  "page": "Law of Causality"
+ },
+ "Flaming Bolt": {
+  "cat": null,
+  "gesture": false,
+  "page": null
+ },
+ "Flock's Canvas Talisman": {
+  "cat": "Talismans",
+  "gesture": false,
+  "page": null
+ },
+ "Pearldrake Talisman": {
+  "cat": "Talismans",
+  "gesture": false,
+  "page": null
+ },
+ "Alexander's Innards": {
+  "cat": null,
+  "gesture": false,
+  "page": null
+ },
+ "Companion Jar": {
+  "cat": "Talismans",
+  "gesture": false,
+  "page": "Companion Jar"
+ },
+ "Corhyn's Robe": {
+  "cat": "Armor",
+  "gesture": false,
+  "page": null
+ },
+ "Ash of War: Savage Claws": {
+  "cat": "Ashes of War",
+  "gesture": false,
+  "page": null
+ },
+ "Ash of War: Blind Spot": {
+  "cat": "Ashes of War",
+  "gesture": false,
+  "page": null
+ },
+ "Ash of War: Overhead Stance": {
+  "cat": "Ashes of War",
+  "gesture": false,
+  "page": null
+ },
+ "Toxic Mossling": {
+  "cat": null,
+  "gesture": false,
+  "page": null
+ },
+ "Thiollier's Concoction": {
+  "cat": null,
+  "gesture": false,
+  "page": "Thiollier's Concoction"
+ },
+ "Red Fulgurbloom": {
+  "cat": null,
+  "gesture": false,
+  "page": null
+ },
+ "Sunwarmth Stone": {
+  "cat": null,
+  "gesture": false,
+  "page": "Sunwarmth Stone"
+ },
+ "Glinting Nail": {
+  "cat": null,
+  "gesture": false,
+  "page": "Glinting Nail"
+ },
+ "Perfumer's Bolt": {
+  "cat": null,
+  "gesture": false,
+  "page": null
+ },
+ "Bone Dart": {
+  "cat": null,
+  "gesture": false,
+  "page": null
+ },
+ "Ash of War: Shield Strike": {
+  "cat": "Ashes of War",
+  "gesture": false,
+  "page": null
+ },
+ "Ansbach's Longbow": {
+  "cat": "Weapons",
+  "gesture": false,
+  "page": null
+ },
+ "Ansbach's Set": {
+  "cat": "Armor",
+  "gesture": false,
+  "page": null
+ },
+ "Dane's Set": {
+  "cat": "Armor",
+  "gesture": false,
+  "page": null
+ },
+ "Scorpion Liver": {
+  "cat": null,
+  "gesture": false,
+  "page": null
+ },
+ "Clarifying Cured Meat": {
+  "cat": null,
+  "gesture": false,
+  "page": null
+ },
+ "Scarlet Bud": {
+  "cat": null,
+  "gesture": false,
+  "page": null
+ }
+}

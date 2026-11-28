@@ -1,0 +1,25 @@
+Things on Redmaw's item sheets the app has no marker for: 16
+
+bosses: 152 entries in Redmaw's sheet, 14 with no marker in the app
+   Demi-Human Chiefs | Erdtree Burial Watchdogs | Mad Pumpkin Heads | Cleanrot Knights | Nox Swordstress & Nox Monk | Putrid Crystalians | Misbegotten Warrior & Crucible Knight | Valiant Gargoyles | Perfumer Tricia & Misbegotten Warrior | Kindreds of Rot | Crucible Knights | Beastmen of Farum Azula | Night's Cavalries | Black Knight Edredd
+
+weapons: 487 entries in Redmaw's sheet, 0 with no marker in the app
+   
+
+armor: 722 entries in Redmaw's sheet, 0 with no marker in the app
+   
+
+talismans: 154 entries in Redmaw's sheet, 0 with no marker in the app
+   
+
+spells: 213 entries in Redmaw's sheet, 0 with no marker in the app
+   
+
+ashes: 200 entries in Redmaw's sheet, 0 with no marker in the app
+   
+
+key-items: 202 entries in Redmaw's sheet, 1 with no marker in the app
+   Coming soon...
+
+miscellaneous-items: 124 entries in Redmaw's sheet, 1 with no marker in the app
+   Coming soon...

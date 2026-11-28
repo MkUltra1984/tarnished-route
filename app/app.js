@@ -17,9 +17,12 @@
   // ---------- saved progress ----------
   const KEY = 'tarnished-route-v2';   // v2: steps are saved by their stable id, so rebuilding the route keeps your progress
   const S = Object.assign({ st: {}, got: {}, hist: [], size: 18, extras: false, all: false, tab: 'route' }, JSON.parse(localStorage.getItem(KEY) || '{}'));
-  const tickKey = a => a[0] + '_' + a[1] + '_' + a[2], keyIndex = new Map(MK.list.map((a, i) => [tickKey(a), i]));
-  if (S.gotV === 2) { const g = {}; for (const k in S.got) { const i = keyIndex.get(k); if (i != null) g[i] = 1; } S.got = g; }   // (without gotV: an older save, ticks by number, read as they are)
-  const stored = () => { const g = {}; for (const i in S.got) if (S.got[i] && MK.list[i]) g[tickKey(MK.list[i])] = 1; return { ...S, got: g, gotV: 2, tab: keptTab == null ? S.tab : keptTab }; };
+  // Ticks are saved under a name that does not move when the marker list is rebuilt: map, position, kind and name.
+  // (gotV 3. gotV 2 had map and position only, which two things at one spot shared; without gotV: by number.)
+  const tickKey = a => a[0] + '_' + a[1] + '_' + a[2] + '_' + a[3] + '_' + a[4], spotKey = a => a[0] + '_' + a[1] + '_' + a[2];
+  if (S.gotV === 3) { const at = new Map(MK.list.map((a, i) => [tickKey(a), i])), g = {}; for (const k in S.got) { const i = at.get(k); if (i != null) g[i] = 1; } S.got = g; }
+  else if (S.gotV === 2) { const at = new Map(); MK.list.forEach((a, i) => { const k = spotKey(a); if (!at.has(k)) at.set(k, []); at.get(k).push(i); }); const g = {}; for (const k in S.got) for (const i of at.get(k) || []) g[i] = 1; S.got = g; }
+  const stored = () => { const g = {}; for (const i in S.got) if (S.got[i] && MK.list[i]) g[tickKey(MK.list[i])] = 1; return { ...S, got: g, gotV: 3, tab: keptTab == null ? S.tab : keptTab }; };
   let keptTab = null;   // the tab to remember while a tab from the address (?tab=) is only being looked at
   const save = () => { syncDrops(); localStorage.setItem(KEY, JSON.stringify(stored())); };
   syncDrops();
@@ -102,6 +105,7 @@
   map.on('moveend', drawAll);
   function pulse(mk) { const el = mk && mk.getElement(); if (!el) return; el.classList.remove('pulse'); void el.offsetWidth; el.classList.add('pulse'); }
   function showSpot(m, pan) { // locate any marker from a list, even when it is not part of the current step
+    if (!m.map) return;   // bought, dropped or handed over: it has no place on the map
     setMap(m.map); let mk = markerOf.get(m.i);
     if (!mk) { spot.clearLayers(); mk = explain(L.marker(ll(m.x, m.y), { icon: symIcon(m), zIndexOffset: 900, title: m.title, m }).addTo(spot)); }
     if (pan) map.setView(ll(m.x, m.y), Math.max(map.getZoom(), 5), { animate: true });
@@ -137,14 +141,14 @@
     sh.hidden = false;
     sh.innerHTML = `<div class="panel card"><button class="cx" aria-label="Close">&times;</button>
       ${c.img ? `<div class="cpic${c.boss ? ' boss' : ''}"><img src="cards/${esc(c.img)}?v=${CARDS.v || 1}" alt=""></div>` : ''}
-      <h2>${esc(m.title)}</h2><div class="over">${esc(m.label)} &middot; ${esc(MAPNAME[m.map])}</div>
+      <h2>${esc(m.title)}</h2><div class="over">${esc(m.label)} &middot; ${esc(MAPNAME[m.map] || 'not on the map')}</div>
       ${m.desc ? `<p class="cnote">${esc(m.desc)}</p>` : ''}
       ${c.intro.length ? c.intro.map(p => `<p>${esc(p)}</p>`).join('') : ''}
       ${c.boss ? sec('Key facts', c.facts) + drops + sec('Strategy', c.strat) : sec('Where to find', c.where)}
-      <div class="seg cbtn"><button class="btn" id="cmap">Show on map</button><button class="btn${S.got[m.i] ? ' on' : ''}" id="ctick">${S.got[m.i] ? '&#10003; ' : ''}${c.boss ? 'Defeated' : 'Collected'}</button></div>
+      <div class="seg cbtn">${m.map ? '<button class="btn" id="cmap">Show on map</button>' : ''}<button class="btn${S.got[m.i] ? ' on' : ''}" id="ctick">${S.got[m.i] ? '&#10003; ' : ''}${c.boss ? 'Defeated' : 'Collected'}</button></div>
       <p class="credit">Picture and text from the <a href="https://eldenring.wiki.fextralife.com/${encodeURIComponent(c.list || CARDS.by[m.title]).replace(/%20/g, '+')}" target="_blank" rel="noopener">Fextralife Elden Ring Wiki</a>.</p></div>`;
     const close = () => { sh.hidden = true; sh.innerHTML = ''; sh.onclick = null; };
-    sh.onclick = e => { if (e.target === sh) close(); }; $('.cx', sh).onclick = close; $('#cmap').onclick = () => { close(); showSpot(m, true); };
+    sh.onclick = e => { if (e.target === sh) close(); }; $('.cx', sh).onclick = close; if ($('#cmap')) $('#cmap').onclick = () => { close(); showSpot(m, true); };
     $('#ctick').onclick = () => { const t = dropOf.has(m.i) ? dropOf.get(m.i) : m.i; if (S.got[t]) delete S.got[t]; else S.got[t] = 1; settle(t); save(); close(); if (S.tab === 'route') { renderRoute(); const mk = markerOf.get(m.i); if (mk) mk.setIcon(symIcon(m)); } else { document.querySelectorAll('.row').forEach(x => x.classList.toggle('got', !!S.got[+x.dataset.i])); refreshCounts(); } };
     return true;
   }
@@ -254,7 +258,7 @@
     const all = M.filter(m => cats.includes(m.cat));
     if (openCat) {
       const l = M.filter(m => m.cat === openCat).sort((a, b) => a.title.localeCompare(b.title));
-      listPage(openCat, count(l) + ' collected', `<button class="back">&lsaquo; All categories</button>` + l.map(m => rowHTML(m, MAPNAME[m.map])).join(''));
+      listPage(openCat, count(l) + ' collected', `<button class="back">&lsaquo; All categories</button>` + l.map(m => rowHTML(m, MAPNAME[m.map] || 'Not on the map: bought, dropped or handed over')).join(''));
       $('.back').onclick = () => { openCat = null; renderCollection(); }; refreshCounts = () => $('#cnt').textContent = count(l) + ' collected'; return;
     }
     listPage('Collection', count(all) + ' collected', cats.map(c => { const l = M.filter(m => m.cat === c); return `<button class="group" data-c="${esc(c)}"><span><img src="icons/${MK.cats[c].f}.png" alt="">${esc(c)}</span><span class="meta">${count(l)}</span></button>`; }).join(''));

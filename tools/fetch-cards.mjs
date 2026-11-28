@@ -53,7 +53,7 @@ if (fs.existsSync('raw/index')) for (const f of fs.readdirSync('raw/index')) { c
     ENTRY.set(norm(name), { title: name, lines: [t], src: src(box), from: f.replace('.html', '').replace(/\+/g, ' ') }); }); }
 const entryOf = t => { const p = plain(t); for (const x of [p, strip(p), p.replace(/\s+-\s+.*$/, ''), strip(p.replace(/\(?gesture\)?/i, '')), p.replace(/\s+-\s+.*$/, '').replace(/\(?gesture\)?/i, '')]) { const e = ENTRY.get(norm(x)); if (e) return e; } return null; };
 
-const want = MK.list.filter(m => MK.cats[m[3]].kind === 'g' && !['NPCs', 'NPC Invaders'].includes(m[3]));
+const want = MK.list.filter(m => MK.cats[m[3]].kind === 'g' && !['NPCs', 'NPC Invaders', 'Sites of Grace'].includes(m[3]));
 const by = {}, pages = {};
 let fetched = 0, none = 0, pics = 0;
 

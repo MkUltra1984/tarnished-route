@@ -298,3 +298,16 @@ Not done: nobody has started the game with it yet. The Gauntlet tab in the app s
 - Rest of the review: ticks are saved by map and position (gotV 2; old saves by number are still read); card pictures
   are asked for as cards/<file>?v=<cards.json v> (count v up when pictures are fetched again); the step header says
   "left open earlier" once the route has come round. `node tools/test-offline.mjs` checks offline start on the live app.
+
+## UPDATE 17 (2026-11-28): completeness
+- Owner asked why the tutorial gesture was no step, whether graces count, and what else 100% needs.
+- Sites of Grace are now things to tick (cats kind 'g' in markers.json; inside build-route-redmaw.mjs they stay places).
+  335 of 429 are named by a step, the rest are "nearby".
+- `tools/sheet-only.mjs` -> data/sheet-only.json: 113 names the sheet has you obtain that the wiki map has no marker
+  for; 82 of them (27 gestures, rewards from people, some weapons/sets) become objectives of their step. They are
+  appended to markers.json with a[6] === 'rm' (stripped and re-added on every run).
+- Redmaw's item sheets (raw/redmaw/weapons|armor|talismans|spells|ashes|key-items|miscellaneous-items.html) are the
+  complete lists. 693 things on them had no marker at all (merchant wares, enemy drops, starting gear, remembrance
+  trades): added to the Collection with map -1 (a[7] === 'list'), tickable, no place on the map, in no step.
+  `node tools/completion-audit.mjs` compares the sheets with the markers (16 left, mostly plural boss names).
+- Ticks are saved by map + position + kind + name (gotV 3); gotV 2 and number-keyed saves are still read.

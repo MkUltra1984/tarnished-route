@@ -16,9 +16,14 @@
 import fs from 'node:fs';
 import * as cheerio from 'cheerio';
 
-const MK = JSON.parse(fs.readFileSync('app/data/markers.json', 'utf8')), L = MK.list;
+const MK = JSON.parse(fs.readFileSync('app/data/markers.json', 'utf8'));
+MK.list = MK.list.filter(a => a[6] !== 'rm');   // without the objectives an earlier run of this tool added (see "sheet-only" below)
+const L = MK.list;
+// Things the sheet has you obtain that the wiki's map has no marker for (gestures, rewards people hand over, a few
+// weapons and sets): tools/sheet-only.mjs has looked up what each is. They become objectives of the step that obtains them.
+const SHEET_ONLY = fs.existsSync('data/sheet-only.json') ? JSON.parse(fs.readFileSync('data/sheet-only.json', 'utf8')) : {};
 const PLACES = JSON.parse(fs.readFileSync('data/places.json', 'utf8'));
-const kind = i => MK.cats[L[i][3]].kind, mapOf = i => MK.maps[L[i][0]];
+const kind = i => L[i][3] === 'Sites of Grace' ? 'p' : MK.cats[L[i][3]].kind, mapOf = i => MK.maps[L[i][0]];   // inside this tool a site of grace is a place; the app lists it to be ticked
 const plain = t => t.replace(/<[^>]+>/g, ' ').replace(/&amp;/g, '&').replace(/[‘’]/g, "'").replace(/\s+/g, ' ').trim();
 const norm = s => plain(s).toLowerCase().replace(/[^a-z0-9]/g, '');
 const strip = t => { let p; t = plain(t); do { p = t; t = t.replace(/\s*\([^)]*\)\s*$/, '').replace(/\s+-\s+.*$/, '').replace(/\s+[A-Z]$/, '').replace(/\s*-?\s*\d+x\b.*$/, '').trim(); } while (t !== p); return t; };
@@ -37,11 +42,12 @@ const lookupPerson = t => { const words = plain(t).toLowerCase().split(/[^a-z']+
 const placeByTitle = new Map(Object.values(PLACES).map(p => [norm(p.title), p]));
 
 const nameOf = i => { const t = short(L[i][4]); return t.length < 5 || L[i][3] === 'Maps' ? plain(L[i][4]) : t; };
-const allLines = [];
+const allLines = [], madeNew = new Set();
 // places as they stand in running text ("... she left at Stormhill Shack"): they say where a line is, better than
 // the spot of the line before, which may be far away after a fast travel
 const placeNames = (() => { const m = new Map(); L.forEach((x, i) => { if (kind(i) !== 'p' || !['Locations', 'Sites of Grace'].includes(x[3])) return; const k = short(x[4]).toLowerCase(); if (k.replace(/[^a-z]/g, '').length < 8) return; if (!m.has(k)) m.set(k, []); m.get(k).push(i); }); return [...m.entries()].filter(e => e[1].length <= 2).sort((p, q) => q[0].length - p[0].length); })();
 const DROPPED = /dropped by|drops? from|after defeating|upon defeat|upon defeating|reward for defeating|by defeating/i, KILL = /\b(kill|kills|killing|defeat|defeating|slay|invade|beat|fight)\b/i;
+let added = 0;
 const used = new Set(), steps = [], stats = { lines: 0, links: 0, matched: 0, plain: 0 };
 // objective names as they would stand in running text (lower case, at least 7 letters, longest first)
 const plainNames = (() => { const m = new Map(); L.forEach((x, i) => { if (kind(i) !== 'g') return; const k = strip(x[4]).toLowerCase(); if (k.replace(/[^a-z]/g, '').length < 7) return; if (!m.has(k)) m.set(k, []); m.get(k).push(i); }); return [...m.entries()].sort((p, q) => q[0].length - p[0].length); })();
@@ -59,6 +65,9 @@ for (const [file, game, maps] of [['walkthrough', 'base', ['overland', 'undergro
     const sectionSteps = [];
     const close = () => {
       if (!pending.length) return;
+      // objectives without a marker on the wiki's map: a marker of their own, at the spot of the step
+      { const spot = pending.flatMap(l => l.marks)[0], here = spot != null ? { m: L[spot][0], x: L[spot][1], y: L[spot][2] } : cur ? { m: MK.maps.indexOf(cur.map), x: cur.x, y: cur.y } : { m: MK.maps.indexOf(maps[0]), x: 0.5, y: 0.5 }; let k = 0;
+        for (const l of pending) for (const f of l.fresh || []) { k++; const i = L.length; L.push([here.m, +(here.x + 0.0007 * k).toFixed(5), +(here.y + 0.0004 * k).toFixed(5), f.cat, f.gesture ? f.name + ' (Gesture)' : f.name, l.text, 'rm']); used.add(i); l.marks.push(i); added++; } }
       const marks = [...new Set(pending.flatMap(l => l.marks))], g = marks.filter(i => kind(i) === 'g' && !dropOf.has(i)), lead = g[0] ?? marks[0];
       const names = (g.length ? g : marks.filter(i => kind(i) === 'g')).map(i => (KIND[L[i][3]] || '') + nameOf(i));
       const title = names.length ? names.slice(0, 2).join(', ') + (names.length > 2 ? ` +${names.length - 2}` : '') : region;
@@ -79,14 +88,16 @@ for (const [file, game, maps] of [['walkthrough', 'base', ['overland', 'undergro
       const missEl = li.find('.missable').first(), miss = missEl.length ? (missEl.attr('data-tooltip') || 'This can be lost for the rest of the playthrough.') : (li.find('.badge').filter((_, b) => /missable/i.test($(b).text())).length ? 'This can be lost for the rest of the playthrough.' : null);
       const optional = li.find('.badge').filter((_, b) => /optional/i.test($(b).text())).length > 0;
       const body = li.clone(); body.find('.badge').remove(); const text = plain(body.text()), low = text.toLowerCase();
-      const marks = [], note = /^\s*(note|tip|warning)\b/i.test(text);
+      const marks = [], fresh = [], note = /^\s*(note|tip|warning)\b/i.test(text);
       const MENTION = /\b(needs?|requires?|requiring|using|use|used|uses|bought|buy|sells?|sold|give|giving|offer|spend|equip|equipped|without|instead of|such as|die to|avoid|avoiding|ignore|skip|run past|sneak past|if you (?:have|picked|chose))\b(?:\s+(?:a|an|the|your|his|her|their|him|them|two|three|both|some|one|\d+))*\s*$/i;
       const foe = i => L[i][3] === 'Bosses' || L[i][3] === 'NPC Invaders';
       const take = pick => { used.add(pick); marks.push(pick); stats.matched++; cur = { map: mapOf(pick), x: L[pick][1], y: L[pick][2] }; for (const d of DROPS[pick] || []) if (!used.has(d)) { used.add(d); marks.push(d); } };
       // 1. the names the line links
       const todo = [];
       li.find('a').each((_, a) => { stats.links++; const href = decodeURIComponent((($(a).attr('href') || '').match(/wiki\.gg\/wiki\/([^#?]+)/) || [, ''])[1]).replace(/_/g, ' ');
-        const c = lookup($(a).text()) || (href && lookup(href)) || lookupPerson($(a).text()) || (href && lookupPerson(href)); if (!c || note) return;
+        const c = lookup($(a).text()) || (href && lookup(href)) || lookupPerson($(a).text()) || (href && lookupPerson(href));
+        if (!c && !note) { const nm = plain($(a).text()).replace(/\s+x\d+$/i, ''), so = SHEET_ONLY[nm]; if (so && so.cat && !madeNew.has(nm)) { const html = $.html(li), at = html.indexOf($.html(a)), before = plain(html.slice(0, at)).split(/[.;!?]\s/).pop() || ''; if (!MENTION.test(before)) { madeNew.add(nm); fresh.push({ name: nm, cat: so.cat, gesture: so.gesture }); } } }
+        if (!c || note) return;
         // Redmaw prints enemies in red: only a red name can be a boss or invader to defeat, and a red name is nothing to pick up
         const red = /\bred\b/.test($(a).attr('class') || '');
         // a name that is only mentioned (something to use, give, buy or need) is not a pick-up
@@ -130,7 +141,8 @@ for (const [file, game, maps] of [['walkthrough', 'base', ['overland', 'undergro
       recent.push(text); if (recent.length > 6) recent.shift();
       const count = new Map(); li.find('a').each((_, a) => { const t = $(a).text(), k = norm(t.replace(/s+xd+$/i, '')), n = +((t.match(/sx(d+)$/i) || [, 1])[1]); count.set(k, (count.get(k) || 0) + Math.min(n, 6)); });
       pending.push({ id, text, marks, miss, optional, count, names: new Set(li.find('a').map((_, a) => norm($(a).text().replace(/s+xd+$/i, ''))).get()), red: new Set(li.find('a.red').map((_, a) => norm($(a).text())).get()), note });
-      if (marks.some(i => kind(i) === 'g')) close();
+      pending[pending.length - 1].fresh = fresh;
+      if (marks.some(i => kind(i) === 'g') || fresh.length) close();
     });
     // what is left at the end of a section belongs to its last step
     if (pending.length && sectionSteps.length) { const last = sectionSteps[sectionSteps.length - 1]; for (const l of pending) { l.step = last; allLines.push(l); last.lines.push({ text: l.text, marks: l.marks }); last.text.push(l.text); for (const i of l.marks) if (!last.m.includes(i)) last.m.push(i); if (l.miss) last.miss = (last.miss ? last.miss + ' ' : '') + l.miss; } pending = []; } else close();
@@ -213,7 +225,7 @@ for (const st of steps) { st.m = [...new Set(st.m)]; st.n = [...new Set(st.n)].f
   const names = shown.map(labelOf); let title = names.length ? names.slice(0, 2).join(', ') + (names.length > 2 ? ` +${names.length - 2}` : '') : st.region.replace(/ · meeting.*$/, '');
   if (title.length > 58 && names.length > 1) title = names[0] + ` +${names.length - 1}`; st.title = title;
   // the words: Redmaw's line says where to go and what to do; under it the wiki's note for each thing the line names
-  const text = [], said = new Set(), noted = new Set(), note = i => { const d = plain(L[i][5] || ''); if (kind(i) === 'p' || d.length <= 12 || noted.has(i)) return; noted.add(i); const t = `${nameOf(i)}: ${d}`; if (!said.has(t)) { said.add(t); text.push(t); } };
+  const text = [], said = new Set(), noted = new Set(), note = i => { const d = plain(L[i][5] || ''); if (kind(i) === 'p' || d.length <= 12 || noted.has(i) || L[i][6] === 'rm') return; noted.add(i); const t = `${nameOf(i)}: ${d}`; if (!said.has(t)) { said.add(t); text.push(t); } };
   for (const l of st.lines || []) { if (l.text && !said.has(l.text)) { said.add(l.text); text.push(l.text); } for (const i of l.marks) if (st.m.includes(i)) note(i); }
   for (const i of st.m) if (kind(i) === 'g') note(i);
   st.text = text.length ? text : st.text; delete st.lines;
@@ -263,6 +275,23 @@ for (const l of meet.values()) { const u = [...new Set(l)]; if (u.length > 1) u.
 for (const s of steps) delete s.lines;
 const ids = new Set(); for (const s of steps) { while (ids.has(s.id)) s.id += '+'; ids.add(s.id); s.x = +s.x.toFixed(5); s.y = +s.y.toFixed(5); }
 fs.writeFileSync('app/data/route.json', JSON.stringify(steps));
+MK.cats['Sites of Grace'].kind = 'g';   // the app lists every site of grace to be ticked
+// Complete lists. Redmaw's item sheets (weapons, armor, talismans, spells, ashes, key items, miscellaneous) name every
+// thing 100% needs. Whatever has no marker by now (bought from merchants, dropped by ordinary enemies, starting gear,
+// remembrance trades) is added to the Collection as a thing to tick that has no place on the map: map -1.
+let listOnly = 0;
+{ const have = new Set(); L.forEach(m => { for (const k of [norm(strip(m[4])), norm(m[4]), norm(strip(m[4]).replace(/^ash of war: /i, '')), norm(strip(m[4]).split(',')[0])]) have.add(k); });
+  const sets = [...have].filter(k => k.endsWith('set')).map(k => k.slice(0, -3)), hash = t => { let h = 2166136261; for (const c of t) { h ^= c.charCodeAt(0); h = Math.imul(h, 16777619); } return (h >>> 0) / 4294967296; };
+  for (const [file, cat] of [['weapons', 'Weapons'], ['armor', 'Armor'], ['talismans', 'Talismans'], ['spells', 'Spells'], ['ashes', null], ['key-items', 'Key Items'], ['miscellaneous-items', 'Key Items']]) {
+    const f = 'raw/redmaw/' + file + '.html'; if (!fs.existsSync(f)) continue; const $ = cheerio.load(fs.readFileSync(f, 'utf8'));
+    $('input[type=checkbox]').each((_, box) => { const li = $(box).closest('li').clone(); li.find('ul,ol').remove(); const a = li.find('a[href*="wiki.gg"]').first(); if (!a.length) return;
+      const t = plain(a.text()).replace(/\s+x\d+$/i, ''), k = norm(t); if (t.length < 3 || t.length > 70 || /^coming soon/i.test(t)) return;
+      if (have.has(k) || have.has(norm(strip(t))) || have.has(k + 'set') || have.has(k + 'ashes') || have.has('ashofwar' + k) || (file === 'armor' && sets.some(x => x.length >= 6 && k.startsWith(x)))) return;
+      const c = cat || (/^ash of war/i.test(t) ? 'Ashes of War' : 'Spirit Ashes'), gesture = file === 'miscellaneous-items' && $(box).closest('ul,ol').prevAll('h3,h4').first().text().toLowerCase().includes('gesture');
+      have.add(k); L.push([-1, +hash(c + ':' + t).toFixed(9), 0, c, gesture ? t + ' (Gesture)' : t, '', 'rm', 'list']); listOnly++; }); } }
+fs.writeFileSync('app/data/markers.json', JSON.stringify(MK));
+console.log('things added to the Collection that have no place on the map:', listOnly);
+console.log('objectives added from the sheet (no marker on the wiki map):', added, '| sites of grace named by a step:', steps.reduce((n, st) => n + st.m.filter(i => L[i][3] === 'Sites of Grace').length, 0), 'of', L.filter(m => m[3] === 'Sites of Grace').length);
 
 // report
 const inSteps = new Map(); steps.forEach(s => [...s.m, ...s.n].forEach(i => inSteps.set(i, (inSteps.get(i) || 0) + 1)));
@@ -271,7 +300,7 @@ const sizes = steps.map(s => s.m.filter(i => kind(i) === 'g' && !dropOf.has(i)).
 const R = [
   `Redmaw route: ${steps.length} steps (${steps.filter(s => s.game === 'base').length} base game, ${steps.filter(s => s.game === 'dlc').length} expansion) from ${stats.lines} lines of the sheet.`,
   `Links in the sheet: ${stats.links}; things matched to a map marker: ${stats.matched}, of these ${stats.plain} from names the sheet says without a link.`,
-  `Markers: ${L.length}; in exactly one step: ${[...inSteps.values()].filter(v => v === 1).length}; in none: ${L.length - inSteps.size}; in more than one: ${[...inSteps.values()].filter(v => v > 1).length}.`,
+  `Markers with a place: ${L.filter(m => m[0] >= 0).length}; in exactly one step: ${[...inSteps.values()].filter(v => v === 1).length}; in none: ${L.filter(m => m[0] >= 0).length - inSteps.size}; in more than one: ${[...inSteps.values()].filter(v => v > 1).length}.`,
   `Second-chance matches (name linked by the sheet, step close by): ${rescued}.`,
   `Objectives (bosses, people, items): ${gAll.length}; named by the sheet and placed in its order: ${gOwn}; not named, attached to the nearest step: ${leftG}.`,
   `Objectives per step: largest own list ${Math.max(...sizes)}, steps with more than 5 of their own: ${sizes.filter(n => n > 5).length}; largest "nearby" list ${Math.max(...nearby)}, steps with more than 6 nearby: ${nearby.filter(n => n > 6).length}.`,

@@ -23,7 +23,6 @@ Armor: Gravebird's Blackquill Armor
 Armor: Greathood
 Armor: Haligtree Knight Helm
 Armor: Highland Attire
-Armor: Hoslow's Set
 Armor: Igon's Set
 Armor: Iji's Mirrorhelm
 Armor: Incantation Scarab
@@ -44,7 +43,6 @@ Armor: Marais Robe
 Armor: Marionette Soldier Birdhelm
 Armor: Mask of Confidence
 Armor: Nox Monk Armor
-Armor: Pelt of Ralva
 Armor: Raging Wolf Set
 Armor: Ronin's Set
 Armor: Rotten Duelist Helm
@@ -57,7 +55,6 @@ Armor: Upper-Class Robe
 Armor: Wise Man's Mask - Enir-Ilim
 Ashes of War: Ash of War The Poison Flower Blooms Twice
 Ashes of War: Ash of War: Barbaric Roar
-Ashes of War: Ash of War: Barricade Shield
 Ashes of War: Ash of War: Blood Blade
 Ashes of War: Ash of War: Carian Sovereignty
 Ashes of War: Ash of War: Chilling Mist
@@ -77,13 +74,11 @@ Ashes of War: Ash of War: Lightning Slash
 Ashes of War: Ash of War: Mighty Shot
 Ashes of War: Ash of War: Palm Blast
 Ashes of War: Ash of War: Piercing Throw - Ruined Forge of Starfall Past
-Ashes of War: Ash of War: Poison Moth Flight
 Ashes of War: Ash of War: Poisonous Mist
 Ashes of War: Ash of War: Prayerful Strike
 Ashes of War: Ash of War: Prelate's Charge
 Ashes of War: Ash of War: Raging Beast
 Ashes of War: Ash of War: Rain of Arrows
-Ashes of War: Ash of War: Repeating Thrust
 Ashes of War: Ash of War: Rolling Sparks
 Ashes of War: Ash of War: Sacred Blade
 Ashes of War: Ash of War: Sacred Ring of Light
@@ -99,29 +94,11 @@ Ashes of War: Ash of War: Unsheathe
 Ashes of War: Ash of War: Vacuum Slice
 Ashes of War: Ash of War: Vow of the Indomitable
 Ashes of War: Ash of War: Wild Strikes
-Bosses: Base Serpent Messmer
-Bosses: Beast Clergyman / Maliketh, The Black Blade
-Bosses: Cleanrot Knight Duo (Abandoned Cave)
-Bosses: Crucible Knight & Crucible Knight Ordovis
-Bosses: Crucible Knight / Misbegotten Warrior
-Bosses: Crucible Knight Siluria
 Bosses: Crystalians (Trio - Sellia Hideaway)
-Bosses: Demi-Human Queen Marigga
-Bosses: Flying Dragon Greyll
-Bosses: Ghost Troll
-Bosses: Knight of the Solitary Gaol
-Bosses: Lichdragon Fortissax
-Bosses: Ralva the Great Red Bear
-Flask Upgrades: Cerulean Hidden Tear
-Flask Upgrades: Crimsonburst Crystal Tear
-Flask Upgrades: Glovewort Crystal Tear
-Flask Upgrades: Leaden Hardtear
-Flask Upgrades: Opaline Bubbletear
 Flask Upgrades: Opaline Hardtear
 Flask Upgrades: Stonebarb Cracked Tear
 Flask Upgrades: Strength-Knot Crystal Tear
 Flask Upgrades: Thorny Cracked Tear
-Flask Upgrades: Viridian Hidden Tear
 Key Items: "The Sacred Tower" Painting
 Key Items: Ancestral Infant's Head
 Key Items: Ancient Dragon Apostle's Cookbook [2]
@@ -168,7 +145,6 @@ Key Items: Greater Potentate's Cookbook [8]
 Key Items: Heart of Bayle
 Key Items: Herbalist's Bell Bearing
 Key Items: Homing Instinct Painting
-Key Items: Horned Bairn
 Key Items: Igon's Cookbook [1]
 Key Items: Igon's Cookbook [2]
 Key Items: Incursion Painting Solution
@@ -201,44 +177,12 @@ Key Items: Triumphant Delight (Gesture)
 Key Items: Two Fingers' Prayerbook
 Miquella's Cross: Miquella's Cross: Belurat Tower Settlement
 Miquella's Cross: Miquella's Cross: Three-Path Cross
-NPC Invaders: Anastasia Tarnished-Eater (Consecrated Snowfield)
-NPC Invaders: Anastasia, Tarnished-Eater A
-NPC Invaders: Anastasia, Tarnished-Eater B
-NPC Invaders: Bloody Finger Ravenmount Assassin
-NPC Invaders: Great Horned Tragoth
-NPC Invaders: Juno Hoslow, Knight of Blood
-NPC Invaders: Moongrum, Carian Knight
-NPC Invaders: Nameless White Mask
-NPC Invaders: Nameless White Mask
-NPC Invaders: Nameless White Mask
-NPC Invaders: Old Knight Istvan
-NPC Invaders: Preceptor Miriam
-NPC Invaders: Recusant Henricus
-NPC Invaders: Rileigh the Idle
-NPC Invaders: Vargram the Raging Wolf
 NPCs: Blaidd (Ranni's Quest - First Location)
 NPCs: Blaidd (Ranni's Quest - Second Location)
-NPCs: D's Twin Brother (Second Location)
 NPCs: D, Hunter of the Dead Summonwater Village
-NPCs: Frustrated Spirit
-NPCs: Gurranq Beast Clergyman
-NPCs: Hermit Merchant Mountaintops East
 NPCs: Isolated Merchant Dragonbarrow
-NPCs: Nomadic Merchant Caelid South
-NPCs: Nomadic Merchant Castle Morne Rampart
 NPCs: Nomadic Merchant East Limgrave
-NPCs: Nomadic Merchant Liurnia of the Lakes
-NPCs: Nomadic Merchant Mt. Gelmir
-NPCs: Nomadic Merchant North Limgrave
 NPCs: Nomadic Merchant West Altus Plateau
-NPCs: Pidia, Carian Servant
-NPCs: The Great-Jar
-NPCs: Wandering Merchant Caelid Highway North
-NPCs: Wandering Merchant Siofra River
-NPCs: White Mask Varre Invasion Sign
-NPCs: White-Mask Varre (Second Location)
-NPCs: Witch-Hunter Jerren (Third Location)
-Remembrances: Remembrance of the Dancing Lion - Belurat Tower Settlement
 Remembrances: Remembrance of the Starscourge
 Shields: Beast Crest Heater Shield
 Shields: Beastman's Jar-Shield
@@ -252,7 +196,6 @@ Shields: Serpent Crest Shield
 Shields: Spiked Palisade Shield
 Shields: Spiralhorn Shield
 Shields: Verdigris Greatshield - Enir-Ilim
-Spells: Ancient Death Rancor
 Spells: Barrier of Gold
 Spells: Bestial Constitution
 Spells: Bloodflame Talons
@@ -294,12 +237,9 @@ Spirit Ashes: Revered Spirit Ash: Abandoned Ailing Village
 Spirit Ashes: Skeletal Militiaman Ashes
 Talismans: Aged One's Exultation
 Talismans: Arrow's Sting Talisman
-Talismans: Blue-Feathered Branchsword
 Talismans: Clarifying Horn Charm +1
-Talismans: Crepus's Vial
 Talismans: Crimson Amber Medallion +3 - Fog Rift Catacombs
 Talismans: Erdtree's Favor +1
-Talismans: Great-Jar's Arsenal
 Talismans: Haligdrake Talisman +2
 Talismans: Hammer Talisman
 Talismans: Immunizing Horn Charm +1
@@ -308,7 +248,6 @@ Talismans: Millicent's Prosthesis
 Talismans: Mottled Necklace +1
 Talismans: Pearl Shield Talisman
 Talismans: Prince of Death's Cyst
-Talismans: Red-Feathered Branchsword
 Talismans: Ritual Shield Talisman
 Talismans: Ritual Shield Talisman
 Talismans: Rotten Winged Sword Insignia
@@ -324,7 +263,6 @@ Weapons: Coded Sword
 Weapons: Commander's Standard
 Weapons: Deadly Poison Perfume Bottle
 Weapons: Death Knight's Twin Axes - Fog Rift Catacombs
-Weapons: Death's Poker
 Weapons: Digger's Staff
 Weapons: Dragonscale Blade
 Weapons: Dryleaf Seal
@@ -340,9 +278,9 @@ Weapons: Great Epee
 Weapons: Great Mace
 Weapons: Greathorn Hammer
 Weapons: Harp Bow
-Weapons: Helphen's Steeple
 Weapons: Inseparable Sword
 Weapons: Large Club
+Weapons: Leda's Sword - Enir-Ilim
 Weapons: Lightning Perfume Bottle
 Weapons: Lordsworn's Straight Sword (B)
 Weapons: Lucerne
@@ -358,8 +296,8 @@ Weapons: Repeating Crossbow
 Weapons: Rotten Battle Hammer
 Weapons: Rotten Crystal Sword
 Weapons: Royal Greatsword
-Weapons: Sacrificial Axe
 Weapons: Scavenger's Curved Sword
+Weapons: Scepter of the All-Knowing
 Weapons: Siluria's Tree
 Weapons: Spiraltree Seal
 Weapons: Spirit Sword

@@ -46,10 +46,10 @@ const phone = async (w = 412, h = 800) => { const ctx = await browser.newContext
   ok(p.errs.length === 0, 'no page errors' + (p.errs[0] ? ': ' + p.errs[0] : '')); await p.close(); }
 
 // ticks survive a rebuilt marker list: they are saved by map and position, and an old save (by number) is still read
-{ const p = await phone(), b = L.findIndex(m => m[3] === 'Bosses'), K = i => L[i][0] + '_' + L[i][1] + '_' + L[i][2];
+{ const p = await phone(), b = L.findIndex(m => m[3] === 'Bosses'), K = i => L[i].slice(0, 5).join('_');
   await p.goto(base); await p.waitForSelector('.title'); await p.evaluate(([key, i]) => localStorage.setItem(key, JSON.stringify({ st: {}, got: { [i]: 1 }, hist: [], tab: 'bosses' })), [KEY, b]);
   await p.goto(base); await p.waitForSelector('.row'); ok(await p.locator(`.row.got[data-i="${b}"]`).count() === 1, 'an old save (ticks by number) is still read');
-  await p.locator('.row [data-tick]').nth(5).click(); await p.waitForTimeout(200); const st = await state(p); ok(st.gotV === 2 && st.got[K(b)] === 1 && !(b in st.got), 'ticks are now saved by map and position');
+  await p.locator('.row [data-tick]').nth(5).click(); await p.waitForTimeout(200); const st = await state(p); ok(st.gotV === 3 && st.got[K(b)] === 1 && !(b in st.got), 'ticks are now saved by map, position and name');
   await p.reload(); await p.waitForSelector('.row'); ok(await p.locator(`.row.got[data-i="${b}"]`).count() === 1, 'and read back after a reload'); await p.close(); }
 
 await browser.close(); console.log(fails ? fails + ' FAILED' : 'ALL PASSED'); process.exit(fails ? 1 : 0);
