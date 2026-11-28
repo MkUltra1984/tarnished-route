@@ -2,7 +2,7 @@
 // App files and data: always asked from the network first (revalidated, never a stale copy); the cached copy is only used offline.
 // Map tiles, walkthrough pictures and card pictures: served from the cache once seen, because they are large and do not change between app updates.
 const APP = 'app-v3', BIG = 'big-v2';
-const SHELL = ['./', 'index.html', 'app.css', 'app.js', 'vendor/leaflet.js', 'vendor/leaflet.css', 'fonts/inter.woff2', 'fonts/marcellus.woff2', 'data/route.json', 'data/markers.json', 'data/cards.json', 'tiles/meta.json', 'manifest.webmanifest'];
+const SHELL = ['./', 'index.html', 'app.css', 'app.js', 'vendor/leaflet.js', 'vendor/leaflet.css', 'fonts/inter.woff2', 'fonts/marcellus.woff2', 'data/route.json', 'data/markers.json', 'data/cards.json', 'data/extra.json', 'tiles/meta.json', 'manifest.webmanifest'];
 self.addEventListener('install', e => e.waitUntil(caches.open(APP).then(c => c.addAll(SHELL.map(u => new Request(u, { cache: 'reload' })))).then(() => self.skipWaiting())));
 self.addEventListener('activate', e => e.waitUntil(caches.keys().then(k => Promise.all(k.filter(n => n !== APP && n !== BIG).map(n => caches.delete(n)))).then(() => self.clients.claim())));
 self.addEventListener('fetch', e => {

@@ -322,3 +322,18 @@ Not done: nobody has started the game with it yet. The Gauntlet tab in the app s
 - Not used from Redmaw's site: achievements (72), questlines (587 lines by person), npc-walkthrough (604),
   new-game-plus (68), resources (reference tables), bosses sheet (207, the app uses the wiki's), the 🏆 and Optional
   badges, his videos and images.
+
+## UPDATE 18 (2026-11-28): the rest of Redmaw's sheets
+- Owner: farmable gear belongs to "my version of 100%"; use everything from Redmaw not yet covered, nothing twice.
+- Rest of the complete lists (build-route-redmaw.mjs, block before "making the steps fit together"): 32 armour pieces
+  are parts of a set that is in a step (hung on the set like boss drops, MK.drops; cards.json pages carry `set`);
+  240 things are put, by the first place their wiki "where to find" text names, into that place's step as step field
+  `farm` (fold-out "Found or farmed around here", not counted as open); 74 name no place and stay Collection-only.
+- `tools/build-extra.mjs` -> app/data/extra.json: 52 questlines (587 steps) in the Quests tab above the map list,
+  72 achievements and 68 New Game Plus lines as two groups in the Collection tab, 11 reference tables as a group in the
+  Materials tab. Ticks in S.chk by the sheet's line id. Icons trophy.png / cycle.png generated in the symbol style.
+- In the walkthrough itself: "Optional: " prefix (217 lines), "(This earns an achievement.)" (42 lines), video and
+  picture links (19 steps, open the web).
+- Deliberately not used: npc-walkthrough (58% word for word in the main walkthrough, the rest is the questlines), the
+  bosses sheet (the Bosses tab is the wiki's).
+- Tests: test-app, test-fixes, test-drops, test-forget, test-extra (local or live), test-offline (live).

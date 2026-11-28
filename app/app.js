@@ -5,7 +5,7 @@
   const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
   const json = (u, fallback) => fetch(u).then(r => r.ok ? r.json() : Promise.reject()).catch(() => fallback);
 
-  const [ROUTE, MK, TILES, CARDS] = await Promise.all([json('data/route.json'), json('data/markers.json'), json('tiles/meta.json', {}), json('data/cards.json', { by: {}, pages: {} })]);
+  const [ROUTE, MK, TILES, CARDS, EXTRA] = await Promise.all([json('data/route.json'), json('data/markers.json'), json('tiles/meta.json', {}), json('data/cards.json', { by: {}, pages: {} }), json('data/extra.json', { quests: [], achievements: [], ngplus: [], reference: [] })]);
   const MAPNAME = { overland: 'The Lands Between', underground: 'Underground', ashen: 'Leyndell, Ashen Capital', shadow: 'Realm of Shadow' };
   const TABS = [['route', 'Route'], ['bosses', 'Bosses'], ['collection', 'Collection'], ['quests', 'Quests'], ['materials', 'Materials'], ['settings', 'Settings']];
   const M = MK.list.map((a, i) => ({ i, src: a[7], map: MK.maps[a[0]], x: a[1], y: a[2], cat: a[3], title: a[4], desc: a[5], f: MK.cats[a[3]].f, label: MK.cats[a[3]].label, kind: MK.cats[a[3]].kind }));
@@ -20,7 +20,7 @@
   // Ticks are saved under a name that does not move when the marker list is rebuilt: map, position, kind and name.
   // (gotV 3. gotV 2 had map and position only, which two things at one spot shared; without gotV: by number.)
   const tickKey = a => a[0] + '_' + a[1] + '_' + a[2] + '_' + a[3] + '_' + a[4], spotKey = a => a[0] + '_' + a[1] + '_' + a[2];
-  S.skip = S.skip || {};
+  S.skip = S.skip || {}; S.chk = S.chk || {};   // chk: ticks of the checklists that are not on the map (questlines, achievements, New Game Plus), by the sheet's own line id
   if (S.gotV === 3) { const at = new Map(MK.list.map((a, i) => [tickKey(a), i])); for (const f of ['got', 'skip']) { const g = {}; for (const k in S[f]) { const i = at.get(k); if (i != null) g[i] = 1; } S[f] = g; } }
   else if (S.gotV === 2) { const at = new Map(); MK.list.forEach((a, i) => { const k = spotKey(a); if (!at.has(k)) at.set(k, []); at.get(k).push(i); }); const g = {}; for (const k in S.got) for (const i of at.get(k) || []) g[i] = 1; S.got = g; }
   const stored = () => { const g = {}, k = {}; for (const i in S.got) if (S.got[i] && MK.list[i]) g[tickKey(MK.list[i])] = 1; for (const i in S.skip) if (S.skip[i] && MK.list[i]) k[tickKey(MK.list[i])] = 1; return { ...S, got: g, skip: k, gotV: 3, tab: keptTab == null ? S.tab : keptTab }; };
@@ -210,6 +210,7 @@
         <div class="dir">${shot(s.imgs[0], 'lead')}${s.card != null && cardOf(M[s.card]) && cardOf(M[s.card]).img ? `<img class="shot lead cardlead${cardOf(M[s.card]).boss ? '' : ' item'}" data-card="${s.card}" loading="lazy" src="cards/${esc(cardOf(M[s.card]).img)}?v=${CARDS.v || 1}" alt="">` : ''}${para.map(p => p.startsWith('## ') ? `<h3>${esc(p.slice(3))}</h3>` : `<p>${esc(p)}</p>`).join('')}${s.imgs.length > 1 ? `<div class="strip">${s.imgs.slice(1).map(f => shot(f, 'thumb')).join('')}</div>` : ''}</div>
         ${s.place && (s.place.walk.length || s.place.notes.length || s.place.img) ? `<div class="over sechead">${esc(s.place.title)} in detail</div><div class="dir">${shot(s.place.img, 'lead')}${s.place.walk.map(p => p.startsWith('## ') ? `<h3>${esc(p.slice(3))}</h3>` : `<p>${esc(p)}</p>`).join('')}${s.place.notes.length ? `<h3>Notes</h3><ul>${s.place.notes.map(p => `<li>${esc(p)}</li>`).join('')}</ul>` : ''}</div>` : ''}
         ${(s.guide || []).map(g => `<details class="guide"><summary>Wiki walkthrough: ${esc(g.title)}</summary><div class="dir">${g.text.map(p => `<p>${esc(p)}</p>`).join('')}</div></details>`).join('')}
+        ${(s.links || []).length ? `<div class="steplinks">${s.links.map(l => `<a href="${esc(l.href)}" target="_blank" rel="noopener">${esc(l.t)} &rsaquo;</a>`).join('')}</div>` : ''}
         ${s.miss ? `<div class="miss"><b>Missable:</b> ${esc(s.miss)}</div>` : ''}
         <div class="sechead" id="todo"><span class="over">To do here &middot; ${got(here)} of ${due(here)}</span>${grab.length > 1 ? `<button class="link" id="allb">${open ? 'Tick all' : 'Untick all'}</button>` : ''}</div>
         ${here.map(checkHTML).join('') || '<div class="none">Nothing to pick up here.</div>'}
@@ -259,21 +260,34 @@ ${(s.farm || []).length ? `<details class="guide farm"${S.farmOpen ? ' open' : '
     const html = MK.maps.map(mp => { const l = BOSSES.filter(b => b.map === mp).sort((a, b) => a.title.localeCompare(b.title)); return l.length ? `<div class="over sec">${esc(MAPNAME[mp])} &middot; ${l.length}</div>` + l.map(m => rowHTML(m, m.desc || 'Boss')).join('') : ''; }).join('');
     listPage('Bosses', count(BOSSES) + ' defeated', html); refreshCounts = () => $('#cnt').textContent = count(BOSSES) + ' defeated';
   }
+  // ---------- checklists that are not on the map (from Redmaw's sheets: questlines, achievements, New Game Plus) ----------
+  const lineHTML = l => `<button class="chk ql${S.chk[l.id] ? ' got' : ''}" data-q="${esc(l.id)}" style="padding-left:${(l.d || 0) * 18}px"><span class="cn">${l.opt ? '<em class="tag">Optional</em> ' : ''}${l.name ? `<b>${esc(l.name)}</b>: ` : ''}${esc(l.text)}${l.miss ? `<small class="qmiss">Missable${l.miss === 'Missable' ? '' : ': ' + esc(l.miss)}</small>` : ''}</span><span class="box" aria-hidden="true"></span></button>`;
+  const doneOf = sec => sec.lines.filter(l => S.chk[l.id]).length, doneAll = list => list.reduce((n, s) => n + doneOf(s), 0), sizeAll = list => list.reduce((n, s) => n + s.lines.length, 0);
+  function wireChecks(root, again) { root.querySelectorAll('[data-q]').forEach(b => b.onclick = () => { const id = b.dataset.q; if (S.chk[id]) delete S.chk[id]; else S.chk[id] = 1; save(); const list = $('.list'), y = list ? list.scrollTop : 0; again(); if ($('.list')) $('.list').scrollTop = y; }); }
+  function checklistPage(title, list, back, lead) {
+    listPage(title, `${doneAll(list)} of ${sizeAll(list)} done`, `<button class="back">&lsaquo; ${back}</button>${lead ? `<p class="lead">${lead}</p>` : ''}` + list.map(sec => `<div class="over sec qh"><span>${esc(sec.name)}</span><span>${doneOf(sec)} of ${sec.lines.length}</span></div>` + sec.lines.map(lineHTML).join('')).join(''));
+    wireChecks($('#pane'), () => { checklistPage(title, list, back, lead); $('.back').onclick = goBack; }); }
+  let goBack = () => {};
   let openCat = null;
   function renderCollection() {
     const cats = Object.keys(MK.cats).filter(c => MK.cats[c].kind === 'g' && !['Bosses', 'NPCs', 'NPC Invaders'].includes(c));
     const all = M.filter(m => cats.includes(m.cat));
     if (openCat) {
+      if (openCat === '@achievements' || openCat === '@ngplus') { const ach = openCat === '@achievements'; goBack = () => { openCat = null; renderCollection(); };
+        checklistPage(ach ? 'Achievements' : 'New Game Plus', ach ? EXTRA.achievements : EXTRA.ngplus, 'All categories', ach ? 'Every achievement and how to earn it.' : 'What is worth doing again in a later cycle, for the things one playthrough gives only once.'); $('.back').onclick = goBack; refreshCounts = () => {}; return; }
       const l = M.filter(m => m.cat === openCat).sort((a, b) => a.title.localeCompare(b.title));
       listPage(openCat, count(l) + ' collected', `<button class="back">&lsaquo; All categories</button>` + l.map(m => rowHTML(m, m.src && m.desc ? m.desc : MAPNAME[m.map] || 'Not on the map: bought, dropped or handed over')).join(''));
       $('.back').onclick = () => { openCat = null; renderCollection(); }; refreshCounts = () => $('#cnt').textContent = count(l) + ' collected'; return;
     }
-    listPage('Collection', count(all) + ' collected', cats.map(c => { const l = M.filter(m => m.cat === c); return `<button class="group" data-c="${esc(c)}"><span><img src="icons/${MK.cats[c].f}.png" alt="">${esc(c)}</span><span class="meta">${count(l)}</span></button>`; }).join(''));
+    listPage('Collection', count(all) + ' collected', cats.map(c => { const l = M.filter(m => m.cat === c); return `<button class="group" data-c="${esc(c)}"><span><img src="icons/${MK.cats[c].f}.png" alt="">${esc(c)}</span><span class="meta">${count(l)}</span></button>`; }).join('') +
+      (EXTRA.achievements.length ? `<button class="group" data-c="@achievements"><span><img src="icons/trophy.png" alt="">Achievements</span><span class="meta">${doneAll(EXTRA.achievements)} of ${sizeAll(EXTRA.achievements)}</span></button>` : '') +
+      (EXTRA.ngplus.length ? `<button class="group" data-c="@ngplus"><span><img src="icons/cycle.png" alt="">New Game Plus</span><span class="meta">${doneAll(EXTRA.ngplus)} of ${sizeAll(EXTRA.ngplus)}</span></button>` : ''));
     document.querySelectorAll('.group').forEach(g => g.onclick = () => { openCat = g.dataset.c; renderCollection(); }); refreshCounts = () => {};
   }
   const baseName = s => s.replace(/\s*\([^)]*\)\s*$/, '').replace(/\s+-\s+.*$/, '').trim();
   const stepOf = new Map(); ROUTE.forEach((s, k) => [...s.m, ...s.n].forEach(i => { if (!stepOf.has(i)) stepOf.set(i, k); }));
   const routeOrder = (a, b) => (stepOf.get(a.i) ?? 1e9) - (stepOf.get(b.i) ?? 1e9);
+  let openQuest = null;
   function renderQuests() {
     // characters move as their story goes on: the wiki map has one marker per place, shown here in route order
     const people = M.filter(m => m.cat === 'NPCs' || m.cat === 'NPC Invaders'), groups = new Map();
@@ -281,7 +295,10 @@ ${(s.farm || []).length ? `<details class="guide farm"${S.farmOpen ? ' open' : '
     const names = [...groups.keys()].sort((a, b) => a.localeCompare(b));
     const html = names.map(k => { const l = groups.get(k).sort(routeOrder), met = l.filter(m => S.got[m.i]).length;
       return `<div class="over sec qh"><span>${esc(k)}</span><span>${met} of ${l.length}</span></div>` + l.map((m, j) => { const where = (m.title.match(/\(([^)]*)\)\s*$/) || [])[1], st = stepOf.has(m.i) ? ROUTE[stepOf.get(m.i)] : null; return rowHTML(m, m.desc || m.label, (l.length > 1 ? (j + 1) + '. ' : '') + (where || (st ? st.title : MAPNAME[m.map]))); }).join(''); }).join('');
-    listPage('Quests', `${names.length} characters &middot; ${count(people)} meetings`, `<p class="lead">Each character is listed with every place they appear, in the order the route reaches them. Tap a row to find the spot, tap the picture to tick it off.</p>` + html);
+    const lines = EXTRA.quests.map(q => `<details class="guide qline"${openQuest === q.name ? ' open' : ''} data-n="${esc(q.name)}"><summary>${esc(q.name)} &middot; ${doneOf(q)} of ${q.lines.length}</summary>${q.lines.map(lineHTML).join('')}</details>`).join('');
+    listPage('Quests', `${EXTRA.quests.length} questlines &middot; ${doneAll(EXTRA.quests)} of ${sizeAll(EXTRA.quests)} steps`, (lines ? `<p class="lead">Each person's quest, step by step. Open one and tick as you go.</p>${lines}<div class="over sec qh" style="margin-top:24px"><span>Where they stand on the map</span><span>${count(people)}</span></div><p class="lead">Every place a person appears, in the order the route reaches them. Tap a row to find the spot.</p>` : '') + html);
+    document.querySelectorAll('.qline').forEach(d => d.ontoggle = () => { if (d.open) openQuest = d.dataset.n; else if (openQuest === d.dataset.n) openQuest = null; });
+    wireChecks($('#pane'), renderQuests);
     refreshCounts = () => { if (S.tab === 'quests') { const y = $('.list').scrollTop; renderQuests(); $('.list').scrollTop = y; } };
   }
 
@@ -296,14 +313,15 @@ ${(s.farm || []).length ? `<details class="guide farm"${S.farmOpen ? ' open' : '
         l.map(m => { const st = stepOf.has(m.i) ? ROUTE[stepOf.get(m.i)] : null; return rowHTML(m, m.desc || MAPNAME[m.map], (matQty(m) > 1 ? matQty(m) + 'x \u00b7 ' : '') + (st ? st.title : MAPNAME[m.map])); }).join(''));
       $('.back').onclick = () => { matOpen = null; renderMaterials(); }; return;
     }
-    if (matCat) {
+    if (matCat && matCat !== '@reference') {
       const g = new Map(); for (const m of MATS) if (m.cat === matCat) { const k = matName(m); if (!g.has(k)) g.set(k, []); g.get(k).push(m); }
       const names = [...g.keys()].sort((a, b) => a.localeCompare(b, undefined, { numeric: true }));
       listPage(matCat, `${names.length} different materials`, `<button class="back">&lsaquo; All materials</button>` + names.map(k => `<button class="group" data-k="${esc(k)}"><span><img src="icons/${MK.cats[matCat].f}.png" alt="">${esc(k)}</span><span class="meta">${g.get(k).length} ${g.get(k).length === 1 ? 'place' : 'places'}</span></button>`).join(''));
       $('.back').onclick = () => { matCat = null; renderMaterials(); };
       document.querySelectorAll('.group').forEach(b => b.onclick = () => { matOpen = b.dataset.k; renderMaterials(); }); return;
     }
-    listPage('Materials', `${MATS.length} places on the map`, `<p class="lead">Every place the wiki's map marks for a material, grouped by material.</p>` + cats.map(c => `<button class="group" data-c="${esc(c)}"><span><img src="icons/${MK.cats[c].f}.png" alt="">${esc(c)}</span><span class="meta">${new Set(MATS.filter(m => m.cat === c).map(matName)).size}</span></button>`).join(''));
+    if (matCat === '@reference') { listPage('Reference tables', 'Soft caps, upgrade materials, runes', `<button class="back">&lsaquo; All materials</button>` + EXTRA.reference.map(sec => `<h3 class="refh">${esc(sec.title)}</h3>` + sec.blocks.map(b => b.rows ? `<div class="reft"><table>${b.rows.map((r, k) => `<tr>${r.map(c => k ? `<td>${esc(c)}</td>` : `<th>${esc(c)}</th>`).join('')}</tr>`).join('')}</table></div>` : `<p class="lead">${esc(b.text)}</p>`).join('')).join('')); $('.back').onclick = () => { matCat = null; renderMaterials(); }; return; }
+    listPage('Materials', `${MATS.length} places on the map`, `<p class="lead">Every place the wiki's map marks for a material, grouped by material.</p>` + cats.map(c => `<button class="group" data-c="${esc(c)}"><span><img src="icons/${MK.cats[c].f}.png" alt="">${esc(c)}</span><span class="meta">${new Set(MATS.filter(m => m.cat === c).map(matName)).size}</span></button>`).join('') + (EXTRA.reference.length ? `<button class="group" data-c="@reference"><span><img src="icons/upgrade.png" alt="">Reference tables</span><span class="meta">${EXTRA.reference.length}</span></button>` : ''));
     document.querySelectorAll('.group').forEach(b => b.onclick = () => { matCat = b.dataset.c; renderMaterials(); });
   }
 
@@ -316,7 +334,7 @@ ${(s.farm || []).length ? `<details class="guide farm"${S.farmOpen ? ' open' : '
       <div class="opt">Markers on the map</div>${seg('al', [[0, 'This step only'], [1, 'Everything']], S.all ? 1 : 0)}
       <p class="credit">The order of the route follows <a href="https://eldenring.redmaw.dev/" target="_blank" rel="noopener">Redmaw's Elden Ring Completion Sheets</a>, and where the wiki has no note the step shows Redmaw's own line. Map images, marker positions and descriptions come from the <a href="https://eldenring.wiki.fextralife.com/" target="_blank" rel="noopener">Fextralife Elden Ring Wiki</a>. Elden Ring is a trademark of its owners; this is a personal fan tool.</p></div>`;
     document.querySelectorAll('#al .btn').forEach(b => b.onclick = () => { S.all = !!+b.dataset.v; save(); drawAll(); renderSettings(); });
-    let armed = false; $('#reset').onclick = e => { if (!armed) { armed = true; e.target.textContent = 'Tap again to erase all progress'; return; } S.st = {}; S.got = {}; S.skip = {}; S.hist = []; S.again = 0; S.tab = 'route'; keptTab = null; save(); peek = null; openInfo = null; showOpen = false; render(); };
+    let armed = false; $('#reset').onclick = e => { if (!armed) { armed = true; e.target.textContent = 'Tap again to erase all progress'; return; } S.st = {}; S.got = {}; S.skip = {}; S.chk = {}; S.hist = []; S.again = 0; S.tab = 'route'; keptTab = null; save(); peek = null; openInfo = null; showOpen = false; render(); };
   }
 
 

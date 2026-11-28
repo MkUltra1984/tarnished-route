@@ -95,7 +95,8 @@ for (const [file, game, maps] of [['walkthrough', 'base', ['overland', 'undergro
       const miss = pending.filter(l => l.miss).map(l => l.miss).join(' ') || null;
       let place = null; for (const i of marks) if (L[i][3] === 'Locations') { const p = placeByTitle.get(norm(short(L[i][4]))); if (p && !p.taken && (p.walk.length || p.notes.length)) { p.taken = true; place = { title: p.title, walk: p.walk, notes: p.notes, img: p.img || null }; break; } }
       const at = lead != null ? { map: mapOf(lead), x: L[lead][1], y: L[lead][2] } : (steps.length ? { map: steps[steps.length - 1].map, x: steps[steps.length - 1].x, y: steps[steps.length - 1].y } : { map: maps[0], x: 0.5, y: 0.5 });
-      const st = { id: `rm:${pending[pending.length - 1].id}`, game, region, title, ...at, text, miss, boss: g.some(i => L[i][3] === 'Bosses'), m: marks, n: [], imgs: [], place, card: g[0] ?? null, optional: pending.every(l => l.optional) || undefined, lines: pending.map(l => ({ text: l.text, marks: l.marks })) };
+      const st = { id: `rm:${pending[pending.length - 1].id}`, game, region, title, ...at, text, miss, boss: g.some(i => L[i][3] === 'Bosses'), m: marks, n: [], imgs: [], place, card: g[0] ?? null, optional: pending.every(l => l.optional) || undefined, lines: pending.map(l => ({ text: l.text, marks: l.marks })), links: pending.flatMap(l => l.links || []) };
+      if (!st.links.length) delete st.links;
       for (const l of pending) { l.step = st; allLines.push(l); }
       steps.push(st); sectionSteps.push(st); pending = [];
     };
@@ -104,7 +105,9 @@ for (const [file, game, maps] of [['walkthrough', 'base', ['overland', 'undergro
       const li = $(box).closest('li').clone(); li.find('ul, ol').remove(); const id = $(box).attr('id'); stats.lines++;
       const missEl = li.find('.missable').first(), miss = missEl.length ? (missEl.attr('data-tooltip') || 'This can be lost for the rest of the playthrough.') : (li.find('.badge').filter((_, b) => /missable/i.test($(b).text())).length ? 'This can be lost for the rest of the playthrough.' : null);
       const optional = li.find('.badge').filter((_, b) => /optional/i.test($(b).text())).length > 0;
-      const body = li.clone(); body.find('.badge').remove(); const text = plain(body.text()), low = text.toLowerCase();
+      const body = li.clone(); body.find('.badge').remove(); const trophy = li.find('.badge').filter((_, b) => /\u{1F3C6}/u.test($(b).text())).length > 0;
+      const text = (optional ? 'Optional: ' : '') + plain(body.text()) + (trophy ? ' (This earns an achievement.)' : ''), low = text.toLowerCase();
+      const linksOut = li.find('a').map((_, a) => { const h = $(a).attr('href') || ''; return /youtu\.?be/.test(h) ? { t: 'Video: ' + plain($(a).text()), href: h } : /^\/images\//.test(h) ? { t: 'Picture: ' + plain($(a).text()), href: 'https://eldenring.redmaw.dev' + h } : null; }).get().filter(Boolean);
       const marks = [], fresh = [], note = /^\s*(note|tip|warning)\b/i.test(text);
       const MENTION = /\b(needs?|requires?|requiring|using|use|used|uses|bought|buy|sells?|sold|give|giving|offer|spend|equip|equipped|without|instead of|such as|die to|avoid|avoiding|ignore|skip|run past|sneak past|if you (?:have|picked|chose))\b(?:\s+(?:a|an|the|your|his|her|their|him|them|two|three|both|some|one|\d+))*\s*$/i;
       const foe = i => L[i][3] === 'Bosses' || L[i][3] === 'NPC Invaders';
@@ -160,12 +163,12 @@ for (const [file, game, maps] of [['walkthrough', 'base', ['overland', 'undergro
         take(pick); stats.plain++; }
       recent.push(text); if (recent.length > 6) recent.shift();
       const count = new Map(); li.find('a').each((_, a) => { const t = $(a).text(), k = norm(t.replace(/s+xd+$/i, '')), n = +((t.match(/sx(d+)$/i) || [, 1])[1]); count.set(k, (count.get(k) || 0) + Math.min(n, 6)); });
-      pending.push({ id, text, marks, miss, optional, count, names: new Set(li.find('a').map((_, a) => norm($(a).text().replace(/s+xd+$/i, ''))).get()), red: new Set(li.find('a.red').map((_, a) => norm($(a).text())).get()), note });
+      pending.push({ id, text, marks, miss, optional, links: linksOut, count, names: new Set(li.find('a').map((_, a) => norm($(a).text().replace(/s+xd+$/i, ''))).get()), red: new Set(li.find('a.red').map((_, a) => norm($(a).text())).get()), note });
       pending[pending.length - 1].fresh = fresh;
       if (marks.some(i => kind(i) === 'g') || fresh.length) close();
     });
     // what is left at the end of a section belongs to its last step
-    if (pending.length && sectionSteps.length) { const last = sectionSteps[sectionSteps.length - 1]; for (const l of pending) { l.step = last; allLines.push(l); last.lines.push({ text: l.text, marks: l.marks }); last.text.push(l.text); for (const i of l.marks) if (!last.m.includes(i)) last.m.push(i); if (l.miss) last.miss = (last.miss ? last.miss + ' ' : '') + l.miss; } pending = []; } else close();
+    if (pending.length && sectionSteps.length) { const last = sectionSteps[sectionSteps.length - 1]; for (const l of pending) { l.step = last; allLines.push(l); last.lines.push({ text: l.text, marks: l.marks }); if ((l.links || []).length) last.links = [...(last.links || []), ...l.links]; last.text.push(l.text); for (const i of l.marks) if (!last.m.includes(i)) last.m.push(i); if (l.miss) last.miss = (last.miss ? last.miss + ' ' : '') + l.miss; } pending = []; } else close();
   });
 }
 
