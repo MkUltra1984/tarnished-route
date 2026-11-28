@@ -58,7 +58,7 @@ for (const [name, w, h] of [['tablet', 1280, 800], ['phone', 412, 915]]) {
   const nearby = await page.locator('.over.warn').count(); ok(true, `${name}: next step lists ${nearby ? await page.locator('.over.warn').innerText() : 'no leftovers nearby'}`);
   await page.screenshot({ path: `shots/app-${name}-nearby.png` });
   // tabs
-  for (const t of ['bosses', 'collection', 'quests', 'gauntlet']) {
+  for (const t of ['bosses', 'collection', 'quests']) {
     await page.locator(`.tab[data-t="${t}"]`).click(); await page.waitForTimeout(400);
     ok(await page.locator('.listhead h1').count() === 1, `${name}: ${t} tab opens (${await page.locator('#cnt').innerText()})`);
     if (t === 'collection') { await page.locator('.group').first().click(); await page.waitForTimeout(300); await page.screenshot({ path: `shots/app-${name}-collection-open.png` }); await page.locator('.row [data-tick]').first().click(); ok(await page.locator('.row.got').count() >= 1, `${name}: ticking an item works`); await page.locator('.back').click(); await page.waitForTimeout(200); }

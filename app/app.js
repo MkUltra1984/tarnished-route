@@ -7,7 +7,7 @@
 
   const [ROUTE, MK, TILES, ART] = await Promise.all([json('data/route.json'), json('data/markers.json'), json('tiles/meta.json', {}), json('data/art.json', {})]);
   const MAPNAME = { overland: 'The Lands Between', underground: 'Underground', ashen: 'Leyndell, Ashen Capital', shadow: 'Realm of Shadow' };
-  const TABS = [['route', 'Route'], ['bosses', 'Bosses'], ['collection', 'Collection'], ['quests', 'Quests'], ['gauntlet', 'Gauntlet']];
+  const TABS = [['route', 'Route'], ['bosses', 'Bosses'], ['collection', 'Collection'], ['quests', 'Quests']];
   const M = MK.list.map((a, i) => ({ i, map: MK.maps[a[0]], x: a[1], y: a[2], cat: a[3], title: a[4], desc: a[5], f: MK.cats[a[3]].f, label: MK.cats[a[3]].label, kind: MK.cats[a[3]].kind }));
   const BOSSES = M.filter(m => m.cat === 'Bosses');
 
@@ -18,6 +18,7 @@
   const q = new URLSearchParams(location.search);
   let peek = q.has('step') ? +q.get('step') : null;          // look at a step without changing progress
   if (q.has('tab')) S.tab = q.get('tab');
+  if (!TABS.some(t => t[0] === S.tab)) S.tab = 'route';
 
   function currentStep() {
     if (peek != null && ROUTE[peek]) return ROUTE[peek];
@@ -140,7 +141,7 @@
   function renderRoute() {
     if (showOpen) return renderOpen();
     const pane = $('#pane'), s = currentStep(), total = ROUTE.length, dn = doneCount();
-    if (!s) { pane.innerHTML = `<div class="listhead"><h1>Route complete</h1></div><div class="list"><p class="lead">Every step is done. The Gauntlet tab is next.</p></div>`; return; }
+    if (!s) { pane.innerHTML = `<div class="listhead"><h1>Route complete</h1></div><div class="list"><p class="lead">Every step is done.</p></div>`; return; }
     const keep = $('.body', pane) ? $('.body', pane).scrollTop : 0;
     const pos = ROUTE.indexOf(s) + 1, grab = grabOf(s), extra = extraOf(s), nx = nextAfter(s), open = grab.filter(m => !S.got[m.i]).length;
     const para = s.text.length ? s.text : ['Explore this place and pick up everything listed below.'];
@@ -222,14 +223,6 @@
     listPage('Quests', `${names.length} characters &middot; ${count(people)} meetings`, `<p class="lead">Each character is listed with every place they appear, in the order the route reaches them. Tap a row to find the spot, tap the picture to tick it off.</p>` + html);
     refreshCounts = () => { if (S.tab === 'quests') { const y = $('.list').scrollTop; renderQuests(); $('.list').scrollTop = y; } };
   }
-  function renderGauntlet() {
-    // every boss once (duplicates and variants folded into one name), in the order the route meets them
-    const groups = new Map(); for (const b of [...BOSSES].sort(routeOrder)) { const k = baseName(b.title); if (!groups.has(k)) groups.set(k, []); groups.get(k).push(b); }
-    const list = [...groups.entries()], ready = list.filter(([, l]) => l.some(b => S.got[b.i])).length;
-    const html = list.map(([k, l], j) => { const done = l.some(b => S.got[b.i]); return `<div class="grow${done ? ' ok' : ''}"><span class="gn">${j + 1}</span><img src="icons/boss.png" alt=""><span class="gt">${esc(k)}${l.length > 1 ? `<small>${l.length} versions on the map</small>` : ''}</span><span class="gs">${done ? 'Beaten' : 'Open'}</span></div>`; }).join('');
-    listPage('Gauntlet', `${ready} of ${list.length} bosses beaten once`, `<p class="lead">The gauntlet fights every boss one more time before the final boss. This is the line-up: ${list.length} different bosses, in the order the route meets them. A boss counts once you have beaten any version of it.</p>` + html);
-    refreshCounts = () => {};
-  }
 
   // ---------- settings ----------
   function openSettings() {
@@ -251,7 +244,7 @@
     $('#tabs').innerHTML = TABS.map(t => `<button class="tab${S.tab === t[0] ? ' on' : ''}" data-t="${t[0]}"><span><img src="icons/tab-${t[0]}.png" alt="">${t[1]}</span></button>`).join('');
     document.querySelectorAll('.tab').forEach(b => b.onclick = () => { S.tab = b.dataset.t; save(); render(); });
     refreshCounts = () => {};
-    ({ route: renderRoute, bosses: renderBosses, collection: renderCollection, quests: renderQuests, gauntlet: renderGauntlet }[S.tab] || renderRoute)();
+    ({ route: renderRoute, bosses: renderBosses, collection: renderCollection, quests: renderQuests }[S.tab] || renderRoute)();
     placeMapButton();
     const s = currentStep(); if (s && (S.tab === 'route' || !mapName)) drawStep(s, true);
   }

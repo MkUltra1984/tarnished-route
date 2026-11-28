@@ -205,3 +205,13 @@ How to rebuild: run the patch scripts from `tarnished-gauntlet\`, then
   (original kept as version.txt.orig). Check after repack: only CalcCorrectGraph and SpEffectParam differ from the base.
 
 Not done: nobody has started the game with it yet. The Gauntlet tab in the app still lists 160 bosses in route order, not these 134.
+
+## UPDATE 13 (2026-11-28)
+- App: the Gauntlet tab is gone for good (owner: "its in the walkthrough anyway"). Four tabs: Route, Bosses, Collection, Quests.
+- Gauntlet mod, no handouts: `tarnished-gauntlet\tools\patch-gifts.mjs` strips every item gift from "Prepare the gauntlet"
+  (event 10010001), ends the gift events 11107803/811/821/843, removes the awards in 11107808 and the grace's
+  "max out flasks" entry. Recompiled: common_func, m11_10_00_00 (DarkScript3), m00_00_00_00 talk (esdtool).
+- Twin Maiden Husks: the mod had emptied their shop (11 of 737 rows). `tools\patch-shop.mjs` puts the game's own rows
+  100000-102999 back into ShopLineupParam (vanilla regulation unpacked in `gauntlet-tools\work-vanilla`); regulation
+  repacked from `gauntlet-tools\work-verify`, round-trip checked (194 tables identical to intent).
+- Still untested in the game.

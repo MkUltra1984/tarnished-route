@@ -7,7 +7,7 @@ button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:poin
 #app{display:grid;height:100dvh;grid-template-columns:1fr clamp(400px,37vw,520px);grid-template-rows:1fr 64px;grid-template-areas:"map pane" "tabs tabs"}
 #map{grid-area:map;background:var(--bg);min-height:0;z-index:0}
 #pane{grid-area:pane;background:var(--surface);border-left:1px solid var(--divider);display:flex;flex-direction:column;min-height:0;min-width:0}
-#tabs{grid-area:tabs;background:var(--bg);border-top:1px solid var(--divider);display:grid;grid-template-columns:repeat(5,1fr);padding-bottom:env(safe-area-inset-bottom)}
+#tabs{grid-area:tabs;background:var(--bg);border-top:1px solid var(--divider);display:grid;grid-template-columns:repeat(4,1fr);padding-bottom:env(safe-area-inset-bottom)}
 
 /* tabs */
 .tab{display:flex;align-items:center;justify-content:center;height:63px}
@@ -78,7 +78,7 @@ button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:poin
 .gear{width:48px;height:48px;margin:-14px -12px -14px 8px;display:grid;place-items:center;color:var(--text-3)}
 .gear svg{width:24px;height:24px}
 
-/* lists (Bosses, Collection, Quests, Gauntlet) */
+/* lists (Bosses, Collection, Quests) */
 .listhead{flex:none;padding:16px var(--pad) 12px}
 .listhead h1{font-family:Marcellus,Georgia,serif;font-weight:400;font-size:28px;line-height:32px;margin:0 0 8px}
 .list{flex:1;min-height:0;overflow-y:auto;padding:0 var(--pad) 16px;border-top:1px solid var(--divider);overscroll-behavior:contain}
@@ -166,20 +166,13 @@ button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:poin
 .tip .leaflet-popup-content span{display:block;margin-top:6px;color:var(--text-2)}
 .tip .leaflet-popup-tip{background:var(--gold)}
 
-/* walkthrough pictures, detailed place text, quests and gauntlet lists */
+/* walkthrough pictures, detailed place text, quests */
 .shot{display:block;width:100%;height:auto;border-radius:8px;margin:0 0 12px;background:var(--surface-2)}
 .bigshot{max-width:100%;max-height:100%;border-radius:8px}
 .dir h3{font-family:Inter,system-ui,sans-serif;font-size:16px;line-height:22px;font-weight:700;color:var(--text);margin:14px 0 6px}
 .dir ul{margin:0 0 12px;padding-left:20px}.dir li{margin-bottom:6px}
 .qh{display:flex;justify-content:space-between;margin:20px 0 6px;color:var(--gold)}
 .qh span:last-child{color:var(--text-3)}
-.grow{display:grid;grid-template-columns:34px 32px 1fr auto;column-gap:10px;align-items:center;min-height:48px;border-bottom:1px solid var(--divider)}
-.grow img{width:32px;height:32px}
-.gn{font-weight:700;font-size:14px;color:var(--text-3);font-variant-numeric:tabular-nums;text-align:right}
-.gt{font-weight:600;font-size:17px;line-height:22px;min-width:0}
-.gt small{display:block;font-size:13px;line-height:18px;color:var(--text-3);font-weight:600}
-.gs{font-size:13px;font-weight:700;color:var(--text-3)}
-.grow.ok .gs{color:var(--ok)}.grow.ok .gt{color:var(--text-3)}.grow.ok img{opacity:.45}
 
 /* permanent Undo beside the Next line */
 .undo{height:auto;min-height:32px;gap:12px}
