@@ -265,3 +265,11 @@ button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:poin
   .tab img{padding:0;width:22px;height:22px;background:none!important}
   .tab.on span{color:var(--gold)}
 }
+
+/* six tabs on a narrow phone: equal columns that cannot be widened by a long label, a little air at the screen edges */
+#tabs{grid-template-columns:repeat(6,minmax(0,1fr))}
+@media (max-width:559px){
+  #tabs{padding-left:6px;padding-right:6px}
+  .tab span{font-size:11px;line-height:15px;max-width:100%}
+  .tab img{padding:4px 12px}
+}
