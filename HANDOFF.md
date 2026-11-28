@@ -337,3 +337,4 @@ Not done: nobody has started the game with it yet. The Gauntlet tab in the app s
 - Deliberately not used: npc-walkthrough (58% word for word in the main walkthrough, the rest is the questlines), the
   bosses sheet (the Bosses tab is the wiki's).
 - Tests: test-app, test-fixes, test-drops, test-forget, test-extra (local or live), test-offline (live).
+- Step 1 is 'Character creation' (no objectives; keepsake line rewritten: skip the Fanged Imp Ashes, bought later at step 'Talk to Isolated Merchant (Raya Lucaria)'). Lines about origin/keepsake never match objectives.

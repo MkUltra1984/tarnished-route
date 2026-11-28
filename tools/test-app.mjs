@@ -14,6 +14,8 @@ for (const [name, w, h] of [['tablet', 1280, 800], ['phone', 412, 915]]) {
   await page.goto(base, { waitUntil: 'networkidle' });
   const title = () => page.locator('.title').innerText(), stepNo = () => page.locator('.over.gold').innerText();
   ok((await stepNo()).startsWith('STEP 1 OF') || (await stepNo()).toLowerCase().startsWith('step 1 of'), `${name}: starts at step 1 (${await stepNo()})`);
+  // the route opens with character creation, a step without anything to tick: the checks below start at the step after it
+  if (await page.locator('.chk').count() === 0) { ok(/character creation/i.test(await title()), `${name}: the route opens with character creation`); await page.locator('.done').click(); await page.waitForTimeout(400); }
   const first = await title();
   // nothing is cut off: the main button, the map buttons and the tab bar are fully inside the window
   for (const sel of ['.done', '#tabs', '#recentre', '#zin', '#zout']) { const b = await page.locator(sel).boundingBox(); ok(b && b.y >= 0 && b.y + b.height <= h + 0.5 && b.x >= 0 && b.x + b.width <= w + 0.5, `${name}: ${sel} fully visible`); }

@@ -81,7 +81,7 @@ for (const [file, game, maps] of [['walkthrough', 'base', ['overland', 'undergro
     const close = () => {
       if (!pending.length) return;
       // objectives without a marker on the wiki's map: a marker of their own, at the spot of the step
-      { const spot = pending.flatMap(l => l.marks)[0], here = spot != null ? { m: L[spot][0], x: L[spot][1], y: L[spot][2] } : cur ? { m: MK.maps.indexOf(cur.map), x: cur.x, y: cur.y } : { m: MK.maps.indexOf(maps[0]), x: 0.5, y: 0.5 }; let k = 0;
+      { const spot = pending.flatMap(l => l.marks)[0], here = spot != null ? { m: L[spot][0], x: L[spot][1], y: L[spot][2] } : cur ? { m: MK.maps.indexOf(cur.map), x: cur.x, y: cur.y } : steps.length ? { m: MK.maps.indexOf(steps[steps.length - 1].map), x: steps[steps.length - 1].x, y: steps[steps.length - 1].y } : { m: MK.maps.indexOf(maps[0]), x: 0.5, y: 0.5 }; let k = 0;
         for (const l of pending) for (const f of l.fresh || []) { k++; const px = +(here.x + 0.0007 * k).toFixed(5), py = +(here.y + 0.0004 * k).toFixed(5);
           if (f.idx != null) { const m = L[f.idx]; m[0] = here.m; m[1] = px; m[2] = py; m[5] = l.text; m[7] = 'sheet'; l.marks.push(f.idx); fromLists++; continue; }
           const i = L.length; L.push([here.m, px, py, f.cat, f.gesture ? f.name + ' (Gesture)' : f.name, l.text, 'rm']); used.add(i); l.marks.push(i); added++; } }
@@ -106,9 +106,12 @@ for (const [file, game, maps] of [['walkthrough', 'base', ['overland', 'undergro
       const missEl = li.find('.missable').first(), miss = missEl.length ? (missEl.attr('data-tooltip') || 'This can be lost for the rest of the playthrough.') : (li.find('.badge').filter((_, b) => /missable/i.test($(b).text())).length ? 'This can be lost for the rest of the playthrough.' : null);
       const optional = li.find('.badge').filter((_, b) => /optional/i.test($(b).text())).length > 0;
       const body = li.clone(); body.find('.badge').remove(); const trophy = li.find('.badge').filter((_, b) => /\u{1F3C6}/u.test($(b).text())).length > 0;
-      const text = (optional ? 'Optional: ' : '') + plain(body.text()) + (trophy ? ' (This earns an achievement.)' : ''), low = text.toLowerCase();
+      const creation = /\b(origin|keepsakes?)\b/i.test(plain(body.text())) && steps.length === 0;
+      const text = /keepsakes?/i.test(plain(body.text())) && steps.length === 0
+        ? 'Keepsake: do not take the Fanged Imp Ashes. They can be bought later from the Isolated Merchant near the Main Academy Gate for 2,000 runes, so choosing them wastes the keepsake. The Golden Seed helps most at the start (one more flask charge). Avoid the Stonesword Keys: the route never needs bought ones.'
+        : (optional ? 'Optional: ' : '') + plain(body.text()) + (trophy ? ' (This earns an achievement.)' : ''), low = text.toLowerCase();
       const linksOut = li.find('a').map((_, a) => { const h = $(a).attr('href') || ''; return /youtu\.?be/.test(h) ? { t: 'Video: ' + plain($(a).text()), href: h } : /^\/images\//.test(h) ? { t: 'Picture: ' + plain($(a).text()), href: 'https://eldenring.redmaw.dev' + h } : null; }).get().filter(Boolean);
-      const marks = [], fresh = [], note = /^\s*(note|tip|warning)\b/i.test(text);
+      const marks = [], fresh = [], note = creation || /^\s*(note|tip|warning)\b/i.test(text);
       const MENTION = /\b(needs?|requires?|requiring|using|use|used|uses|bought|buy|sells?|sold|give|giving|offer|spend|equip|equipped|without|instead of|such as|die to|avoid|avoiding|ignore|skip|run past|sneak past|if you (?:have|picked|chose))\b(?:\s+(?:a|an|the|your|his|her|their|him|them|two|three|both|some|one|\d+))*\s*$/i;
       const foe = i => L[i][3] === 'Bosses' || L[i][3] === 'NPC Invaders';
       const take = pick => { used.add(pick); marks.push(pick); stats.matched++; cur = { map: mapOf(pick), x: L[pick][1], y: L[pick][2] }; for (const d of DROPS[pick] || []) if (!used.has(d)) { used.add(d); marks.push(d); } };
@@ -165,6 +168,7 @@ for (const [file, game, maps] of [['walkthrough', 'base', ['overland', 'undergro
       const count = new Map(); li.find('a').each((_, a) => { const t = $(a).text(), k = norm(t.replace(/s+xd+$/i, '')), n = +((t.match(/sx(d+)$/i) || [, 1])[1]); count.set(k, (count.get(k) || 0) + Math.min(n, 6)); });
       pending.push({ id, text, marks, miss, optional, links: linksOut, count, names: new Set(li.find('a').map((_, a) => norm($(a).text().replace(/s+xd+$/i, ''))).get()), red: new Set(li.find('a.red').map((_, a) => norm($(a).text())).get()), note });
       pending[pending.length - 1].fresh = fresh;
+      if (steps.length === 0 && /^begin your playthrough/i.test(text)) { close(); const st = steps[steps.length - 1], ch = L.findIndex(m => m[3] === 'Locations' && /^Chapel of Anticipation/.test(plain(m[4]))); st.fixedTitle = 'Character creation'; if (ch >= 0) { st.map = mapOf(ch); st.x = L[ch][1]; st.y = L[ch][2]; } return; }
       if (marks.some(i => kind(i) === 'g') || fresh.length) close();
     });
     // what is left at the end of a section belongs to its last step
@@ -285,7 +289,7 @@ const whereOf = i => { const t = plain(L[i][4]), m = t.match(/\(([^)]+)\)\s*$/) 
 const labelOf = i => { const b = (KIND[L[i][3]] || '') + nameOf(i); return KIND[L[i][3]] && sameShort.get(norm(short(L[i][4]))) > 1 && whereOf(i) ? `${b} (${whereOf(i)})` : b; };
 for (const st of steps) { st.m = [...new Set(st.m)]; st.n = [...new Set(st.n)].filter(i => !st.m.includes(i)); const g = ownG(st), shown = g.length ? g : st.m.filter(i => kind(i) === 'g');
   const names = shown.map(labelOf); let title = names.length ? names.slice(0, 2).join(', ') + (names.length > 2 ? ` +${names.length - 2}` : '') : st.region.replace(/ · meeting.*$/, '');
-  if (title.length > 58 && names.length > 1) title = names[0] + ` +${names.length - 1}`; st.title = title;
+  if (title.length > 58 && names.length > 1) title = names[0] + ` +${names.length - 1}`; st.title = st.fixedTitle || title; delete st.fixedTitle;
   // the words: Redmaw's line says where to go and what to do; under it the wiki's note for each thing the line names
   const text = [], said = new Set(), noted = new Set(), note = i => { const d = plain(L[i][5] || ''); if (kind(i) === 'p' || d.length <= 12 || noted.has(i) || L[i][6] === 'rm') return; noted.add(i); const t = `${nameOf(i)}: ${d}`; if (!said.has(t)) { said.add(t); text.push(t); } };
   for (const l of st.lines || []) { if (l.text && !said.has(l.text)) { said.add(l.text); text.push(l.text); } for (const i of l.marks) if (st.m.includes(i)) note(i); }
