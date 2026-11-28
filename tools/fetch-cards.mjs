@@ -23,6 +23,8 @@ const names = t => {
   const b = strip(plain(t)), out = [b];
   for (const sep of [' & ', ' / ', ' and ']) if (b.includes(sep)) out.push(...b.split(sep).reverse().map(x => x.trim()));
   if (plain(t) !== b) out.push(plain(t));
+  // other spellings the wiki uses for the same page: without the "[3]", "the" in lower case, every word capitalised
+  for (const x of [...out]) { out.push(x.replace(/\s*\[\d+\]$/, ''), x.replace(/, The /g, ', the '), x.replace(/\b[a-z]/g, c => c.toUpperCase()).replace(/\b(Of|The|And|In)\b/g, w => w.toLowerCase()).replace(/^./, c => c.toUpperCase())); }
   return [...new Set(out)].filter(x => x.length > 2);
 };
 const want = MK.list.filter(m => MK.cats[m[3]].kind === 'g' && !['NPCs', 'NPC Invaders'].includes(m[3]));
@@ -63,7 +65,7 @@ async function picture(src, slug, boss) {
 function parse(html, boss) {
   const $ = cheerio.load(html), root = $('#mw-content-text'); if (!root.length) return null;
   const out = { title: clean($('h1').first().text()).replace(/\s*\|.*$/, ''), boss: boss ? 1 : 0, facts: [], intro: [], where: [], strat: [] };
-  const bad = s => !s || !/fextralifeimages\.com\/file\//.test(s) || /\d{2}px|icon|status_effect|currency|banner|logo/i.test(s.split('/').pop());
+  const bad = s => !s || !/fextralifeimages\.com\/file\//.test(s) || /(^|[^0-9])\d{2}px|[-_]\d{2}\.(png|webp|jpe?g)$|icon|status_effect|currency|runes|banner|logo|damage|upgrades/i.test(decodeURIComponent(s.split('/').pop()));
   const imgs = (boss && $('.infobox').length ? $('.infobox').first() : root).find('img').map((_, e) => $(e).attr('src') || $(e).attr('data-src') || '').get();
   out.src = imgs.find(s => !bad(s)) || null;
   let mode = null; const seen = new Set();

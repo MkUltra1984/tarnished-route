@@ -290,3 +290,4 @@ button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:poin
   #app{grid-template-rows:1fr auto}
   #tabs{padding-bottom:max(2px,env(safe-area-inset-bottom))}
 }
+.tile:has(.art:not(.ph)){background:#3a352b}

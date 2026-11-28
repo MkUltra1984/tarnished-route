@@ -226,3 +226,18 @@ Not done: nobody has started the game with it yet. The Gauntlet tab in the app s
   Stonesword Keys. Beach / Seaside Ruins items that hung on steps 2-3 as "nearby" moved to Coastal Cave and
   Dragon-Burnt Ruins (build-route.mjs, block before "write"). Known general weakness: "nearby" is as the crow flies,
   so cliffs are ignored; other steps may have the same kind of stray item.
+
+## UPDATE 14 (2026-11-28)
+- Tabs: Route, Bosses, Collection, Quests, Materials, Settings (the gear is gone). New tab icons were generated with
+  `IMG_MODEL=gpt-image-1.5` and recoloured with `tools/match-tab-icons.mjs` so all six share one tone.
+- OpenAI key: a 401 in a session usually means the session holds an old copy; read the stored user variable (never print it).
+- Dungeon steps hold only what is inside (`tools/boss-drops.mjs`, second block; list in data/outside-moves.txt).
+  "check the page here" sentences are removed there too. Step 1's starting-class sentence is replaced in build-route.mjs.
+- Cards: `tools/fetch-cards.mjs` saves the wiki page of every boss and collectible (raw/cards, cached) and writes
+  app/data/cards.json + app/cards/ pictures. 1717 of 1824 markers have a card; 107 do not (mostly numbered cookbooks /
+  bell bearings whose page name differs). Tapping a row in Bosses / Collection, or "Picture and details" under an
+  objective in a step, opens the card.
+- Phone layout: app is `position:fixed; inset:0` and no longer uses viewport-fit=cover (Android Chrome hid the tab labels
+  under the gesture bar). Sideways phones get map and text side by side.
+- Offered, not done: shortening all walkthrough texts with a language model (3,092 paragraphs, ~180,000 words), with an
+  automatic name/number check and a Short/Full switch. Waiting for the owner's go.
