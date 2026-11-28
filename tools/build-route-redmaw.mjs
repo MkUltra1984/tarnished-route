@@ -37,7 +37,10 @@ const lookupPerson = t => { const words = plain(t).toLowerCase().split(/[^a-z']+
 const placeByTitle = new Map(Object.values(PLACES).map(p => [norm(p.title), p]));
 
 const nameOf = i => { const t = short(L[i][4]); return t.length < 5 || L[i][3] === 'Maps' ? plain(L[i][4]) : t; };
-const used = new Set(), steps = [], stats = { lines: 0, links: 0, matched: 0 };
+const allLines = [];
+const used = new Set(), steps = [], stats = { lines: 0, links: 0, matched: 0, plain: 0 };
+// objective names as they would stand in running text (lower case, at least 7 letters, longest first)
+const plainNames = (() => { const m = new Map(); L.forEach((x, i) => { if (kind(i) !== 'g') return; const k = strip(x[4]).toLowerCase(); if (k.replace(/[^a-z]/g, '').length < 7) return; if (!m.has(k)) m.set(k, []); m.get(k).push(i); }); return [...m.entries()].sort((p, q) => q[0].length - p[0].length); })();
 const KIND = { 'NPCs': 'Talk to ', 'NPC Invaders': 'Invader: ', 'Bosses': 'Boss: ' };
 
 for (const [file, game, maps] of [['walkthrough', 'base', ['overland', 'underground', 'ashen']], ['dlc-walkthrough', 'dlc', ['shadow']]]) {
@@ -62,38 +65,70 @@ for (const [file, game, maps] of [['walkthrough', 'base', ['overland', 'undergro
       let place = null; for (const i of marks) if (L[i][3] === 'Locations') { const p = placeByTitle.get(norm(short(L[i][4]))); if (p && !p.taken && (p.walk.length || p.notes.length)) { p.taken = true; place = { title: p.title, walk: p.walk, notes: p.notes, img: p.img || null }; break; } }
       const at = lead != null ? { map: mapOf(lead), x: L[lead][1], y: L[lead][2] } : (steps.length ? { map: steps[steps.length - 1].map, x: steps[steps.length - 1].x, y: steps[steps.length - 1].y } : { map: maps[0], x: 0.5, y: 0.5 });
       const st = { id: `rm:${pending[pending.length - 1].id}`, game, region, title, ...at, text, miss, boss: g.some(i => L[i][3] === 'Bosses'), m: marks, n: [], imgs: [], place, card: g[0] ?? null, optional: pending.every(l => l.optional) || undefined };
+      for (const l of pending) { l.step = st; allLines.push(l); }
       steps.push(st); sectionSteps.push(st); pending = [];
     };
     list.find('input[type=checkbox]').each((_, box) => {
-      const li = $(box).closest('li'), id = $(box).attr('id'); stats.lines++;
+      // a line of the sheet is the entry itself, without the sub-entries nested inside it (they are lines of their own)
+      const li = $(box).closest('li').clone(); li.find('ul, ol').remove(); const id = $(box).attr('id'); stats.lines++;
       const missEl = li.find('.missable').first(), miss = missEl.length ? (missEl.attr('data-tooltip') || 'This can be lost for the rest of the playthrough.') : (li.find('.badge').filter((_, b) => /missable/i.test($(b).text())).length ? 'This can be lost for the rest of the playthrough.' : null);
       const optional = li.find('.badge').filter((_, b) => /optional/i.test($(b).text())).length > 0;
-      const marks = [];
+      const body = li.clone(); body.find('.badge').remove(); const text = plain(body.text()), low = text.toLowerCase();
+      const marks = [], note = /^\s*(note|tip|warning)\b/i.test(text);
+      const MENTION = /\b(needs?|requires?|requiring|using|use|used|uses|bought|buy|sells?|sold|give|giving|offer|spend|equip|equipped|without|instead of|such as|die to|avoid|avoiding|ignore|skip|run past|sneak past|if you (?:have|picked|chose))\b[^,]*$/i;
+      const foe = i => L[i][3] === 'Bosses' || L[i][3] === 'NPC Invaders';
+      const take = pick => { used.add(pick); marks.push(pick); stats.matched++; cur = { map: mapOf(pick), x: L[pick][1], y: L[pick][2] }; for (const d of DROPS[pick] || []) if (!used.has(d)) { used.add(d); marks.push(d); } };
+      // 1. the names the line links
+      const todo = [];
       li.find('a').each((_, a) => { stats.links++; const href = decodeURIComponent((($(a).attr('href') || '').match(/wiki\.gg\/wiki\/([^#?]+)/) || [, ''])[1]).replace(/_/g, ' ');
-        const c = lookup($(a).text()) || (href && lookup(href)) || lookupPerson($(a).text()) || (href && lookupPerson(href)); if (!c) return;
+        const c = lookup($(a).text()) || (href && lookup(href)) || lookupPerson($(a).text()) || (href && lookupPerson(href)); if (!c || note) return;
         // Redmaw prints enemies in red: only a red name can be a boss or invader to defeat, and a red name is nothing to pick up
-        const red = /\bred\b/.test($(a).attr('class') || ''), foe = i => L[i][3] === 'Bosses' || L[i][3] === 'NPC Invaders';
-        // a name that is only mentioned (something to use, give, buy or need; a side note) is not a pick-up
-        const html = $.html(li), at = html.indexOf($.html(a)), before = plain(html.slice(0, at)).split(/[.;!?]\s/).pop() || '';
-        if (/^\s*(note|tip|warning)\b/i.test(plain(li.text()).replace(/^(optional|missable)\s*/i, '')) || /\b(needs?|requires?|requiring|using|use|used|uses|bought|buy|sells?|sold|give|giving|offer|spend|equip|equipped|without|instead of|such as|die to|avoid|avoiding|ignore|skip|run past|sneak past|if you (?:have|picked|chose))\b[^,]*$/i.test(before)) return;
-        const free = c.filter(i => !used.has(i) && maps.includes(mapOf(i)) && (red ? foe(i) || L[i][3] === 'NPCs' : !foe(i))); if (!free.length) return;
-        const pick = free.sort((p, q) => dist(p) - dist(q))[0];
-        // a common name far from where the walkthrough is right now is probably a mention, not a pick-up
-        // of many things with one name only one close to where the walkthrough is can be meant (0.04 of the map is about 330 px)
-        if (c.length >= 3 && (!cur || dist(pick) > 0.04)) return;
-        if (c.length === 2 && cur && dist(pick) > 0.15) return;
-        if (!cur && kind(pick) !== 'g' && c.length > 1) return;
-        used.add(pick); marks.push(pick); stats.matched++; cur = { map: mapOf(pick), x: L[pick][1], y: L[pick][2] };
-        for (const d of DROPS[pick] || []) if (!used.has(d)) { used.add(d); marks.push(d); } });
-      const body = li.clone(); body.find('.badge').remove(); const text = plain(body.text());
-      pending.push({ id, text, marks, miss, optional });
+        const red = /\bred\b/.test($(a).attr('class') || '');
+        // a name that is only mentioned (something to use, give, buy or need) is not a pick-up
+        const html = $.html(li), at = html.indexOf($.html(a)), before = plain(html.slice(0, at)).split(/[.;!?]\s/).pop() || ''; if (MENTION.test(before)) return;
+        const free = c.filter(i => !used.has(i) && maps.includes(mapOf(i)) && (red ? foe(i) || L[i][3] === 'NPCs' : !foe(i))); if (free.length) todo.push({ c, free, red }); });
+      // names that can only mean one marker first: they say where the line is (after a fast travel, too)
+      const anchors = []; const near = i => Math.min(dist(i), ...anchors.map(a => a.map === mapOf(i) ? Math.hypot(L[i][1] - a.x, L[i][2] - a.y) : 5));
+      for (const t of todo) { if (t.free.length !== 1 || t.c.length > 1 && (!cur || dist(t.free[0]) > 0.15) && kind(t.free[0]) !== 'g') continue; const i = t.free[0]; if (used.has(i)) continue; t.done = true; take(i); anchors.push({ map: mapOf(i), x: L[i][1], y: L[i][2] }); }
+      // a drop named in the line points at its boss ("kill the Deathbird for Blue-Feathered Branchsword")
+      for (const t of todo) { if (t.done || !t.red) continue; const viaDrop = t.free.find(b => (DROPS[b] || []).some(d => marks.includes(d) || todo.some(o => o !== t && o.c.includes(d)))); if (viaDrop != null && !used.has(viaDrop)) { t.done = true; take(viaDrop); anchors.push({ map: mapOf(viaDrop), x: L[viaDrop][1], y: L[viaDrop][2] }); } }
+      // of several markers with one name, the nearest to where the line is; too far away is a mention, not a pick-up
+      for (const t of todo) { if (t.done) continue; const free = t.free.filter(i => !used.has(i)); if (!free.length) continue; const pick = free.sort((p, q) => near(p) - near(q))[0], d = near(pick);
+        if (t.c.length >= 3 && d > 0.04) continue; if (t.c.length === 2 && d > 0.15) continue; if (d > 4 && kind(pick) !== 'g' && t.c.length > 1) continue;
+        take(pick); anchors.push({ map: mapOf(pick), x: L[pick][1], y: L[pick][2] }); }
+      // 2. names the line says without linking them: only things that are right here
+      if (!note && cur) for (const [name, list2] of plainNames) { const p = low.indexOf(name); if (p < 0) continue; if (p > 0 && /[a-z]/.test(low[p - 1]) || /[a-z]/.test(low[p + name.length] || '')) continue;
+        if (MENTION.test(text.slice(0, p).split(/[.;!?]\s/).pop() || '')) continue;
+        const free = list2.filter(i => !used.has(i) && maps.includes(mapOf(i)) && !marks.includes(i)); if (!free.length) continue; const pick = free.sort((a, b) => near(a) - near(b))[0]; if (near(pick) > 0.03) continue;
+        take(pick); stats.plain++; }
+      pending.push({ id, text, marks, miss, optional, names: new Set(li.find('a').map((_, a) => norm($(a).text().replace(/s+xd+$/i, ''))).get()), red: new Set(li.find('a.red').map((_, a) => norm($(a).text())).get()), note });
       if (marks.some(i => kind(i) === 'g')) close();
     });
     // what is left at the end of a section belongs to its last step
-    if (pending.length && sectionSteps.length) { const last = sectionSteps[sectionSteps.length - 1]; for (const l of pending) { last.text.push(l.text); for (const i of l.marks) if (!last.m.includes(i)) last.m.push(i); if (l.miss) last.miss = (last.miss ? last.miss + ' ' : '') + l.miss; } pending = []; } else close();
+    if (pending.length && sectionSteps.length) { const last = sectionSteps[sectionSteps.length - 1]; for (const l of pending) { l.step = last; allLines.push(l); last.text.push(l.text); for (const i of l.marks) if (!last.m.includes(i)) last.m.push(i); if (l.miss) last.miss = (last.miss ? last.miss + ' ' : '') + l.miss; } pending = []; } else close();
   });
 }
 
+// Repair of same-named things. "Golden Seed" or "Stonesword Key" stands for many markers; the first pass takes the
+// nearest free one to where the walkthrough was. Looking at the finished route, a pick that lies far from everything
+// in the steps around it, while a free marker of the same name lies among them, was the wrong one: they are swapped.
+const nameKey = i => norm(strip(L[i][4])), siblings = new Map(); L.forEach((m, i) => { const k = nameKey(i); if (!siblings.has(k)) siblings.set(k, []); siblings.get(k).push(i); });
+const context = (i, k) => { let d = 5; for (let q = Math.max(0, k - 3); q <= Math.min(steps.length - 1, k + 3); q++) for (const j of steps[q].m) if (j !== i && mapOf(j) === mapOf(i) && nameKey(j) !== nameKey(i)) d = Math.min(d, Math.hypot(L[j][1] - L[i][1], L[j][2] - L[i][2])); return d; };
+let swapped = 0, lonely = 0;
+steps.forEach((st, k) => { for (const i of [...st.m]) { const sib = siblings.get(nameKey(i)); if (sib.length < 2 || dropOf.has(i)) continue; const mine = context(i, k); if (mine <= 0.05) continue;
+    const better = sib.filter(j => !used.has(j) && L[j][3] === L[i][3] && (mapOf(j) === 'shadow') === (st.game === 'dlc')).map(j => [context(j, k), j]).sort((a, b) => a[0] - b[0])[0];
+    if (better && better[0] + 0.02 < mine && better[0] < 0.04) { st.m[st.m.indexOf(i)] = better[1]; used.delete(i); used.add(better[1]); if (st.card === i) st.card = better[1]; swapped++; } else lonely++; } });
+for (const st of steps) { const lead = st.m.find(i => kind(i) === 'g' && !dropOf.has(i)) ?? st.m[0]; if (lead != null && (st.card == null || !st.m.includes(st.card))) { st.card = kind(lead) === 'g' ? lead : null; } if (lead != null) { st.map = mapOf(lead); st.x = L[lead][1]; st.y = L[lead][2]; } }
+console.log('same-named picks repaired:', swapped, '| still far from their neighbours with no better candidate:', lonely);
+
+// Second chance for objectives the first pass left out although the sheet links their name (the walkthrough had
+// travelled, so "the nearest one" was not the right one, or the line read like a mention): each goes to the nearest
+// step whose line names it, if that step is close to the thing on the map.
+let rescued = 0;
+L.forEach((m, i) => { if (used.has(i) || kind(i) !== 'g' || dropOf.has(i)) return; const keys = new Set([norm(strip(m[4])), norm(m[4]), norm(strip(m[4]).replace(/^ash of war: /i, ''))]), foe = m[3] === 'Bosses' || m[3] === 'NPC Invaders';
+  let best = null, bd = 0.06; for (const l of allLines) { if (l.note || !l.step || l.step.map !== mapOf(i) || (l.step.game === 'dlc') !== (mapOf(i) === 'shadow')) continue; const hit = [...keys].find(k => l.names.has(k)); if (!hit || foe !== l.red.has(hit)) continue;
+    const d = Math.min(Math.hypot(l.step.x - m[1], l.step.y - m[2]), ...l.step.m.map(j => mapOf(j) === mapOf(i) ? Math.hypot(L[j][1] - m[1], L[j][2] - m[2]) : 5)); if (d < bd) { bd = d; best = l.step; } }
+  if (!best) return; best.m.push(i); used.add(i); rescued++; for (const d of DROPS[i] || []) if (!used.has(d)) { used.add(d); best.m.push(d); } });
 // markers the sheet never names: to the nearest step on their map, as "nearby, on the way"
 let leftG = 0, leftOther = 0; const far = [], extras = [];
 const byMap = new Map(); steps.forEach(s => { if (!byMap.has(s.map)) byMap.set(s.map, []); byMap.get(s.map).push(s); });
@@ -153,8 +188,9 @@ const gAll = L.map((_, i) => i).filter(i => kind(i) === 'g'), gOwn = gAll.filter
 const sizes = steps.map(s => s.m.filter(i => kind(i) === 'g' && !dropOf.has(i)).length), nearby = steps.map(s => s.n.filter(i => kind(i) === 'g' && !dropOf.has(i)).length);
 const R = [
   `Redmaw route: ${steps.length} steps (${steps.filter(s => s.game === 'base').length} base game, ${steps.filter(s => s.game === 'dlc').length} expansion) from ${stats.lines} lines of the sheet.`,
-  `Links in the sheet: ${stats.links}; matched to a map marker: ${stats.matched}.`,
+  `Links in the sheet: ${stats.links}; things matched to a map marker: ${stats.matched}, of these ${stats.plain} from names the sheet says without a link.`,
   `Markers: ${L.length}; in exactly one step: ${[...inSteps.values()].filter(v => v === 1).length}; in none: ${L.length - inSteps.size}; in more than one: ${[...inSteps.values()].filter(v => v > 1).length}.`,
+  `Second-chance matches (name linked by the sheet, step close by): ${rescued}.`,
   `Objectives (bosses, people, items): ${gAll.length}; named by the sheet and placed in its order: ${gOwn}; not named, attached to the nearest step: ${leftG}.`,
   `Objectives per step: largest own list ${Math.max(...sizes)}, steps with more than 5 of their own: ${sizes.filter(n => n > 5).length}; largest "nearby" list ${Math.max(...nearby)}, steps with more than 6 nearby: ${nearby.filter(n => n > 6).length}.`,
   `Steps with the wiki's detailed place text: ${steps.filter(s => s.place).length}. Missable steps: ${steps.filter(s => s.miss).length}.`,

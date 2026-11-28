@@ -260,3 +260,10 @@ Not done: nobody has started the game with it yet. The Gauntlet tab in the app s
 - The wiki's long texts are kept in the Redmaw route: 239 of its place pages as "... in detail" on the first step at
   the place, and 170 walkthrough sections as a fold-out "Wiki walkthrough: ..." on the step where their things begin
   (taken from the wiki-ordered route, saved as data/route-fextra.json by build-route-redmaw.mjs).
+- Redmaw matching, second round (owner: "research all things not exact"): a sheet line is now read without its nested
+  sub-lines (they were swallowed into one step before); names that can only mean one marker anchor the line; a drop
+  named in a line identifies its boss; unlinked names in running text match things within 0.03; a second pass places
+  things whose name a nearby step's line links; a repair pass swaps same-named picks that lie far from their
+  neighbours. Result: 1,402 steps, 1,921 of 2,025 objectives in the sheet's order, 208 not placed by the sheet
+  (137 of them are not in the sheet at all). `node tools/redmaw-audit.mjs --all` lists them (data/redmaw-audit.txt).
+- App: when the route is rebuilt, saved ticks are carried over to step progress (carryOver in app.js).

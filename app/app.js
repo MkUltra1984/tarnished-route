@@ -36,6 +36,16 @@
   const doneCount = () => ROUTE.filter(x => S.st[x.id] === 'd').length;
   const grabOf = s => [...new Set([...s.m, ...s.n])].map(i => M[i]).filter(m => m.kind === 'g' && !dropOf.has(m.i));
   const extraOf = s => s.n.map(i => M[i]).filter(m => m.kind === 'x');
+  // The route was rebuilt (new steps, new ids): the saved step position cannot be carried over, the ticks can.
+  // Steps whose objectives are all ticked count as done, up to the last such step; steps on the way with something
+  // still open count as "left open", so they come back.
+  (function carryOver() {
+    const known = new Set(ROUTE.map(s => s.id)), old = Object.keys(S.st).filter(k => !known.has(k)); if (!old.length && S.routeV === ROUTE.length) return;
+    if (old.length) { S.st = {}; S.hist = [];
+      const state = ROUTE.map(s => { const g = grabOf(s); return !g.length ? 0 : g.every(m => S.got[m.i]) ? 2 : g.some(m => S.got[m.i]) ? 1 : -1; });
+      const last = state.lastIndexOf(2); for (let k = 0; k <= last; k++) S.st[ROUTE[k].id] = state[k] === 2 || state[k] === 0 ? 'd' : 'l'; }
+    S.routeV = ROUTE.length; save();
+  })();
 
   // ---------- map ----------
   const SIZE = Math.min(innerWidth, innerHeight) < 600 ? 30 : 40, MAXZOOM = 7, FITZOOM = 5;   // symbols have one fixed size; each step zooms in until its objectives are spread out
