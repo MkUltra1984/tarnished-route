@@ -75,7 +75,6 @@ Murkwater Cave -> A Familiar Feeling: Armorer's Cookbook [1]
 Murkwater Cave -> A Familiar Feeling: Ash of War: Determination
 Murkwater Cave -> A Familiar Feeling: Ash of War: Repeating Thrust
 Murkwater Cave -> A Familiar Feeling: Boc the Seamster (First Location)
-Murkwater Cave -> A Familiar Feeling: Leather Set (No Helmet)
 Murkwater Cave -> A Familiar Feeling: Night's Cavalry (Limgrave)
 Northern Nameless Mausoleum -> Church of the Crusade: Crimson Amber Medallion +3 - Fog Rift Catacombs
 Northern Nameless Mausoleum -> Church of the Crusade: Death Knight's Twin Axes - Fog Rift Catacombs

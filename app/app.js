@@ -172,6 +172,8 @@
     if (!s) { pane.innerHTML = `<div class="listhead"><h1>Route complete</h1></div><div class="list"><p class="lead">Every step is done.</p></div>`; return; }
     const keep = $('.body', pane) ? $('.body', pane).scrollTop : 0;
     const pos = ROUTE.indexOf(s) + 1, grab = grabOf(s), extra = extraOf(s), nx = nextAfter(s), open = grab.filter(m => !S.got[m.i]).length;
+    // what the step is about, and what merely lies close to its path
+    const own = new Set(s.m), here = grab.filter(m => own.has(m.i)), onway = grab.filter(m => !own.has(m.i)), got = l => l.filter(m => S.got[m.i]).length;
     const para = s.text.length ? s.text : ['Explore this place and pick up everything listed below.'];
     const back = nearbyLeft(s), openAll = leftOpen().length;
     pane.innerHTML = `
@@ -186,8 +188,9 @@
         <div class="dir">${shot(s.imgs[0], 'lead')}${para.map(p => p.startsWith('## ') ? `<h3>${esc(p.slice(3))}</h3>` : `<p>${esc(p)}</p>`).join('')}${s.imgs.length > 1 ? `<div class="strip">${s.imgs.slice(1).map(f => shot(f, 'thumb')).join('')}</div>` : ''}</div>
         ${s.place && (s.place.walk.length || s.place.notes.length || s.place.img) ? `<div class="over sechead">${esc(s.place.title)} in detail</div><div class="dir">${shot(s.place.img, 'lead')}${s.place.walk.map(p => p.startsWith('## ') ? `<h3>${esc(p.slice(3))}</h3>` : `<p>${esc(p)}</p>`).join('')}${s.place.notes.length ? `<h3>Notes</h3><ul>${s.place.notes.map(p => `<li>${esc(p)}</li>`).join('')}</ul>` : ''}</div>` : ''}
         ${s.miss ? `<div class="miss"><b>Missable:</b> ${esc(s.miss)}</div>` : ''}
-        <div class="sechead" id="todo"><span class="over">To do here &middot; ${grab.length - open} of ${grab.length}</span>${grab.length > 1 ? `<button class="link" id="allb">${open ? 'Tick all' : 'Untick all'}</button>` : ''}</div>
-        ${grab.map(checkHTML).join('') || '<div class="none">Nothing to pick up here.</div>'}
+        <div class="sechead" id="todo"><span class="over">To do here &middot; ${got(here)} of ${here.length}</span>${grab.length > 1 ? `<button class="link" id="allb">${open ? 'Tick all' : 'Untick all'}</button>` : ''}</div>
+        ${here.map(checkHTML).join('') || '<div class="none">Nothing to pick up here.</div>'}
+        ${onway.length ? `<div class="sechead"><span class="over">Nearby, on the way &middot; ${got(onway)} of ${onway.length}</span></div>${onway.map(checkHTML).join('')}` : ''}
         ${back.length ? `<div class="sechead"><span class="over warn">Left open nearby &middot; ${back.length}</span></div>${back.map(m => checkHTML(m, 'from ' + ROUTE[stepOf.get(m.i)].title)).join('')}` : ''}
         ${extra.length ? `<button class="link wide" id="xt">${S.extras ? 'Hide' : 'Show'} ${extra.length} nearby materials</button>${S.extras ? extra.map(checkHTML).join('') : ''}` : ''}
       </div>

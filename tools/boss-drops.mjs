@@ -41,6 +41,8 @@ console.log(rows.length, 'boss drops on', Object.keys(drops).length, 'bosses');
     for (const i of s.n) { const m = L[i];
       const inside = norm(m[4]).includes(t) || norm(m[5] || '').includes(t) || (MK.cats[m[3]].kind === 'g' && (txt.includes(nm(m[4])) || links.has(nm(m[4])))) || (m[3] === 'Bosses' && Math.hypot(m[1] - s.x, m[2] - s.y) < 0.004);
       if (!inside) out.add(i); }
+    // a boss's drops stay with their boss
+    for (const b of [...s.m, ...s.n]) if (drops[b] && !out.has(b)) for (const i of drops[b]) out.delete(i);
     if (!out.size) return; from++;
     for (const i of out) { const m = L[i]; let best = -1, bd = 9;
       for (const win of [12, 1e9]) { R.forEach((x, xi) => { if (xi === si || isDun(x) || x.map !== MK.maps[m[0]] || Math.abs(xi - si) > win) return; const d = near(x, m) + (xi < 2 ? 1 : 0); if (d < bd) { bd = d; best = xi; } }); if (best >= 0 && bd < 0.06) break; }
