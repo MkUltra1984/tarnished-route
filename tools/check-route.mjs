@@ -64,12 +64,13 @@ const kind = i => MK.cats[MK.list[i][3]].kind, name = i => clean(MK.list[i][4]).
 let obj = 0, namedHere = 0, listedHere = 0, namedElsewhere = 0, unnamed = 0; const worst = [], rest = [];
 const pl = new Map(Object.values(PLACES).map(p => [p.title.toLowerCase(), new Set((p.links || []).map(l => clean(l).replace(/[‘’]/g, "'").toLowerCase()))]));
 const listedBy = R.map(s => pl.get(s.title.toLowerCase()) || (s.place && pl.get(s.place.title.toLowerCase())) || null);
-const lower = stepText.map(ps => ps.join(' ').toLowerCase().replace(/[‘’]/g, "'"));
+const lower = stepText.map((ps, i) => (R[i].title + ' . ' + ps.join(' ')).toLowerCase().replace(/[‘’]/g, "'"));
+const says = (txt, i) => { const m = clean(MK.list[i][4]).replace(/[‘’]/g, "'").match(/^(.*\S)\s*[\[(](\d+)[\])]\s*$/); return m ? txt.includes(`${m[1].toLowerCase()} [${m[2]}]`) || txt.includes(`${m[1].toLowerCase()} (${m[2]})`) : txt.includes(name(i)); };
 const allText = lower.join(' ');
 R.forEach((s, si) => {
   let u = 0, n = 0;
   for (const i of new Set([...s.m, ...s.n])) { if (kind(i) !== 'g') continue; obj++; const nm = name(i); if (nm.length < 4) { namedHere++; continue; }
-    if (lower[si].includes(nm)) namedHere++; else if (listedBy[si] && listedBy[si].has(nm)) listedHere++; else if (allText.includes(nm)) { namedElsewhere++; n++; } else { unnamed++; u++; rest.push(MK.list[i][3] + ': ' + MK.list[i][4]); } }
+    if (says(lower[si], i)) namedHere++; else if (listedBy[si] && (listedBy[si].has(nm) || listedBy[si].has(clean(MK.list[i][4]).replace(/[‘’]/g, "'").toLowerCase()))) listedHere++; else if (says(allText, i)) { namedElsewhere++; n++; } else { unnamed++; u++; rest.push(MK.list[i][3] + ': ' + MK.list[i][4]); } }
   if (n >= 4) worst.push([n, `${si + 1}. ${s.title}: ${n} objectives that only another step's text talks about`]);
 });
 say(`D. Objectives (${obj}): ${namedHere} are named in the text of their own step; ${listedHere} more are in the item list of their own place's page; ${namedElsewhere} are listed in one step but only named in another step's text; ${unnamed} are not named in the route's text under their map name (map-only, item lists, or a different spelling).`);

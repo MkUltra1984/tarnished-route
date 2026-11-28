@@ -26,7 +26,7 @@ const CAT = { // wiki category -> [symbol file, singular label, kind]   kind: g 
   'Sites of Grace': ['grace', 'Site of Grace', 'p'], 'Locations': ['location', 'Location', 'p'], 'Spiritsprings': ['spiritspring', 'Spiritspring', 'p'],
   'Summoning Pools': ['pool', 'Summoning Pool', 'p'], 'Waygates': ['waygate', 'Waygate', 'p'],
 };
-const NOISE = /^notes$|^enemies$|general information|creatures|all items|^items found|all legacy dungeons|^.{0,40}\bbosses$|^npcs?$|^items$|video|trophy|^maps?$/i;
+const NOISE = /^notes$|^enemies$|general information|creatures|all items|^items found|all legacy dungeons|^.{0,40}\bbosses$|^npcs?$|^items$|video|trophy|^maps?$|follow us on socials/i;
 const HEADER = /walkthrough\s*-\s*(.+)$/i;
 const SPEEDRUN = new Set(['Entry to Cliffside', 'Cliffside to Rampart Tower', 'Rampart Towers to Liftside Chamber', 'Liftside Chamber to the Courtyard and Godrick', 'After Godrick', 'East Capital Rampart to Avenue Balcony', 'West Capital Rampart to Spectral Godfrey', 'Erdtree Sanctuary to Morgott']);
 const clean = s => (s || '').replace(/<[^>]+>/g, ' ').replace(/&amp;/g, '&').replace(/&nbsp;/g, ' ').replace(/\s+/g, ' ').trim();
@@ -40,6 +40,8 @@ const readJson = (f, d) => fs.existsSync(f) ? JSON.parse(fs.readFileSync(f, 'utf
 const WALKIMG = readJson('data/walk-images.json', {}), PLACES = readJson('data/places.json', {});
 const dist = (a, b) => Math.hypot(a.x - b.x, a.y - b.y);
 const TRACE = process.env.TRACE, trace = (mk, why, st) => { if (TRACE && mk.title === TRACE) console.log('TRACE', mk.title, '->', st.title, '|', why); };
+const lev = (a, b) => { if (Math.abs(a.length - b.length) > 2) return 9; let p = [...Array(b.length + 1).keys()]; for (let i = 1; i <= a.length; i++) { const c = [i]; for (let j = 1; j <= b.length; j++) c[j] = Math.min(p[j] + 1, c[j - 1] + 1, p[j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1)); p = c; } return p[b.length]; };
+const sameTitle = (a, b) => a === b || (a.length >= 10 && lev(a, b) <= 2);
 const med = a => { const v = [...a].sort((p, q) => p - q); return v[v.length >> 1]; };
 
 // ---- markers ----
@@ -68,9 +70,10 @@ function pinOf(place, game) {
 // everything the place's own page lists (items, characters, bosses) that sits at the place on the map
 function itemsOf(place, pin) {
   const got = [];
+  if (!place) return got;
   for (const name of place.links) for (const m of byName.get(norm(name)) || []) {
     if (m.map !== pin.map || claimed.has(m.key) || m.key === pin.key) continue;
-    if (dist(m, pin) <= (m.kind === 'x' ? 0.012 : 0.02)) got.push(claim(m.key));
+    if (dist(m, pin) <= (m.kind === 'x' ? 0.012 : 0.02)) { trace(m, 'item list of the place page', place); got.push(claim(m.key)); }
   }
   return got;
 }
@@ -80,7 +83,7 @@ function placeStep(p, pin, game, region, extra) {
   const m = [claim(pin.key), ...itemsOf(p, pin)], notes = p.notes.map(tidy).filter(Boolean);
   return { listed: new Set(p.links.map(norm)), game, region, title: p.title, map: pin.map, text: placeText(p), miss: null, m, pin: pin.key, imgs: p.img ? [p.img] : [], place: notes.length ? { title: p.title, walk: [], notes, img: null } : null, src: extra ? 'map' : 'place' };
 }
-for (const [slug, p] of Object.entries(PLACES)) { p.slug = slug; p.links ||= []; }
+for (const [slug, p] of Object.entries(PLACES)) { if (/ wiki$/i.test(p.title) || /^elden ring$/i.test(p.title)) { delete PLACES[slug]; continue; } p.slug = slug; p.links ||= []; }   // the wiki's home page is not a place
 
 // places that a section is named after belong to that section, wherever else they are mentioned first
 const reserved = new Set(), exact = new Map();   // exact: place -> the section whose title is exactly that place
@@ -91,9 +94,11 @@ for (const file of ['walkthrough-base.json', 'walkthrough-dlc.json']) for (const
   for (const p of Object.values(PLACES)) { if (p.title.length > 4 && words.includes(p.title.toLowerCase())) reserved.add(p.slug); if (norm(p.title) === norm(nice) && !exact.has(p.slug)) exact.set(p.slug, clean(s.title)); }
 }
 
+const placeByTitle = new Map(Object.values(PLACES).map(p => [norm(p.title), p]));
 let region = 'Limgrave';
 for (const [game, file] of [['base', 'walkthrough-base.json'], ['dlc', 'walkthrough-dlc.json']]) {
-  let speedrun = false, blockStart = null;
+  let speedrun = false, blockStart = null, pending = null;   // pending: an area's introduction, waiting for the first step of that area
+  const flush = () => { const last = steps[steps.length - 1]; if (pending && last && last.game === game) { last.text.push(...pending.text); last.imgs.push(...pending.imgs); } pending = null; };
   for (const s of readJson(`data/${file}`, [])) {
     const title = clean(s.title), words = title.toLowerCase();
     const h = title.match(HEADER); if (h) region = h[1].replace(/^Things you Should do in /i, '').replace(/\s*Walkthrough$/i, '').trim();
@@ -121,7 +126,7 @@ for (const [game, file] of [['base', 'walkthrough-base.json'], ['dlc', 'walkthro
     // (a place that has a section of its very own is kept for that section: "The Student of Raya Lucaria Academy" is not the Academy)
     const mayOwn = p => !usedPlace.has(p.slug) && (!exact.has(p.slug) || exact.get(p.slug) === title);
     const inTitle = Object.values(PLACES).filter(p => mayOwn(p) && p.title.length > 4 && words.includes(p.title.toLowerCase())).sort((a, b) => b.title.length - a.title.length)[0];
-    const primary = (cand.find(c => norm(c.p.title) === norm(niceTitle)) || cand.find(c => c.named && mayOwn(c.p)) || {}).p || inTitle || null;
+    const primary = (cand.find(c => norm(c.p.title) === norm(niceTitle)) || cand.find(c => mayOwn(c.p) && sameTitle(norm(c.p.title), norm(niceTitle))) || cand.find(c => c.named && mayOwn(c.p)) || {}).p || inTitle || null;
     const subs = [];
 
     // what the section itself names: one marker per name, the one nearest to where the section happens
@@ -133,16 +138,19 @@ for (const [game, file] of [['base', 'walkthrough-base.json'], ['dlc', 'walkthro
     let mine = [], map = null, pin = null;
     const ppin = primary ? pinOf(primary, game) : null;
     if (free.length || ppin) {
-      const count = {}; free.flat().forEach(x => count[x.map] = (count[x.map] || 0) + 1);
+      const solidNames = hits.map(a => a.filter(x => x.kind !== 'x')).filter(a => a.length), count = {};
+      for (const a of (solidNames.length ? solidNames : hits)) for (const mp of new Set(a.map(x => x.map))) count[mp] = (count[mp] || 0) + 1;
       // stay on the map the walkthrough is on, unless this section clearly is about another one (rooms of a dungeon
       // share names with places on other maps)
       const top = Object.entries(count).sort((a, b) => b[1] - a[1])[0], prevWalk = [...steps].reverse().find(st => st.game === game && st.src === 'walk');
-      map = ppin ? ppin.map : (prevWalk && count[prevWalk.map] && top[1] < 3 * count[prevWalk.map]) ? prevWalk.map : top[0];
+      map = ppin ? ppin.map : (/(underground)/i.test(title) && count.underground) ? 'underground' : (prevWalk && count[prevWalk.map] && top[1] < 3 * count[prevWalk.map]) ? prevWalk.map : top[0];
       // names that exist in several spots: the walkthrough carries on from where the last step was, so take the nearest
       const last = [...steps].reverse().find(st => st.map === map && st.src === 'walk'), L = last ? all.get(last.pin) : null;
       const pick = a => { const c = a.filter(x => x.map === map); return c.length < 2 || !L ? c[0] : c.sort((p, q) => dist(p, L) - dist(q, L))[0]; };
-      const picked = free.map(pick).filter(Boolean), solid = picked.filter(p => p.kind !== 'x'), pool = solid.length ? solid : picked;   // materials grow everywhere: they do not say where a section happens
+      const picked = hits.map(pick).filter(Boolean), solid = picked.filter(p => p.kind !== 'x'), pool = solid.length ? solid : picked;   // materials grow everywhere: they do not say where a section happens
       const A = ppin ? { x: ppin.x, y: ppin.y } : { x: med(pool.map(p => p.x)), y: med(pool.map(p => p.y)) };
+      // a section that stays in one spot only takes what is around that spot; one that roams takes more
+      const spread = pool.length ? med(pool.map(p => dist(p, A))) : 0, lim = Math.min(0.12, Math.max(0.03, 2.5 * spread));
       // other places this section sends you to get their own step, but only when they are actually around here
       // (a place that is merely mentioned, or that a later section is named after, waits for its turn)
       for (const c of cand) {
@@ -151,21 +159,38 @@ for (const [game, file] of [['base', 'walkthrough-base.json'], ['dlc', 'walkthro
       }
       const taken = new Set();   // one marker per name: a name the text repeats must not also grab its namesake further away
       for (const a of free) {
-        const c = a.filter(x => x.map === map && !claimed.has(x.key)).sort((p, q) => dist(p, A) - dist(q, A))[0];
-        if (c) { const nm = norm(bare(c.title)); if (taken.has(nm)) continue; taken.add(nm); }
-        if (!c || dist(c, A) > (c.kind === 'x' ? 0.02 : ppin ? 0.045 : 0.12)) continue;      // a far-away namesake is not this place (a section about one place stays at that place)
-        mine.push(claim(c.key));
+        const near = a.filter(x => x.map === map && !claimed.has(x.key)).sort((p, q) => dist(p, A) - dist(q, A));
+        for (const c of [near.find(x => x.kind !== 'p'), near.find(x => x.kind === 'p')]) {
+          if (!c) continue; const nm = norm(bare(c.title)) + (c.kind === 'p' ? '|p' : ''); if (taken.has(nm)) continue; taken.add(nm);
+          if (dist(c, A) > (c.kind === 'x' ? 0.02 : ppin ? 0.045 : lim)) continue;      // a far-away namesake is not this place (a section about one place stays at that place)
+          trace(c, 'the section names it', { title }); mine.push(claim(c.key));
+        }
       }
       // places the text only mentions in passing sit far from where the step happens: give them back
       const named = k => { const n = bare(all.get(k).title).toLowerCase(); return n.length > 4 && words.includes(n); };
       const core = mine.map(k => all.get(k)).filter(p => p.kind !== 'p'), ref = core.length ? core : mine.map(k => all.get(k));
       const C = ppin ? A : ref.length ? { x: med(ref.map(p => p.x)), y: med(ref.map(p => p.y)) } : A;
       for (let i = mine.length - 1; i >= 0; i--) { const p = all.get(mine[i]); if (p.kind === 'p' && !named(mine[i]) && dist(p, C) > 0.02) { claimed.delete(mine[i]); mine.splice(i, 1); } }
-      if (ppin) { mine = [claim(ppin.key), ...mine.filter(k => k !== ppin.key), ...itemsOf(primary, ppin)]; pin = ppin.key; }
+      if (ppin) { mine = [claim(ppin.key), ...mine.filter(k => k !== ppin.key)]; pin = ppin.key; }
       else if (mine.length) pin = mine.find(named) || [...mine].sort((a, b) => dist(all.get(a), C) - dist(all.get(b), C))[0];
     }
     if (primary) usedPlace.add(primary.slug);
-    if (!ppin && mine.length && mine.every(k => all.get(k).kind === 'x')) { mine.forEach(k => claimed.delete(k)); mine = []; }   // only materials named: no place of its own
+    const before = steps[steps.length - 1];
+    if (!ppin && mine.length && !mine.some(k => all.get(k).kind === 'g')) {
+      // a place that has a page of its own is not this section's to take: it gets its own step
+      for (let i = mine.length - 1; i >= 0; i--) { const p = all.get(mine[i]); if (p.cat === 'Locations' && placeByTitle.has(norm(bare(p.title)))) { claimed.delete(mine[i]); mine.splice(i, 1); } }
+      if (mine.length && !mine.includes(pin)) pin = mine.find(k => all.get(k).kind === 'p') || mine[0];
+    }
+    if (!ppin && mine.length && !mine.some(k => all.get(k).kind === 'g')) {
+      // nothing to collect or fight here: the text goes with the step before it, unless it happens somewhere else
+      const onlyMat = mine.every(k => all.get(k).kind === 'x'), sameGame = before && before.game === game, sameMap = sameGame && before.map === map;
+      if (onlyMat && sameGame && !sameMap) {
+        // going underground is a step of its own: pin it on a site of grace its text talks about, when there is one around
+        const txt = paras.join(' ').toLowerCase(), P0 = all.get(pin);
+        const g = [...all.values()].filter(x => x.map === map && x.cat === 'Sites of Grace' && !claimed.has(x.key) && bare(x.title).length > 6 && txt.includes(bare(x.title).toLowerCase()) && dist(x, P0) < 0.06).sort((p, q) => dist(p, P0) - dist(q, P0))[0];
+        if (g) { mine.unshift(claim(g.key)); pin = g.key; }
+      } else if (onlyMat || (sameMap && dist(all.get(pin), all.get(before.pin)) < 0.015)) { mine.forEach(k => claimed.delete(k)); mine = []; }
+    }
     if (mine.length) {
       // the place page often repeats the section's paragraphs word for word: keep only what is new
       let place = null;
@@ -175,7 +200,12 @@ for (const [game, file] of [['base', 'walkthrough-base.json'], ['dlc', 'walkthro
         const notes = primary.notes.map(tidy).filter(Boolean);
         if (walk.some(p => !p.startsWith('## ')) || notes.length || primary.img) place = { title: primary.title, walk, notes, img: primary.img };
       }
-      steps.push({ listed: primary && ppin ? new Set(primary.links.map(norm)) : null, game, region, title: niceTitle, map, text: paras, miss: null, m: mine, pin, imgs: takeImgs(game, s.title), place, src: 'walk' });
+      if (before && before.src === 'walk' && before.game === game && before.title === niceTitle && before.map === map) {
+        before.text.push(...(pending ? pending.text : []), ...paras); if (pending) before.imgs.push(...pending.imgs); pending = null; before.m.push(...mine.filter(k => !before.m.includes(k))); before.imgs.push(...takeImgs(game, s.title)); log.push(`joined with the section before it (same title): ${title}`);
+      } else { steps.push({ listed: primary && ppin ? new Set(primary.links.map(norm)) : null, own: primary && ppin ? { p: primary, pin: ppin } : null, header: !!h || /walkthrough$/i.test(title), game, region, title: niceTitle, map, text: pending ? [...pending.text, '## ' + niceTitle, ...paras] : paras, miss: null, m: mine, pin, imgs: [...(pending ? pending.imgs : []), ...takeImgs(game, s.title)], place, src: 'walk' }); pending = null; }
+    } else if (paras.length && (pending || h)) {
+      // the introduction of a new area belongs to the first step in that area, not to the last step of the area before
+      pending ||= { text: [], imgs: [] }; pending.text.push('## ' + niceTitle, ...paras); if (primary) pending.text.push(...placeText(primary), ...primary.notes.map(tidy).filter(Boolean)); pending.imgs.push(...takeImgs(game, s.title)); log.push(`kept for the next step: ${title}`);
     } else if (paras.length && steps.length && steps[steps.length - 1].game === game) {
       // nothing to pin on the map: keep the text with the step it follows
       const prev = steps[steps.length - 1]; prev.text.push('## ' + niceTitle, ...paras); if (primary) prev.text.push(...placeText(primary), ...primary.notes.map(tidy).filter(Boolean)); prev.imgs.push(...takeImgs(game, s.title)); log.push(`folded into "${prev.title}": ${title}`);
@@ -183,8 +213,10 @@ for (const [game, file] of [['base', 'walkthrough-base.json'], ['dlc', 'walkthro
     steps.push(...subs);
     if (blockStart) blockStart.steps = steps.slice(blockStart.at);
   }
+  flush();
 }
 
+for (const st of steps) if (st.own) st.m.push(...itemsOf(st.own.p, st.own.pin));
 const pinXY = st => all.get(st.pin);
 // ---- a section that seems to leave the area and come straight back was pinned on a namesake somewhere else ----
 // (rooms of one dungeon: "Courtyard", "Guest Hall", "Underground Crypt"...). It is a continuation of the step before
@@ -204,7 +236,6 @@ for (let i = 1; i < steps.length; i++) {
 // ---- places the walkthrough never mentions: after the nearest step on the same map ----
 const extras = [];
 const isPin = new Set(steps.map(s => s.pin));
-const placeByTitle = new Map(Object.values(PLACES).map(p => [norm(p.title), p]));
 for (const mk of all.values()) {
   if (mk.cat !== 'Locations' || isPin.has(mk.key)) continue;
   const p = PLACES[slugOf('/' + encodeURIComponent(bare(mk.title)))] || placeByTitle.get(norm(bare(mk.title))); if (!p || usedPlace.has(p.slug) || !p.walk.length) continue;
@@ -220,7 +251,10 @@ for (const [after, st] of extras) { let at = steps.indexOf(after) + 1; while (at
 // ---- every remaining marker goes to the step that has something closest to it ----
 // ---- the same paragraph is shown once: a place page often repeats what the walkthrough section already said ----
 const pkey = t => t.toLowerCase().replace(/[^a-z0-9]/g, '').slice(0, 60), shown = new Map();
-for (let i = 0; i < steps.length; i++) {
+// What a place's own page says stays with the place (its markers are there); the walkthrough section that sent you
+// there keeps the rest. So places are looked at first.
+for (const isPlace of [true, false]) for (let i = 0; i < steps.length; i++) {
+  if ((steps[i].src !== 'walk') !== isPlace) continue;
   const st = steps[i], firstHome = st.text.map(p => p.length > 60 ? shown.get(pkey(p)) : undefined).find(x => x !== undefined);
   st.text = st.text.filter(p => p.startsWith('## ') || p.length <= 60 || !shown.has(pkey(p)));
   st.text = st.text.filter((p, j) => !(p.startsWith('## ') && (st.text[j + 1] || '## ').startsWith('## ')));
@@ -258,35 +292,62 @@ for (const L of lists) {
     trace(mk, 'area list ' + L.title, steps[best]); (steps[best].n ||= []).push(mk.key); owner.set(mk.key, steps[best]); attached++; byList++;
   }
 }
+// "Nomadic Warrior's Cookbook [7]" is one particular book: a numbered thing is only named when its number is
+const numbered = t => { const m = t.replace(/[‘’]/g, "'").match(/^(.*\S)\s*[\[(](\d+)[\])]\s*$/); return m ? [m[1].toLowerCase(), m[2]] : null; };
+const nameOf = mk => { const q = numbered(mk.title); return q ? `${q[0]} [${q[1]}]` : bare(mk.title).toLowerCase(); };
+const says = (txt, mk) => { const q = numbered(mk.title); if (q) return txt.includes(`${q[0]} [${q[1]}]`) || txt.includes(`${q[0]} (${q[1]})`); const nm = bare(mk.title).toLowerCase(); return nm.length >= 5 && txt.includes(nm); };
 const lower = steps.map(st => [...st.text, ...(st.place ? [...st.place.walk, ...st.place.notes] : [])].join(' ').toLowerCase().replace(/[‘’]/g, "'"));
+// a name many markers share ("Golden Seed", "Scadutree Fragment", "Larval Tear"): the text of a step only means the one right there
+const nameCount = new Map(); for (const mk of all.values()) if (mk.kind === 'g') { const n = nameOf(mk); nameCount.set(n, (nameCount.get(n) || 0) + 1); }
+const reach = nm => nameCount.get(nm) >= 3 ? 0.03 : 0.08;
 for (const mk of all.values()) {
   if (owner.has(mk.key)) continue;
-  const nm = bare(mk.title).toLowerCase(); let best = -1, bd = 9, tbest = -1, td = 9;
+  const nm = nameOf(mk); let best = -1, bd = 9, tbest = -1, td = 9;
   for (let i = 0; i < steps.length; i++) {
     if (steps[i].map !== mk.map) continue; let d = 9; for (const p of pts[i]) d = Math.min(d, dist(p, mk));
     if (d < bd) { bd = d; best = i; }
-    if (mk.kind === 'g' && nm.length >= 5 && d < 0.08 && d < td && lower[i].includes(nm)) { td = d; tbest = i; }
+    if (mk.kind === 'g' && d < reach(nm) && d < td && says(lower[i], mk)) { td = d; tbest = i; }
   }
   if (best < 0) { orphan++; continue; }
   if (tbest >= 0 && tbest !== best) byText++;
   trace(mk, tbest >= 0 ? 'text names it' : 'nearest ' + bd.toFixed(4), steps[tbest >= 0 ? tbest : best]); (steps[tbest >= 0 ? tbest : best].n ||= []).push(mk.key); attached++;
 }
 
-// ---- lists follow the text: an objective sits in the step whose text names it, when that step is close by ----
+// ---- lists follow the text ----
+// An objective sits, in this order of preference:
+//   1. in the step whose TITLE names it ("Optional Field Boss: Tree Sentinel", "SCADUTREE AVATAR")
+//   2. in the step whose text names it; when several do, the one that happens closest to it (a dungeon's overview
+//      names its bosses, but the part of the dungeon where the boss is fought is where it belongs)
+//   3. in the step of the place whose own page lists it
+//   4. in the nearest step
 let moved = 0;
 {
-  const P = steps.map(st => [...st.m, ...(st.n || [])].map(k => all.get(k))), home = new Map();
-  steps.forEach((st, i) => [...st.m, ...(st.n || [])].forEach(k => home.set(k, i)));
+  const home = new Map(); steps.forEach((st, i) => [...st.m, ...(st.n || [])].forEach(k => home.set(k, i)));
+  const D = (j, mk) => dist(all.get(steps[j].pin), mk);                     // how far from where the step happens
+  const B = (j, mk) => { let d = 9; for (const p of pts[j]) if (p !== mk) d = Math.min(d, dist(p, mk)); return d; };   // ... or from anything the step named there
+  const sakes = new Map(); for (const mk of all.values()) if (mk.kind === 'g') { const n = nameOf(mk); if (!sakes.has(n)) sakes.set(n, []); sakes.get(n).push(mk); }
+  // a title means one thing: of several markers with that name, the one nearest to the step
+  const meant = (j, mk, nm) => { const P = all.get(steps[j].pin), d = dist(P, mk); return !sakes.get(nm).some(o => o !== mk && o.map === mk.map && dist(P, o) < d); };
+  const titles = steps.map(st => st.title.toLowerCase().replace(/[‘’]/g, "'"));
   for (const [k, i] of home) {
     const mk = all.get(k); if (mk.kind !== 'g' || steps[i].pin === k) continue;
-    const nm = bare(mk.title).toLowerCase(); if (nm.length < 5 || lower[i].includes(nm)) continue;
-    let best = -1, bd = 0.08;
-    for (let j = 0; j < steps.length; j++) { if (j === i || steps[j].map !== mk.map || !lower[j].includes(nm)) continue; let d = 9; for (const p of P[j]) d = Math.min(d, dist(p, mk)); if (d < bd) { bd = d; best = j; } }
-    // no text names it nearby: then the place whose own page lists it, when the marker sits at that place
-    if (best < 0 && !(steps[i].listed && steps[i].listed.has(nm))) { let ld = 0.025; for (let j = 0; j < steps.length; j++) { const st = steps[j]; if (j === i || st.map !== mk.map || !st.listed || !st.listed.has(nm)) continue; const d = dist(all.get(st.pin), mk); if (d < ld) { ld = d; best = j; } } }
+    const nm = nameOf(mk);
+    const generic = nameCount.get(nm) >= 3, r = reach(nm), di = D(i, mk);
+    if (says(titles[i], mk) && di < 0.1 && meant(i, mk, nm)) continue;
+    let best = -1, why = '';
+    // 1. a title
+    { let bd = 0.1; for (let j = 0; j < steps.length; j++) { if (j === i || steps[j].map !== mk.map || !says(titles[j], mk) || !meant(j, mk, nm)) continue; const d = D(j, mk); if (d < bd) { bd = d; best = j; why = 'a step title names it'; } } }
+    const namedHere = says(lower[i], mk) && di < r && meant(i, mk, nm), weak = !!steps[i].header;   // an area's overview names what its parts then cover
+    // 2. the text
+    const strong = namedHere && !weak && (steps[i].src !== 'walk' || !!steps[i].own);   // a place whose own page talks about it keeps it
+    if (best < 0 && !strong) { let bd = namedHere && !weak ? Math.min(r, di * 0.5) : r; for (let j = 0; j < steps.length; j++) { if (j === i || steps[j].map !== mk.map || !says(lower[j], mk) || (namedHere && weak && (steps[j].region !== steps[i].region || steps[j].header))) continue; const d = B(j, mk); if (namedHere && !meant(j, mk, nm) && d >= 0.03) continue; if (d < bd) { bd = d; best = j; why = 'text of a closer step names it'; } } }
+    // 3. the place's own list
+    if (best < 0 && !namedHere && !(steps[i].listed && steps[i].listed.has(nm) && di < 0.03)) { let ld = 0.025; for (let j = 0; j < steps.length; j++) { const st = steps[j]; if (j === i || st.map !== mk.map || !st.listed || !st.listed.has(nm)) continue; const d = dist(all.get(st.pin), mk); if (d < ld) { ld = d; best = j; why = 'the place page lists it'; } } }
+    // 4. nobody talks about it here: the nearest step
+    if (best < 0 && !namedHere && !(steps[i].listed && steps[i].listed.has(nm) && di < 0.03)) { let bd = di * 0.5; for (let j = 0; j < steps.length; j++) { if (j === i || steps[j].map !== mk.map) continue; const d = D(j, mk); if (d < bd) { bd = d; best = j; why = 'nearest step'; } } }
     if (best < 0) continue;
     steps[i].m = steps[i].m.filter(x => x !== k); if (steps[i].n) steps[i].n = steps[i].n.filter(x => x !== k);
-    trace(mk, 'moved (text or place list)', steps[best]); (steps[best].n ||= []).push(k); moved++;
+    trace(mk, 'moved: ' + why, steps[best]); (steps[best].n ||= []).push(k); moved++;
   }
 }
 

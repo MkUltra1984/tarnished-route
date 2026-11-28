@@ -130,3 +130,24 @@ Open, in the owner's words or mine:
 - Found and fixed with this: Stormveil Castle items had been landing in 'The Chapel of Anticipation' and 'Where is Boc?'. Similar faults may remain elsewhere; sample with the scratch script logic (objectives not named in their step's text, with their wiki description) before trusting a region.
 - Check now: 356 steps; A/B/C pass; 1395 objectives named in their own step's text, 138 more in their place's item list, 112 named only in another step's text, 380 not named in route text under their map name.
 
+
+## UPDATE 10 — route rules reworked (coherence round 2)
+
+Faults found by going through the objectives whose text sits in another step, and fixed in `tools/build-route.mjs`:
+- "Explore Siofra River" and "Investigate Ainsel River" were folded into surface steps. A section's map is now decided by the
+  non-material things it names (or "(Underground)" in its title); going underground is always its own step.
+- A link to the wiki home page was taken as the "place" of the Stormveil overview, so Stormveil never got its dungeon page.
+- Where a section happens is decided by everything it names, not only by what earlier steps left unclaimed.
+- A place's item list is applied after every section has taken what its text names. An area's overview is a weak owner:
+  what a later part of the same area names goes to that part. A step whose title names a thing gets it.
+- Names shared by many markers (Golden Seed, Scadutree Fragment) only count within 0.03; numbered things
+  ("Cookbook [7]") only match with their number. A name can be both a grace and its boss.
+- A place's own page text stays with the place (dedupe looks at place steps first). Area introductions go to the first
+  step of their area, not the last step of the previous one. Wiki page footer ("Follow us on socials") dropped.
+- `TRACE="<marker title>" node tools/build-route.mjs` prints which rule placed a marker.
+
+Check now (369 steps): A/B/C pass. D: 1324 objectives named in their own step's text, 181 in their place's item list,
+144 named only in another step's text (mostly far-away mentions and multi-location characters), 376 the walkthrough
+text never names (they sit in the nearest step; the app shows the map's own note for them).
+Still open: read-through of the order for playability; "Malenia, Blade of Miquella" merged into the Elphael place step;
+the 144/376 have not been checked one by one.
