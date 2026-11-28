@@ -234,7 +234,7 @@ Not done: nobody has started the game with it yet. The Gauntlet tab in the app s
 - Dungeon steps hold only what is inside (`tools/boss-drops.mjs`, second block; list in data/outside-moves.txt).
   "check the page here" sentences are removed there too. Step 1's starting-class sentence is replaced in build-route.mjs.
 - Cards: `tools/fetch-cards.mjs` saves the wiki page of every boss and collectible (raw/cards, cached) and writes
-  app/data/cards.json + app/cards/ pictures. 1717 of 1824 markers have a card; 107 do not (mostly numbered cookbooks /
+  app/data/cards.json + app/cards/ pictures. 1822 of 1824 markers have a card (page names are resolved through the wiki index pages saved in raw/index; the two left are empty wiki stubs). Earlier note: (mostly numbered cookbooks /
   bell bearings whose page name differs). Tapping a row in Bosses / Collection, or "Picture and details" under an
   objective in a step, opens the card.
 - Phone layout: app is `position:fixed; inset:0` and no longer uses viewport-fit=cover (Android Chrome hid the tab labels

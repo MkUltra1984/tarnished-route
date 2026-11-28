@@ -18,6 +18,10 @@ fs.mkdirSync('app/cards', { recursive: true });
 const MK = JSON.parse(fs.readFileSync('app/data/markers.json', 'utf8'));
 const plain = t => t.replace(/<[^>]+>/g, ' ').replace(/[‘’]/g, "'").replace(/\s+/g, ' ').trim();
 const strip = t => { let p; do { p = t; t = t.replace(/\s*\([^)]*\)\s*$/, '').replace(/\s+-\s+.*$/, '').replace(/\s+[A-Z]$/, '').replace(/\s*-?\s*\d+x\b.*$/, '').trim(); } while (t !== p); return t; };
+// raw/index/*.html: the wiki's list pages (Cookbooks, Bell Bearings, Bosses ...), saved by hand; every link text -> its page
+const norm = x => x.toLowerCase().replace(/[^a-z0-9]/g, ''), ALIAS = new Map();
+if (fs.existsSync('raw/index')) for (const f of fs.readdirSync('raw/index')) { const $ = cheerio.load(fs.readFileSync('raw/index/' + f, 'utf8'));
+  $('#mw-content-text a[href^="/"]').each((_, a) => { const t = $(a).text().replace(/\s+/g, ' ').trim(), h = $(a).attr('href').split('#')[0]; if (t.length > 2 && !h.includes(':') && !ALIAS.has(norm(t))) ALIAS.set(norm(t), h); }); }
 // page names to try for a marker, most likely first
 const names = t => {
   const b = strip(plain(t)), out = [b];
@@ -25,6 +29,16 @@ const names = t => {
   if (plain(t) !== b) out.push(plain(t));
   // other spellings the wiki uses for the same page: without the "[3]", "the" in lower case, every word capitalised
   for (const x of [...out]) { out.push(x.replace(/\s*\[\d+\]$/, ''), x.replace(/, The /g, ', the '), x.replace(/\b[a-z]/g, c => c.toUpperCase()).replace(/\b(Of|The|And|In)\b/g, w => w.toLowerCase()).replace(/^./, c => c.toUpperCase())); }
+  // the name without its place ("Imp Head (Lion) - Scorpion River Catacombs"), without a count ("Golden Vow x3"),
+  // with the wiki's round brackets ("Cookbook (23)"), and a few kinds of thing the wiki files under another page
+  const p = plain(t); out.push(p.replace(/\s+-\s+.*$/, ''), p.split(':')[0]);
+  for (const x of [...out]) out.push(x.replace(/\s+x\d+$/, ''), x.replace(/\[(\d+)\]/, '($1)'), x.replace(/ Solution$/, ''), x.replace(/ Altar$/, ''), x.replace(/^"([^"]+)" Painting$/, '$1 Painting'));
+  // the wiki's own index pages know the exact page of most names
+  for (const x of [...out]) { const h = ALIAS.get(norm(x)); if (h) out.unshift(decodeURIComponent(h.slice(1)).replace(/_/g, ' ')); }
+  if (/gesture/i.test(p) || ['Inner Order', 'May the Best Win', 'Let Us Go Together'].some(g => p.startsWith(g))) out.push('Gestures');
+  if (/Turtle Marker/.test(p)) out.push("Chelona's Rise");
+  if (p === 'Ghost Troll') out.push('Troll');
+  for (const x of [...out]) if (x.includes('"')) out.push(x.replace(/"/g, ''));
   return [...new Set(out)].filter(x => x.length > 2);
 };
 const want = MK.list.filter(m => MK.cats[m[3]].kind === 'g' && !['NPCs', 'NPC Invaders'].includes(m[3]));
@@ -32,7 +46,7 @@ const by = {}, pages = {};
 let fetched = 0, none = 0, pics = 0;
 
 async function page(name) {
-  const f = `raw/cards/${slugOf(name)}.html`, gone = f.replace('.html', '.missing');
+  const f = `raw/cards/${slugOf(name)}.html`, gone = `raw/cards/${slugOf(name)}.${Buffer.from(name).toString('hex').slice(-16)}.missing`;   // the wiki's names are case-sensitive, the cache file is not
   if (fs.existsSync(f)) return fs.readFileSync(f, 'utf8');
   if (fs.existsSync(gone)) return null;
   for (let tries = 0; tries < 3; tries++) {
@@ -67,7 +81,8 @@ function parse(html, boss) {
   const out = { title: clean($('h1').first().text()).replace(/\s*\|.*$/, ''), boss: boss ? 1 : 0, facts: [], intro: [], where: [], strat: [] };
   const bad = s => !s || !/fextralifeimages\.com\/file\//.test(s) || /(^|[^0-9])\d{2}px|[-_]\d{2}\.(png|webp|jpe?g)$|icon|status_effect|currency|runes|banner|logo|damage|upgrades/i.test(decodeURIComponent(s.split('/').pop()));
   const imgs = (boss && $('.infobox').length ? $('.infobox').first() : root).find('img').map((_, e) => $(e).attr('src') || $(e).attr('data-src') || '').get();
-  out.src = imgs.find(s => !bad(s)) || null;
+  const big = s => /fextralifeimages\.com\/file\//.test(s) && /(^|[^0-9])(1[5-9]\d|[2-9]\d\d)px/.test(decodeURIComponent(s.split('/').pop())) && !/\d\dpx_\d\dpx/.test(s);   // "..._200px.png" is the page's main picture, whatever else its name says
+  out.src = (boss ? null : imgs.find(big)) || imgs.find(s => !bad(s)) || (boss ? root.find('img').map((_, e) => $(e).attr('src') || $(e).attr('data-src') || '').get().find(s => !bad(s)) : null) || null;
   let mode = null; const seen = new Set();
   const push = (arr, t, cap, max = 420) => { if (t.length > 2 && arr.length < cap && !arr.includes(t)) arr.push(t.length > max ? t.slice(0, max).replace(/\s+\S*$/, '') + ' ...' : t); };
   root.find('h2,h3,h4,p,li').each((_, el) => {
@@ -93,6 +108,8 @@ function parse(html, boss) {
     else if (mode === 'where') push(out.where, t, 6);
     else if (mode === 'effect') push(out.intro, t, 4);
   });
+  // a page written differently from the rest: its first real paragraph is still better than no card
+  if (!out.src && !out.intro.length && !out.where.length && !out.facts.length && !out.strat.length) root.find('p').each((_, el) => { const t = clean($(el).text()); if (t.length > 60 && !$(el).parents('table').length) push(out.intro, t, 2, 600); });
   return out;
 }
 
