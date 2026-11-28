@@ -128,7 +128,7 @@
       ${c.intro.length ? c.intro.map(p => `<p>${esc(p)}</p>`).join('') : ''}
       ${c.boss ? sec('Key facts', c.facts) + drops + sec('Strategy', c.strat) : sec('Where to find', c.where)}
       <div class="seg cbtn"><button class="btn" id="cmap">Show on map</button><button class="btn${S.got[m.i] ? ' on' : ''}" id="ctick">${S.got[m.i] ? '&#10003; ' : ''}${c.boss ? 'Defeated' : 'Collected'}</button></div>
-      <p class="credit">Picture and text from the <a href="https://eldenring.wiki.fextralife.com/${encodeURIComponent(CARDS.by[m.title]).replace(/%20/g, '+')}" target="_blank" rel="noopener">Fextralife Elden Ring Wiki</a>.</p></div>`;
+      <p class="credit">Picture and text from the <a href="https://eldenring.wiki.fextralife.com/${encodeURIComponent(c.list || CARDS.by[m.title]).replace(/%20/g, '+')}" target="_blank" rel="noopener">Fextralife Elden Ring Wiki</a>.</p></div>`;
     const close = () => { sh.hidden = true; sh.innerHTML = ''; sh.onclick = null; };
     sh.onclick = e => { if (e.target === sh) close(); }; $('.cx', sh).onclick = close; $('#cmap').onclick = () => { close(); showSpot(m, true); };
     $('#ctick').onclick = () => { const t = dropOf.has(m.i) ? dropOf.get(m.i) : m.i; if (S.got[t]) delete S.got[t]; else S.got[t] = 1; settle(t); save(); close(); render(); };
